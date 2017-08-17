@@ -1,0 +1,37 @@
+.jp-RegulusPanel-toolbar {
+  padding: 2px;
+  height: 28px;
+  box-shadow: var(--jp-toolbar-box-shadow);
+  background: var(--jp-toolbar-background);
+  z-index: 1;
+}
+
+
+/* Top-level toolbar item */
+.jp-Toolbar-item.jp-Regulus-toolbarCellType  {
+}
+
+
+/* select wrapper */
+.jp-Toolbar-item.jp-Regulus-toolbarCellType > .jp-select-wrapper {
+  height: 100%;
+  background-color: var(--jp-Regulus-select-background-color);
+}
+
+
+.jp-Toolbar-item.jp-Regulus-toolbarCellType .jp-select-wrapper.jp-mod-focused {
+  border: none;
+  box-shadow: none;
+}
+
+
+/* Actual select element */
+.jp-Regulus-toolbarCellType select.jp-Regulus-toolbarCellTypeDropdown {
+  font-size: var(--jp-ui-font-size1);
+  background-size: 16px;
+  padding-right: 16px;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  background-color: transparent;
+}
