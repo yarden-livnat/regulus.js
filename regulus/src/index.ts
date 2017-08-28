@@ -1,4 +1,5 @@
-import '../style.index.css';
+import '../style/index.css';
 
 export * from './panel';
-export * from './regulus';
+export * from './widget';
+export * from './tracker';

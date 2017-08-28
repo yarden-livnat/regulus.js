@@ -1,4 +1,8 @@
 import {
+  Panel, PanelLayout, Widget
+} from '@phosphor/widgets';
+
+import {
   IClientSession
 } from '@jupyterlab/apputils';
 
@@ -10,42 +14,30 @@ import {
   Message
 } from '@phosphor/messaging';
 
-// import {
-//   ISignal, Signal
-// } from '@phosphor/signaling';
-
-import {
-  Widget
-} from '@phosphor/widgets';
-
-
 const REGULUS_CLASS = 'jp-Regulus';
-
+const CONTENT_CLASS = 'jp-Regulus-content';
 
 export
 class Regulus extends Widget {
   constructor(options: Regulus.IOptions) {
     super();
     this.addClass(REGULUS_CLASS);
-    console.log('Regulus')
+    console.log('Regulus widget');
 
-    let contentFactory = this.contentFactory = (
+    this.contentFactory = (
       options.contentFactory || Regulus.defaultContentFactory
-    );
-    let modelFactory = this.modelFactory = (
-      options.modelFactory || Regulus.defaultModelFactory
     );
 
     this.session = options.session;
+    this._content = new Panel();
+    this._content.addClass(CONTENT_CLASS);
+
+    let layout = this.layout = new PanelLayout();
+    layout.addWidget(this._content);
 
     this._onKernelChanged();
     this.session.kernelChanged.connect(this._onKernelChanged, this);
   }
-
-  readonly contentFactory: Regulus.IContentFactory;
-  readonly modelFactory: Regulus.IModelFactory;
-
-  readonly session: IClientSession;
 
   dispose() {
     // Do nothing if already disposed.
@@ -55,14 +47,25 @@ class Regulus extends Widget {
     super.dispose();
   }
 
+  readonly contentFactory: Regulus.IContentFactory;
+  readonly session: IClientSession;
+
+  private _content: Panel;
+
   protected onAfterAttach(msg: Message): void {
+    console.log("widget: onAfterAttach:", msg);
   }
 
   protected onBeforeDetach(msg: Message): void {
+    console.log("widget: onBeforeDetach:", msg);
   }
 
-  protected onActivateRequest(msg: Message): void {
-    this.update();
+  protected onActivateMessage(msg: Message): void {
+    console.log("widget: onActivateMessage:", msg);
+  }
+
+  protected onUpdateRequest(msg: Message): void {
+    console.log("widget: onUpdateRequest:", msg);
   }
 
   private _onKernelChanged(): void {
@@ -74,7 +77,7 @@ class Regulus extends Widget {
       if (this.isDisposed || !kernel || !kernel.info) {
         return;
       }
-      // this._handleInfo(kernel.info);
+      console.log('kernel changed:', kernel.info);
     });
   }
 }
@@ -85,7 +88,6 @@ namespace Regulus {
   export
   interface IOptions {
     contentFactory: IContentFactory;
-    modelFactory?: IModelFactory;
     session: IClientSession;
   }
 
@@ -94,33 +96,18 @@ namespace Regulus {
 
   export
   class ContentFactory implements IContentFactory {
+    constructor(options: ContentFactory.IOptions = {}) {
+    }
   }
-
 
   export
   namespace ContentFactory {
-
     export
     interface IOptions {}
   }
 
   export
   const defaultContentFactory: IContentFactory = new ContentFactory();
-
-  export
-  interface IModelFactory {
-  }
-
-  export
-  class ModelFactory {
-    constractor(options: IModelFactoryOptions = {}) {}
-  }
-
-  export
-    interface IModelFactoryOptions {}
-
-  export
-  const defaultModelFactory = new ModelFactory();
 }
 
-namespace Private {}
+// namespace Private {}

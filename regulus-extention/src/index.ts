@@ -3,25 +3,20 @@ import {
 } from '@jupyterlab/application';
 
 import {
-  Dialog, ICommandPalette, IMainMenu, InstanceTracker,
-  showDialog
+   ICommandPalette, IMainMenu, InstanceTracker
 } from '@jupyterlab/apputils';
-
-import {
-  IEditorServices
-} from '@jupyterlab/codeeditor';
 
 import {
   PageConfig
 } from '@jupyterlab/coreutils';
 
 import {
-  IRegulusTracker, RegulusPanel
-} from 'regulus';
-
-import {
   ILauncher
 } from '@jupyterlab/launcher';
+
+import {
+  Menu
+} from '@phosphor/widgets';
 
 import {
   find
@@ -32,27 +27,20 @@ import {
 } from '@phosphor/coreutils';
 
 import {
-  Menu
-} from '@phosphor/widgets';
-
+  IRegulusTracker, RegulusPanel
+} from 'regulus';
 
 namespace CommandIDs {
   export
-  const create = 'regulus:create';
+  const open = 'regulus:open';
 
   export
-  const run = 'regulus:run';
-
-  export
-  const changeKernel = 'regulus:change-kernel';
-
-  export
-  const closeAndShutdown = 'regulus:close-and-shutdown';
+  const interrupt = 'regulus:interrupt-kernel';
 };
 
 export
-const trackerPlugin:JuypterLabPlugin<IRegulusTracker> = {
-  id: 'regulus-tracker',
+const trackerPlugin: JupyterLabPlugin<IRegulusTracker> = {
+  id: 'jupyter.services.regulus-tracker',
   provides: IRegulusTracker,
   requires: [
     IMainMenu,
@@ -65,21 +53,22 @@ const trackerPlugin:JuypterLabPlugin<IRegulusTracker> = {
   autoStart: true
 };
 
+
 export
 const contentFactoryPlugin: JupyterLabPlugin<RegulusPanel.IContentFactory> = {
-  id: 'regulus-renderer',
+  id: 'jupyter.services.regulus-renderer',
   provides: RegulusPanel.IContentFactory,
-  // requires: [IEditorServices],
+  requires: [],
   autoStart: true,
   activate: (app: JupyterLab) => {
-    return new RegulusPanel.ContentFactory({});
+    return new RegulusPanel.ContentFactory();
   }
 };
 
 const plugins: JupyterLabPlugin<any>[] = [contentFactoryPlugin, trackerPlugin];
 export default plugins;
 
-function activateConsole(app: JupyterLab, mainMenu: IMainMenu, palette: ICommandPalette, contentFactory: RegulusPanel.IContentFactory,  restorer: ILayoutRestorer, launcher: ILauncher | null): IRegulusTracker {
+function activateRegulus(app: JupyterLab, mainMenu: IMainMenu, palette: ICommandPalette, contentFactory: RegulusPanel.IContentFactory, restorer: ILayoutRestorer, launcher: ILauncher | null): IRegulusTracker {
   let manager = app.serviceManager;
   let { commands, shell } = app;
   let category = 'Regulus';
@@ -88,27 +77,32 @@ function activateConsole(app: JupyterLab, mainMenu: IMainMenu, palette: ICommand
 
   const tracker = new InstanceTracker<RegulusPanel>({ namespace: 'regulus' });
 
-  // Handle state restoration.
   restorer.restore(tracker, {
     command: CommandIDs.open,
-    args: panel => ({
+    args: panel => {
+      console.log('panel', panel);
+      return {
       path: panel.regulus.session.path,
       name: panel.regulus.session.name
-    }),
-    name: panel => panel.regulus.session.path,
+    }},
+    name: panel => { console.log('name from panel', panel); return panel.regulus.session.path},
     when: manager.ready
   });
 
+  // Update the command registry when the regulus state changes.
   tracker.currentChanged.connect(() => {
+    console.log('tracker.currentChanged')
     if (tracker.size <= 1) {
       commands.notifyCommandChanged(CommandIDs.interrupt);
     }
   });
 
+  // The launcher callback.
   let callback = (cwd: string, name: string) => {
-    return createRegulus{ basePath: cwd, kernelPreference: { name } });
+    return createRegulus({basePath: cwd, kernelPreference: { name }});
   };
 
+  // Add a launcher item if the launcher is available.
   if (launcher) {
     manager.ready.then(() => {
       const specs = manager.specs;
@@ -128,7 +122,7 @@ function activateConsole(app: JupyterLab, mainMenu: IMainMenu, palette: ICommand
           displayName,
           category: 'Regulus',
           name,
-          iconClass: 'jp-RegulusIcon',
+          iconClass: 'jp-Regulus',
           callback,
           rank,
           kernelIconUrl
@@ -147,7 +141,7 @@ function activateConsole(app: JupyterLab, mainMenu: IMainMenu, palette: ICommand
         ...options
       });
 
-      // Add the console panel to the tracker.
+      // Add the regulus panel to the tracker.
       tracker.add(panel);
       shell.addToMainArea(panel);
       shell.activateById(panel.id);
@@ -159,9 +153,36 @@ function activateConsole(app: JupyterLab, mainMenu: IMainMenu, palette: ICommand
     return tracker.currentWidget !== null;
   }
 
+  function getCurrent(args: ReadonlyJSONObject): RegulusPanel | null {
+    let widget = tracker.currentWidget;
+    let activate = args['activate'] !== false;
+    if (activate && widget) {
+      shell.activateById(widget.id);
+    }
+    return widget;
+  }
+
+  command = CommandIDs.interrupt;
+  commands.addCommand(command, {
+    label: 'Interrupt Kernel',
+    execute: args => {
+      console.log('Command.interrupt');
+      let current = getCurrent(args);
+      if (!current) {
+        return;
+      }
+      let kernel = current.regulus.session.kernel;
+      if (kernel) {
+        return kernel.interrupt();
+      }
+    },
+    isEnabled: hasWidget
+  });
+
   command = CommandIDs.open;
   commands.addCommand(command, {
     execute: (args: Partial<RegulusPanel.IOptions>) => {
+      console.log('Command.open');
       let path = args['path'];
       let widget = tracker.find(value => {
         return value.regulus.session.path === path;
@@ -182,26 +203,8 @@ function activateConsole(app: JupyterLab, mainMenu: IMainMenu, palette: ICommand
     },
   });
 
-  command = CommandIDs.create;
-  commands.addCommand(command, {
-    label: 'Start Regulus',
-    execute: (args: Partial<RegulusPanel.IOptions>) => {
-      let basePath = args.basePath || '.';
-      return createRegulus({ basePath, ...args });
-    }
-  });
-  palette.addItem({ command, category });
-
-
-  // menu.addItem({ command: CommandIDs.run });
-  // menu.addItem({ type: 'separator' });
-  // menu.addItem({ command: CommandIDs.changeKernel });
-  // menu.addItem({ type: 'separator' });
-  // menu.addItem({ command: CommandIDs.closeAndShutdown });
-
+  menu.addItem({ command: CommandIDs.interrupt });
   mainMenu.addMenu(menu, {rank: 50});
-
-  // app.contextMenu.addItem({command: CommandIDs.restart, selector: '.jp-Regulus'});
 
   return tracker;
 }

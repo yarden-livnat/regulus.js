@@ -1,10 +1,14 @@
-// import {
-//   Kernel, KernelMessage
-// } from '@jupyterlab/services';
+import {
+  ClientSession, IClientSession
+} from '@jupyterlab/apputils';
 
-// import {
-//   each
-// } from '@phosphor/algorithm';
+import {
+  ServiceManager
+} from '@jupyterlab/services';
+
+import {
+  uuid
+} from '@jupyterlab/coreutils';
 
 import {
   Token
@@ -14,106 +18,75 @@ import {
   Message
 } from '@phosphor/messaging';
 
-// import {
-//   ISignal, Signal
-// } from '@phosphor/signaling';
-
 import {
-  PanelLayout, Widget
+  Panel
 } from '@phosphor/widgets';
 
-import {
-  IClientSession, ClientSession, Toolbar
-} from '@jupyterlab/apputils';
-
-import {
-  uuid
-} from '@jupyterlab/coreutils';
-
-import {
-  ServiceManager
-} from '@jupyterlab/services';
 
 import {
   Regulus
-} from './regulus'
+} from './widget'
 
 /**
  * The class name added to regulus panels.
  */
 const PANEL_CLASS = 'jp-RegulusPanel';
-const PANEL_TOOLBAR_CLASS = 'jp-RegulusPanel-toolbar';
+const ICON_CLASS = 'jp-RegulusIcon';
 
 /**
  * Regulus main panel
  */
 export
-class RegulusPanel extends Widget {
+class RegulusPanel extends Panel {
   constructor(options: RegulusPanel.IOptions) {
     super();
     this.addClass(PANEL_CLASS);
 
     let {
-      path, basePath, name, manager, modelFactory
+      path, basePath, name, manager
     } = options;
 
     let contentFactory = this.contentFactory = (
-      options.contentFactory || RegulusPanel.defaultContentFactory
-    );
+        options.contentFactory || RegulusPanel.defaultContentFactory
+      );
 
+    let count = Private.count++;
     if (!path) {
-      path = `${basePath || ''}/regulus-${uuid()}`;
+      path = `${basePath || ''}/regulus-${count}-${uuid()}`;
     }
 
     let session = this._session = new ClientSession({
       manager: manager.sessions,
       path,
-      name: name || 'Regulus',
+      name: name || `Regulus ${count}`,
       type: 'regulus',
       kernelPreference: options.kernelPreference
     });
 
     this.regulus = contentFactory.createRegulus({
-      session,
-      contentFactory,
-      modelFactory
+      session, contentFactory
     });
 
-    let layout = this.layout = new PanelLayout;
-
-    let toolbar = new Toolbar();
-    toolbar.addClass(PANEL_TOOLBAR_CLASS);
-
-    layout.addWidget(toolbar);
-    layout.addWidget(this.regulus);
+    this.addWidget(this.regulus);
 
     session.ready.then(() => {
-      this._connected = new Date();
+      console.log('session ready');
+      this._updateTitle();
     });
 
     this._manager = manager;
-    this.id = 'regulus';
+    // session.kernelChanged.connect(this._updateTitle, this);
+
+    this.title.icon = ICON_CLASS;
+    this.title.closable = true;
+    this.id = `regulus-${count}`;
   }
 
   readonly contentFactory: RegulusPanel.IContentFactory;
-
   readonly regulus: Regulus;
 
   get session(): IClientSession {
     return this._session;
-  }
-
-  protected onAfterAttach(msg: Message): void {
-    this._session.initialize();
-  }
-
-  protected onCloseRequest(msg: Message): void {
-    super.onCloseRequest(msg);
-    this.dispose();
-  }
-
-  get toolbar(): Toolbar<Widget> {
-    return (this.layout as PanelLayout).widgets[0] as Toolbar<Widget>;
   }
 
   dispose(): void {
@@ -121,8 +94,25 @@ class RegulusPanel extends Widget {
     super.dispose();
   }
 
+  protected onAfterAttach(msg: Message): void {
+    console.log('panel:onAfterAttach:', msg);
+  }
+
+  protected onActivateRequest(msg: Message): void {
+    console.log('panel:onActivateRequest:', msg);
+  }
+
+  protected onCloseRequest(msg: Message): void {
+    console.log('panel:onCloseRequest', msg);
+    super.onCloseRequest(msg);
+    this.dispose();
+  }
+
+  private _updateTitle(): void {
+    console.log('_updateTitle');
+  }
+
   private _manager: ServiceManager.IManager;
-  private _connected: Date | null = null;
   private _session: ClientSession;
 }
 
@@ -137,7 +127,6 @@ namespace RegulusPanel {
     basePath?: string;
     name?: string;
     kernelPreference?: IClientSession.IKernelPreference;
-    modelFactory?: Regulus.IModelFactory;
   }
 
   export
@@ -162,9 +151,10 @@ namespace RegulusPanel {
   const defaultContentFactory: IContentFactory = new ContentFactory();
 
   export
-  const IContentFactory = new Token<IContentFactory>('regulus.content-factory');
+  const IContentFactory = new Token<IContentFactory>('jupyter.services.regulus.content-factory');
 }
 
 namespace Private {
-
+  export
+  let count = 1;
 }
