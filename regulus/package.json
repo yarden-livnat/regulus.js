@@ -1,6 +1,6 @@
 {
   "name": "regulus",
-  "version": "0.1.0a2",
+  "version": "0.1.0a3",
   "description": "Topology based visual analysis of high-dimensional scalar fields",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
