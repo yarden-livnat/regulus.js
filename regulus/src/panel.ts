@@ -22,7 +22,6 @@ import {
   Panel
 } from '@phosphor/widgets';
 
-
 import {
   Regulus
 } from './widget'

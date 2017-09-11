@@ -1,6 +1,6 @@
 {
-  "name": "regulus-extention",
-  "version": "0.1.0a4",
+  "name": "regulus-extension",
+  "version": "0.1.0b1",
   "description": "Regulus Extension",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
