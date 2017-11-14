@@ -26,9 +26,8 @@ import {
   ReadonlyJSONObject
 } from '@phosphor/coreutils';
 
-import {
-  IRegulusTracker, RegulusPanel
-} from 'regulus';
+import { RegulusPanel } from './panel';
+import { IRegulusTracker } from './tracker';
 
 namespace CommandIDs {
   export
@@ -79,15 +78,16 @@ function activateRegulus(app: JupyterLab, mainMenu: IMainMenu, palette: ICommand
 
   restorer.restore(tracker, {
     command: CommandIDs.open,
-    args: panel => {
+    args: (panel:any) => {
       console.log('panel', panel);
       return {
-      path: panel.regulus.session.path,
-      name: panel.regulus.session.name
-    }},
-    name: panel => { console.log('name from panel', panel); return panel.regulus.session.path},
-    when: manager.ready
-  });
+        path: panel.regulus.session.path,
+        name: panel.regulus.session.name
+      }},
+      name: (panel: any) => { console.log('name from panel', panel); return panel.regulus.session.path},
+      when: manager.ready
+    }
+  );
 
   // Update the command registry when the regulus state changes.
   tracker.currentChanged.connect(() => {
@@ -165,7 +165,7 @@ function activateRegulus(app: JupyterLab, mainMenu: IMainMenu, palette: ICommand
   command = CommandIDs.interrupt;
   commands.addCommand(command, {
     label: 'Interrupt Kernel',
-    execute: args => {
+    execute: (args: any) => {
       console.log('Command.interrupt');
       let current = getCurrent(args);
       if (!current) {
@@ -191,7 +191,7 @@ function activateRegulus(app: JupyterLab, mainMenu: IMainMenu, palette: ICommand
         shell.activateById(widget.id);
       } else {
         return manager.ready.then(() => {
-          let model = find(manager.sessions.running(), item => {
+          let model = find(manager.sessions.running(), (item: any) => {
             return item.path === path;
           });
           if (model) {

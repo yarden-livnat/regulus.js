@@ -21,7 +21,7 @@ const IRegulusTracker = new Token<IRegulusTracker>('jupyter.services.regulus');
 
 
 /**
- * A class that tracks console widgets.
+ * A class that tracks regulus widgets.
  */
 export
 interface IRegulusTracker extends IInstanceTracker<RegulusPanel> {}

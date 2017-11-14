@@ -7,7 +7,7 @@ import {
 } from '@jupyterlab/services';
 
 import {
-  uuid
+  PathExt, uuid
 } from '@jupyterlab/coreutils';
 
 import {
@@ -26,11 +26,13 @@ import {
   Regulus
 } from './widget'
 
-/**
- * The class name added to regulus panels.
- */
-const PANEL_CLASS = 'jp-RegulusPanel';
-const ICON_CLASS = 'jp-RegulusIcon';
+import '../style/index.css';
+
+
+const PANEL_CLASS = 'cycle-RegulusPanel';
+const ICON_CLASS = 'cyclus-RegulusIcon';
+
+let count = 0;
 
 /**
  * Regulus main panel
@@ -45,43 +47,36 @@ class RegulusPanel extends Panel {
       path, basePath, name, manager
     } = options;
 
-    let contentFactory = this.contentFactory = (
-        options.contentFactory || RegulusPanel.defaultContentFactory
-      );
+    let n = count++;
 
-    let count = Private.count++;
     if (!path) {
-      path = `${basePath || ''}/regulus-${count}-${uuid()}`;
+      path = `${basePath || ''}/regulus-${n}-${uuid()}`;
     }
 
     let session = this._session = new ClientSession({
       manager: manager.sessions,
       path,
-      name: name || `Regulus ${count}`,
+      name: name || `Regulus ${n}`,
       type: 'regulus',
       kernelPreference: options.kernelPreference
     });
 
-    this.regulus = contentFactory.createRegulus({
-      session, contentFactory
-    });
-
+    this.regulus = new Regulus( { session, commId: options.commId });
     this.addWidget(this.regulus);
 
     session.ready.then(() => {
-      console.log('session ready');
       this._updateTitle();
     });
 
     this._manager = manager;
-    // session.kernelChanged.connect(this._updateTitle, this);
+    session.kernelChanged.connect(this._updateTitle, this);
+    session.propertyChanged.connect(this._updateTitle, this);
 
     this.title.icon = ICON_CLASS;
     this.title.closable = true;
-    this.id = `regulus-${count}`;
+    this.id = `regulus-${n}`;
   }
 
-  readonly contentFactory: RegulusPanel.IContentFactory;
   readonly regulus: Regulus;
 
   get session(): IClientSession {
@@ -94,21 +89,27 @@ class RegulusPanel extends Panel {
   }
 
   protected onAfterAttach(msg: Message): void {
-    console.log('panel:onAfterAttach:', msg);
+    this._session.initialize();
   }
 
   protected onActivateRequest(msg: Message): void {
-    console.log('panel:onActivateRequest:', msg);
   }
 
   protected onCloseRequest(msg: Message): void {
-    console.log('panel:onCloseRequest', msg);
     super.onCloseRequest(msg);
     this.dispose();
   }
 
   private _updateTitle(): void {
-    console.log('_updateTitle');
+    let session = this.regulus.session;
+    let caption = (
+      `Name: ${session.name}\n` +
+      `Path: ${PathExt.dirname(session.path)}\n` +
+      `Kernel: ${session.kernelDisplayName}`
+    );
+
+    this.title.label = `Regulus:${session.name}`;
+    this.title.caption = caption;
   }
 
   private _manager: ServiceManager.IManager;
@@ -119,41 +120,12 @@ export
 namespace RegulusPanel {
 
   export
-  interface IOptions {
-    contentFactory: IContentFactory;
-    manager: ServiceManager.IManager;
+  interface IOptions  extends Regulus.IOptions {
+    manager?: ServiceManager.IManager;
     path?: string;
     basePath?: string;
     name?: string;
     kernelPreference?: IClientSession.IKernelPreference;
   }
 
-  export
-  interface IContentFactory extends Regulus.IContentFactory {
-    createRegulus(options: Regulus.IOptions): Regulus;
-  }
-
-  export
-  class ContentFactory extends Regulus.ContentFactory implements IContentFactory {
-    createRegulus(options: Regulus.IOptions): Regulus {
-      return new Regulus(options);
-    }
-  }
-
-  export
-  namespace ContentFactory {
-    export
-    interface IOptions extends Regulus.ContentFactory.IOptions {}
-  }
-
-  export
-  const defaultContentFactory: IContentFactory = new ContentFactory();
-
-  export
-  const IContentFactory = new Token<IContentFactory>('jupyter.services.regulus.content-factory');
-}
-
-namespace Private {
-  export
-  let count = 1;
 }
