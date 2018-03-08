@@ -23,7 +23,7 @@ export function setup(el) {
 function reset(data) {
   render([]);
   msc = data;
-  group.dims(msc.dims);
+ // group.dims(msc.dims);
 }
 
 function add(partition) {

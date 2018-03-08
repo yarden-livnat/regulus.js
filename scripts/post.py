@@ -295,7 +295,7 @@ def post(args=None):
             print('post ', name)
             y = data[:, measure]
             msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm)
-            msc.Build(X=x, Y=y, names=header[:dims]+[name])
+            msc.build(X=x, Y=y, names=header[:dims]+[name])
             Post(ns.debug).data(msc.base_partitions, msc.hierarchy).build().save(path, name)
             available.add(name)
         except RuntimeError as error:

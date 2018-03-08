@@ -1,0 +1,13 @@
+{
+  "name": "deployment",
+  "data": "simulations.csv",
+  "dims": 6,
+  "msc": [
+    "excess",
+    "waste_Am",
+    "waste_Cm",
+    "waste_Np",
+    "waste_Pu",
+    "waste_U"
+  ]
+}
