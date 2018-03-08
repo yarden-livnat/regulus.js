@@ -18,7 +18,7 @@ __pycache__
 
 *.swp
 *.map
-.idea/
+.idea
 
 test/coverage
 docs/_build

@@ -1,0 +1,19 @@
+.panel {
+  padding: 5px;
+  /*margin: 5px;*/
+  display: flex;
+  justify-content: flex-start;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.panel .header {
+  font-size: 12pt;
+  background: lightblue;
+  width: 100%;
+  padding-left: 5px;
+}
+
+.panel .content {
+  padding: 5px;
+}

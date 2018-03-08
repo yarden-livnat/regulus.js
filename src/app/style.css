@@ -1,0 +1,39 @@
+
+body {
+  font: 10pt Arial;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: bold;
+  padding: 5px 0 5px 10px;
+}
+
+.container {
+  /*padding: 5px;*/
+  /*margin: 5px;*/
+  display: flex;
+  justify-content: flex-start;
+
+}
+
+.expand {
+  flex: 1 1 auto;
+}
+
+.row {
+  flex-direction: row;
+}
+
+.col {
+  flex-direction: column;
+}
+
+
+#dataset_view {
+  flex: 0 1 auto;
+}
+
+#partition_view {
+  flex: 0 1 auto;
+}

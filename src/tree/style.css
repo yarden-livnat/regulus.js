@@ -1,0 +1,25 @@
+.tree_view {
+  display: block;
+}
+
+.tree_view .header {
+  background: lightblue;
+  width: 100%
+}
+
+.tree_view .tree {
+  max-height: 300px;
+  overflow: auto;
+}
+
+.tree_view .node {
+  user-select: none;
+}
+
+.tree_view .node.highlight {
+  background-color: #ddd;
+}
+
+.tree_view .node.selected {
+  font-weight: bold;
+}

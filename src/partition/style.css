@@ -1,0 +1,34 @@
+.partition_view {
+  max-width: 250px;
+}
+
+.partition_view div + div {
+  margin-top: 1em;
+}
+
+.partition_view .entry {
+  display: inline-block;
+  max-width: 80px;
+  text-align: right;
+}
+
+.partition_view input, .partition_view textarea {
+  font: 10pt arial;
+  max-width: 200px;
+  box-sizing: border-box;
+}
+
+.partition_view input {
+  border: none;
+  border-bottom: 1px solid #999;
+  text-align: left;
+}
+
+.partition_view textarea {
+  vertical-align: top;
+}
+
+.partition_view input:focus, .partition_view textarea:focus {
+  outline: none;
+}
+

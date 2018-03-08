@@ -1,0 +1,32 @@
+.groups {
+  position: relative;
+  /*display: flex;*/
+  /*flex-direction: row;*/
+}
+
+.group {
+  /*display: flex;*/
+  width: 100px;
+  height: 400px;
+  position: absolute;
+  flex-direction: column;
+}
+
+.group .plots {
+  display: flex;
+  flex-direction: column;
+}
+
+.plot {
+  /*text-align: center;*/
+  /*font-family: sana;*/
+  padding: 10px;
+  /*flex: 1 1 auto;*/
+}
+
+.plot .line {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5px;
+}
+
