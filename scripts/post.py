@@ -64,6 +64,7 @@ class Post(object):
         self.pts = []
         self.original_pts = set()
         self.debug = debug
+        self.mapping = dict()
 
     def load(self, path):
         with open(path / 'Base_Partition.json') as f:
@@ -82,12 +83,30 @@ class Post(object):
         return self
 
     def build(self):
-        Partition.reset_id()
         self.prepare()
         for merge in self.merges:
+            # print(merge.level, merge.src, merge.dest)
             if merge.src == merge.dest:
                 # print('degenerate', merge.level, merge.is_max, merge.src, merge.dest)
                 continue
+            # merge.dest may have been merged already (same persistence level: degenerate)
+            # if merge.src == 832 and merge.dest == 37:
+            #     print('check')
+            dest = merge.dest
+            while dest in self.mapping:
+                dest = self.mapping[dest]
+            if merge.src == dest:
+                loop = []
+                d = merge.dest
+                loop.append(d)
+                while d in self.mapping:
+                    d = self.mapping[d]
+                    loop.append(d)
+                print('loop: dest points back to src', merge.src, loop)
+                continue
+
+            merge.dest = dest
+            self.mapping[merge.src] = merge.dest
 
             if merge.is_max:
                 self.update(merge, self.max_map, lambda item: item.min_idx)
@@ -129,8 +148,8 @@ class Post(object):
             else:
                 b = len(levels[level])
         print('statistics: {} levels {} base, {} new'.format(len(levels), b, n))
-        for level in sorted(levels.keys()):
-            print("{:.2g} {}".format(level, len(levels[level])))
+        # for level in sorted(levels.keys()):
+        #     print("{:.2g} {}".format(level, len(levels[level])))
 
     def stat(self, node, levels):
         levels[node.persistence].append(node)
@@ -154,10 +173,13 @@ class Post(object):
             'id': node.id,
             'lvl': node.persistence,
             'pts_idx': [node.pts_idx[0], node.pts_idx[1]],
-            'extrema': node.extrema,
+            # 'extrema': node.extrema,
+            'minmax_idx': [node.min_idx, node.max_idx],
             'parent': node.parent.id if node.parent is not None else None,
             'children': [child.id for child in node.children]
         })
+        if len(node.children) > 2:
+            print('{} has {} children'.format(node.id, len(node.children)))
         for child in node.children:
             self.collect(child, array)
 
