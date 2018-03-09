@@ -53,11 +53,24 @@ export class MSC {
     return this;
   }
 
+  partition_pts(partition) {
+    if (!partition.pts) {
+      let ppts = [];
+      for (let i = partition.pts_idx[0]; i < partition.pts_idx[1]; i++) {
+        ppts.push(this.pts[this.pts_idx[i]]);
+      }
+      // consider adding the min/max points
+      partition.pts = ppts;
+    }
+    return partition.pts;
+  }
+
   set msc(_) {
     this.name = _.name;
     this.partitions = _.partitions;
+    this.pts_idx = _.pts;
     this.tree = build_tree(this.partitions);
-    // this.partitions.forEach( p => p.pts = this.pts);
+
     return this;
   }
 

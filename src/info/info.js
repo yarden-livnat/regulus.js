@@ -18,10 +18,10 @@ export function setup(el) {
   root.classed('info', true)
     .html(template);
 
-  root.select('#measures')
-    .on('change', function () {
-      select_dataset(this.value)
-    });
+  // root.select('#measures')
+  //   .on('change', function () {
+  //     select_data(this.value)
+  //   });
 }
 
 export function set_catalog(_) {

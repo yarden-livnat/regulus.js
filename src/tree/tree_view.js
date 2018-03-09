@@ -9,6 +9,7 @@ let root = null;
 let msc = null;
 let tree = List();
 
+
 export function setup(el) {
   root = typeof el === 'string' && d3.select(el) || el;
   root.classed('tree_view', true);

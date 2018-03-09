@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import {publish, subscribe} from "../utils";
 
-import Group from '../components/group';
+import Group from './group';
 import template from './details.html';
 import './style.css';
 
@@ -9,6 +9,7 @@ let root = null;
 let group = Group();
 
 let msc = null;
+let dims = [];
 let partitions = [];
 
 export function setup(el) {
@@ -21,14 +22,17 @@ export function setup(el) {
 }
 
 function reset(data) {
+  partitions = [];
   render([]);
   msc = data;
+  dims = msc.dims.concat();
   group.dims(msc.dims);
+  group.measure(msc.name);
 }
 
 function add(partition) {
   if (!partition.pts) {
-    partition.pts = msc.pts.slice(partition.pts_idx[0], partition.pts_idx[1]);
+    msc.partition_pts(partition);
   }
 
   partitions.push({
@@ -37,7 +41,6 @@ function add(partition) {
     size: partition,
     pts: partition.pts
   });
-
 
   // todo: compute partion minmax and update global minmax
   render(partitions);
@@ -53,7 +56,7 @@ function remove(partition){
 }
 
 function render(list) {
-  list.sort( (a,b) => a.id - b.id );
+  list.sort( (a,b) => b.id - a.id );
   list.forEach( (d, i) => d.x = i);
 
   let groups = root.select('.groups').selectAll('.group')

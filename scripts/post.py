@@ -26,6 +26,10 @@ class Partition(object):
         Partition._id += 1
         return Partition._id
 
+    @staticmethod
+    def reset_id():
+        Partition._id = 0
+
     def __init__(self, persistence, base_pts=None, min_idx=None, max_idx=None, child=None):
         self.id = Partition.gen_id()
         self.persistence = persistence
@@ -78,6 +82,7 @@ class Post(object):
         return self
 
     def build(self):
+        Partition.reset_id()
         self.prepare()
         for merge in self.merges:
             if merge.src == merge.dest:
