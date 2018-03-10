@@ -88,6 +88,7 @@ export default function List() {
   api.data = function (root) {
     tree = root;
     nodes = [];
+    render();
     collect_nodes(root, nodes);
     nodes = nodes.sort( (a, b) => b.lvl - a.lvl || a.id - b.id);
     render();

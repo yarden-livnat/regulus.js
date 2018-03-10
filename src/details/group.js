@@ -2,7 +2,7 @@ import * as d3 from "d3";
 // import {Plot} from "./index";
 import template from './group.html';
 
-let GROUP_WIDTH = 200;
+let GROUP_HEIGHT = 120;
 
 export default function Group() {
   // let plot = Plot();
@@ -17,7 +17,7 @@ export default function Group() {
   let opacity = d3.transition().duration(1500);
 
   function loc(i) {
-    return `${i*GROUP_WIDTH}px`;
+    return `${i*GROUP_HEIGHT}px`;
   }
 
   function name(d) {
@@ -29,7 +29,7 @@ export default function Group() {
       .each(function(d, i) {
         let g = d3.select(this);
         g.transition(move)
-          .style('left', loc(i))   // left or top
+          .style('top', loc(i))   // left or top
           // .style('top', loc(i))
           .transition(opacity)
           .style('opacity', 1);
@@ -53,7 +53,7 @@ export default function Group() {
   group.create = function(selection) {
     selection
       .attr('class', 'group')
-      .style('left', (d, i)=> loc(i))
+      .style('top', (d, i)=> loc(i))
       .style('opacity', 0);
     selection.html(template);
     // let header = selection.append('div')

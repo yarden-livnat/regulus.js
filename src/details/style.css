@@ -7,13 +7,14 @@
   /*height: 400px;*/
   position: absolute;
   display: flex;
-  flex-direction: column;  /* flip for horizontal layout */
+  flex-direction: row;  /* flip for horizontal layout */
 }
 
 .group .header {
   background-color: lavender;
-  width: 100%;
-  padding: 2px 5px 2px 5px;
+  width: 3em;
+  height: 100px;
+  padding: 0 5px 0 5px;
 }
 
 .group .header .name {
@@ -23,13 +24,13 @@
 
 .group .plots {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
 .plot {
-  margin: 5px;
-  width: 150px;
-  height: 50px;
+  margin:  0 0 0 5px;
+  width:  100px;
+  height: 100px;
   background-color: beige;
 }
 

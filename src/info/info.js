@@ -17,27 +17,10 @@ export function setup(el) {
   root = typeof el === 'string' && d3.select(el) || el;
   root.classed('info', true)
     .html(template);
-
-  // root.select('#measures')
-  //   .on('change', function () {
-  //     select_data(this.value)
-  //   });
 }
 
 export function set_catalog(_) {
   catalog = _;
-
-  // catalog.msc.sort();
-  // let opts = root.select('#measures').selectAll('option')
-  //   .data(["select measure"].concat(catalog.msc));
-  //
-  // opts.enter().append('option')
-  //   .merge(opts)
-  //   .attr('value', (d, i) => i && d)
-  //   .attr('disabled', (d, i) => i===0 ? true : null)
-  //   .text( d => d);
-  // opts.exit().remove();
-
   msc = new MSC();
 
   service.load_data(catalog)
@@ -50,8 +33,6 @@ export function set_catalog(_) {
 
 function show()
 {
-  msc.dims.sort((a, b) => a.name < b.name);
-
   // Dimensions
   let li = root.select('.dims').selectAll('li')
     .data(msc.dims, d=>d.name);
@@ -63,7 +44,6 @@ function show()
 
   // Measures
   let available = new Set(catalog.msc);
-  msc.measures.sort( (a, b) => a.name < b.name);
   msc.measures.forEach(m => m.available = available.has(m.name));
   li = root.select('.measures').selectAll('li')
     .data(msc.measures, d => d.name);
