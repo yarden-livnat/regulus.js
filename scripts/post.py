@@ -159,16 +159,15 @@ class Post(object):
             remove_s = set()
             for s in idx_map[merge.src]:
                 if idx(s) == idx(d):
-                    if n is None:
-                        if d.persistence == merge.level:
-                            n = d
-                            if len(s.children) > 0:
-                                n.children.extend(s.children)
-                            else:
-                                n.add_child(s)
+                    if s.persistence == merge.level:
+                        if len(s.children) > 0:
+                            d.children.extend(s.children)
                         else:
+                            d.add_child(s)
+                    else:
+                        if n is None:
                             n = Partition(merge.level, child=d)
-                            remove.add(d) # can't be removed during the iterations
+                            remove.add(d)  # can't be removed during the iterations
                             add.append(n)
                         n.add_child(s)
                     remove_s.add(s)  # can't be removed during the iterations
@@ -249,7 +248,7 @@ class Post(object):
 
         if node.persistence > 0:
             if len(node.children) > 2:
-                print('{} has {} children'.format(node.id, len(node.children)))
+                print('{} has {} children at level {}'.format(node.id, len(node.children), node.persistence))
             for child in node.children:
                 self.collect(child, array)
 
@@ -274,8 +273,6 @@ class Post(object):
                 self.stat(child, levels)
 
     def count(self, partition):
-        # if len(partition.children) == 0:
-        #     return 0, 1
         if partition.persistence == 0:
             return 0, 1
         n = 1
