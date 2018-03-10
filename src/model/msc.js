@@ -34,33 +34,27 @@ export class MSC {
     this.ndims = 0;
     this.attr = [];
     this.dims = [];
-    this.measure = "";
-    this.minmax = [];
+    this.measures = [];
   }
 
   samples(pts, ndims) {
     this.pts = pts;
     let n = pts.columns.length;
-    this.attrs = pts.columns;
-    this.dims = pts.columns.slice(0, ndims);
-    this.measure = pts.columns.slice(ndims);
-
-    this.minmax = this.attrs.map(name => ({
-      name: name,
-      minmax: d3.extent(pts, entry => entry[name])
-    }));
+    this.attrs = pts.columns.map(name => ({name, extent: d3.extent(pts, pt => pt[name]) }));
+    this.dims = this.attrs.slice(0, ndims);
+    this.measures = this.attrs.slice(ndims);
 
     return this;
   }
 
   partition_pts(partition) {
     if (!partition.pts) {
-      let ppts = [];
+      let pts = [];
       for (let i = partition.pts_idx[0]; i < partition.pts_idx[1]; i++) {
-        ppts.push(this.pts[this.pts_idx[i]]);
+        pts.push(this.pts[this.pts_idx[i]]);
       }
       // consider adding the min/max points
-      partition.pts = ppts;
+      partition.pts = pts;
     }
     return partition.pts;
   }
@@ -73,5 +67,4 @@ export class MSC {
 
     return this;
   }
-
 }
