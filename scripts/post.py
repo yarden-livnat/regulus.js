@@ -85,7 +85,7 @@ class Post(object):
     def build(self):
         self.prepare()
         for merge in self.merges:
-            # print(merge.level, merge.src, merge.dest)
+            # print(merge.level, merge.is_max, merge.src, merge.dest)
             if merge.src == merge.dest:
                 # print('degenerate', merge.level, merge.is_max, merge.src, merge.dest)
                 continue
@@ -124,6 +124,8 @@ class Post(object):
         return self
 
     def save(self, path, name):
+        self.rename(self.root, 0)
+
         partitions = []
         self.collect(self.root, partitions)
         tree = {
@@ -136,6 +138,120 @@ class Post(object):
             json.dump(tree, f)
 
     # Private functions
+    def prepare(self):
+        for key, value in self.base.items():
+            m, x = [int(s) for s in key.split(',')]
+            p = Partition(0, list(value), m, x)
+            self.add(p)
+
+        self.merges.sort(key=lambda m: (m.level, m.src))
+        high = self.merges[-1].level
+        for merge in self.merges:
+            merge.level /= high
+        return self
+
+    def update(self, merge, idx_map, idx):
+        add = []
+        remove = set()
+
+        for d in idx_map[merge.dest]:
+            n = None
+            remove_s = set()
+            for s in idx_map[merge.src]:
+                if idx(s) == idx(d):
+                    if n is None:
+                        if d.persistence == merge.level:
+                            n = d
+                            if len(s.children) > 0:
+                                n.children.extend(s.children)
+                            else:
+                                n.add_child(s)
+                        else:
+                            n = Partition(merge.level, child=d)
+                            remove.add(d) # can't be removed during the iterations
+                            add.append(n)
+                        n.add_child(s)
+                    remove_s.add(s)  # can't be removed during the iterations
+            for s in remove_s:
+                self.remove(s)
+
+        for s in idx_map[merge.src]:
+            n = Partition(merge.level, child=s)
+            if idx(s) == s.min_idx:
+                n.max_idx = merge.dest
+            else:
+                n.min_idx = merge.dest
+            add.append(n)
+
+        for r in remove | idx_map[merge.src]:
+            self.remove(r)
+
+        # assign the eliminated extrema as an extra internal point to the first new partition
+        if len(add) > 0:
+            add[0].extrema = [merge.src]
+            for n in add:
+                self.add(n)
+
+    def add(self, n):
+        self.min_map[n.min_idx].add(n)
+        self.max_map[n.max_idx].add(n)
+        self.active.add(n)
+
+    def remove(self, p):
+        self.max_map[p.max_idx].discard(p)
+        self.min_map[p.min_idx].discard(p)
+        self.active.remove(p)
+
+    def visit(self, partition, idx):
+        first = idx
+        if len(partition.children) == 0:
+            add = partition.base_pts
+            try:
+                add.remove(partition.min_idx)
+            except ValueError:
+                pass
+            try:
+                add.remove(partition.max_idx)
+            except ValueError:
+                pass
+
+            if len(add) > 0:
+                self.pts.extend(add)
+                idx += len(add)
+        else:
+            if partition.extrema is not None:
+                self.pts.extend(partition.extrema)
+                idx += len(partition.extrema)
+            for child in partition.children:
+                idx = self.visit(child, idx)
+
+        partition.pts_idx = (first, idx)
+        return idx
+
+    def rename(self, node, idx):
+        node.id = idx
+        idx += 1
+        if node.persistence > 0:
+            for child in node.children:
+                idx = self.rename(child, idx)
+        return idx
+
+    def collect(self, node, array):
+        array.append({
+            'id': node.id,
+            'lvl': node.persistence,
+            'pts_idx': [node.pts_idx[0], node.pts_idx[1]],
+            # 'extrema': node.extrema,
+            'minmax_idx': [node.min_idx, node.max_idx],
+            'parent': node.parent.id if node.parent is not None else None,
+            'children': [child.id for child in node.children] if node.persistence > 0 else []
+        })
+
+        if node.persistence > 0:
+            if len(node.children) > 2:
+                print('{} has {} children'.format(node.id, len(node.children)))
+            for child in node.children:
+                self.collect(child, array)
 
     def statistics(self):
         levels = defaultdict(list)
@@ -153,101 +269,14 @@ class Post(object):
 
     def stat(self, node, levels):
         levels[node.persistence].append(node)
-        for child in node.children:
-            self.stat(child, levels)
-
-    def prepare(self):
-        for key, value in self.base.items():
-            m, x = [int(s) for s in key.split(',')]
-            p = Partition(0, list(value), m, x)
-            self.add(p)
-
-        self.merges.sort(key=lambda m: m.level)
-        high = self.merges[-1].level
-        for merge in self.merges:
-            merge.level /= high
-        return self
-
-    def collect(self, node, array):
-        array.append({
-            'id': node.id,
-            'lvl': node.persistence,
-            'pts_idx': [node.pts_idx[0], node.pts_idx[1]],
-            # 'extrema': node.extrema,
-            'minmax_idx': [node.min_idx, node.max_idx],
-            'parent': node.parent.id if node.parent is not None else None,
-            'children': [child.id for child in node.children]
-        })
-        if len(node.children) > 2:
-            print('{} has {} children'.format(node.id, len(node.children)))
-        for child in node.children:
-            self.collect(child, array)
-
-    def update(self, merge, idx_map, idx):
-        add = []
-        remove = set()
-
-        for d in idx_map[merge.dest]:
-            n = None
-            remove_s = set()
-            for s in idx_map[merge.src]:
-                if idx(s) == idx(d):
-                    if n is None:
-                        n = Partition(merge.level, child=d)
-                        remove.add(d) # can't be removed during the iterations
-                        add.append(n)
-                    n.add_child(s)
-                    remove_s.add(s)  # can't be removed during the iterations
-            for s in remove_s:
-                self.remove(s)
-
-        for s in idx_map[merge.src]:
-            n = Partition(merge.level, child=s)
-            if idx(s) == s.min_idx:
-                n.max_idx = merge.dest
-            else:
-                n.min_idx = merge.dest
-            add.append(n)
-
-        for r in remove | idx_map[merge.src]:
-            self.remove(r)
-
-        # assign the eliminated extrema as an extra internal point to the first new partition
-        add[0].extrema = [merge.src]
-        for n in add:
-            self.add(n)
-
-    def add(self, n):
-        self.min_map[n.min_idx].add(n)
-        self.max_map[n.max_idx].add(n)
-        self.active.add(n)
-
-    def remove(self, p):
-        self.max_map[p.max_idx].discard(p)
-        self.min_map[p.min_idx].discard(p)
-        self.active.remove(p)
-
-    def visit(self, partition, idx):
-        first = idx
-        if len(partition.children) == 0:
-            add = partition.base_pts
-            add.remove(partition.min_idx)
-            add.remove(partition.max_idx)
-            if len(add) > 0:
-                self.pts.extend(add)
-                idx += len(add)
-        else:
-            if partition.extrema is not None:
-                self.pts.extend(partition.extrema)
-                idx += len(partition.extrema)
-            for child in partition.children:
-                idx = self.visit(child, idx)
-
-        partition.pts_idx = (first, idx)
-        return idx
+        if node.persistence > 0:
+            for child in node.children:
+                self.stat(child, levels)
 
     def count(self, partition):
-        if len(partition.children) == 0:
+        # if len(partition.children) == 0:
+        #     return 0, 1
+        if partition.persistence == 0:
             return 0, 1
         n = 1
         b = 0
@@ -322,8 +351,11 @@ def post(args=None):
             print('post ', name)
             y = data[:, measure]
             msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm)
-            msc.Build(X=x, Y=y, names=header[:dims]+[name])
-            Post(ns.debug).data(msc.base_partitions, msc.hierarchy).build().save(path, name)
+            msc.build(X=x, Y=y, names=header[:dims]+[name])
+            Post(ns.debug)\
+                .data(msc.base_partitions, msc.hierarchy)\
+                .build()\
+                .save(path, name)
             available.add(name)
         except RuntimeError as error:
             print(error)
