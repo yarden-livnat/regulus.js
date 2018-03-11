@@ -90,7 +90,7 @@ function select_color(name) {
   color_by = name === 'current' && measure || msc.measure_by_name(name);
   colorScale.domain([color_by.extent[1], color_by.extent[0]]);
 
-  render(partitions);
+  update(partitions, true);
 }
 
 function add(partition) {
@@ -105,7 +105,7 @@ function add(partition) {
     p: partition
   });
 
-  render(partitions);
+  update(partitions);
 }
 
 function remove(partition){
@@ -114,15 +114,15 @@ function remove(partition){
     partitions.splice(idx, 1);
   }
 
-  render(partitions);
+  update(partitions);
 }
 
-function render(list) {
+function update(list, all=false) {
   list.sort( (a,b) => a.id - b.id );
   list.forEach( (d, i) => d.x = i);
 
-  root.select('.groups').each(
-    function() {
+  root.select('.groups')
+    .each( function() {
       y.set(this, pt => sy(pt[measure.name]));
     });
 
@@ -135,7 +135,7 @@ function render(list) {
       .on('mouseleave', d => publish('partition.highlight', d.p, false))
       .call(group.create)
     .merge(groups)
-      .call(group);
+      .call(group, all);
 
   groups.exit().call(group.remove);
 }

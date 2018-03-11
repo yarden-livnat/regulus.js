@@ -9,7 +9,6 @@
 .partition_view .entry {
   display: inline-block;
   max-width: 80px;
-  text-align: right;
 }
 
 .partition_view input, .partition_view textarea {

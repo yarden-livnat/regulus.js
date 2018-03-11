@@ -23,7 +23,7 @@ export default function Group() {
     return `${GROUP_OFFSET + i * GROUP_SIZE}px`;
   }
 
-  function group(selection) {
+  function group(selection, all) {
     selection
       .transition().duration(DURATION)
       .style('top', (d, i) => loc(i))
@@ -38,10 +38,13 @@ export default function Group() {
         g.select('.y_axis').call(y_axis);
 
         let plots = g.select('.plots').selectAll('.plot').data(dims);
-        plots.enter()
+        let list = plots.enter()
           .append('svg')
-          .call(plot.create)
-          .merge(plots)
+          .call(plot.create);
+        if (all)
+          list = list.merge(plots);
+          // .merge(plots)
+        list
           .each(function (dim) {
             let sx = d3.scaleLinear().range([0, PLOT_WIDTH]).domain(dim.extent);
             x.set(this, pt => sx(pt[dim.name]));
