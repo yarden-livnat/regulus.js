@@ -1,42 +1,88 @@
-.groups {
-  position: relative;
+.details .config {
+  border-bottom: 1px solid gray;
+  padding: 2px 0 5px 0;
+  margin-bottom: 10px;
 }
 
-.group {
-  /*width: 100px;*/
-  /*height: 400px;*/
-  position: absolute;
-  display: flex;
-  flex-direction: row;  /* flip for horizontal layout */
-}
-
-.group .header {
-  background-color: lavender;
-  width: 3em;
-  height: 100px;
-  padding: 0 5px 0 5px;
-}
-
-.group .header .name {
-  font-size: 11pt;
-  font-style: italic;
-}
-
-.group .plots {
+.details .dims {
+  margin-left: 110px;
   display: flex;
   flex-direction: row;
 }
 
-.plot {
-  margin:  0 0 0 5px;
-  width:  100px;
-  height: 100px;
-  background-color: beige;
+.details .dims .dim {
+  width: 120px;
+  padding: 0;
+  /*margin-left: 10px;*/
+  text-align: center;
 }
 
-.plot .line {
+.details .dims .dim label {
+  /*background-color: beige;*/
+}
+
+.details .groups {
+  position: relative;
+}
+
+.details .group {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+}
+
+.details .group .header {
+  display: flex;
+  flex-direction: column;
+  background-color: lavender;
+  width: 3em;
+  height: 100px;
+  padding: 0 5px 0 5px;
+  margin-top: 10px;
+  font-size: 10pt;
+}
+
+.details .group .header .size {
+  font-size: 8pt;
+  font-style: italic;
+}
+
+.details .y_axis label {
+  fill: black;
+  font-size: 10pt;
+}
+
+.details .group .plots {
+  display: flex;
+  flex-direction: row;
+}
+
+.details .plot {
+  margin:  10px 10px 0 10px;
+  background-color: #fdfdfd;
+}
+
+.details .plot rect {
+  fill: none;
+  stroke: black;
+  stroke-width: 0.5px;
+  /*shape-rendering: crispEdges;*/
+}
+
+.details .plot .line {
   fill: none;
   stroke: #666;
   stroke-width: 1.5px;
+  shape-rendering: crispEdges;
 }
 
+.details .plot circle {
+  /*fill: steelblue;*/
+}
+
+.details .axis path,
+.details .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}

@@ -1,54 +1,67 @@
 import * as d3 from 'd3'
 
-export default function () {
-    let margin = {top: 8, right: 10, bottom: 2, left: 10},
-      width = 200 - margin.left - margin.right,
-      height = 100 - margin.top - margin.bottom;
+export default function Plot() {
+  let margin = {top: 0, right: 0, bottom: 0, left: 0},
+    width = 100 - margin.left - margin.right,
+    height = 100 - margin.top - margin.bottom;
 
-    let sx, sy;
-    // let sx = d3.scaleLinear().range([0, width]).domain([0, 100]);
-    // let sy = d3.scaleLinear().range([height, 0]).domain([0, 500]);
-    let x = d => d.x;
-    let y = d => d.y;
+  let x = null;
+  let y = null;
+  let color = null;
 
-    // let line = d3.line()
-    //   .x(d => sx(x(d)))
-    //   .y(d => sy(y(d)));
+  function plot(selection) {
+    selection.each(function (d, i)  {
+      let tx = x.get(this);
+      let ty = y.get(this);
 
-    function plot(selection) {
-      let line = d3.line()
-        .x(d => sx.get(this)(x(d)))
-        .y(d => sy.get(this)(y(d)));
+      let pts = d3.select(this).select('.pts').selectAll('circle')
+          .data(d);
 
-      selection.selectAll('path').attr('d', d => line(d));
-    }
+      pts.enter().append('circle')
+          .attr('r', 1.5)
+          .attr('cx', d => tx(d))
+          .attr('cy', d => ty(d))
+        .merge(pts)
+          .style("fill", d => color(d));
+      pts.exit().remove();
+    });
+  }
 
-    plot.create = function(selection) {
-      selection.append('svg')
+  plot.create = function(selection) {
+    let g = selection
         .attr('class', 'plot')
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
-        .append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`)
-        .append('path')
-        .attr('class', 'line');
-    };
+      .append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    plot.size = function(_) {
-      if (!arguments.length) return [width, height];
-      [width, height] = _;
-      return this;
-    };
+    g.append('rect')
+      .attr('width', width)
+      .attr('height', height);
 
-    plot.sx = function(_) {
-      sx = _;
-      return this;
-    };
+    g.append('g').attr('class', 'pts');
+  };
 
-    plot.sy = function(_) {
-      sy = _;
-      return this;
-    };
+  plot.size = function(_) {
+    if (!arguments.length) return [width, height];
+    [width, height] = _;
+    return this;
+  };
 
-    return plot;
-  }
+  plot.x = function(_) {
+    x = _;
+    return this;
+  };
+
+  plot.y = function(_) {
+    y = _;
+    return this;
+  };
+
+  plot.color = function(_) {
+    color = _;
+    return this;
+  };
+
+  return plot;
+}

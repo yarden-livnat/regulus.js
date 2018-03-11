@@ -9,7 +9,7 @@ export default function List() {
   let nodes = [];
   let dispatch = d3.dispatch('highlight', 'select', 'edit');
 
-  let format_lvl = d3.format('3.2'), format_id = d3.format('3d');
+  let format_lvl = d3.format('4.2f'), format_id = d3.format('3d');
 
   function collect_nodes(node, list) {
     list.push(node);

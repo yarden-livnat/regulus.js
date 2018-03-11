@@ -1,52 +1,53 @@
 import * as d3 from "d3";
-// import {Plot} from "./index";
+import Plot from "./plot";
+import YAxis from './y_axis';
 import template from './group.html';
 
-let GROUP_HEIGHT = 120;
+let GROUP_OFFSET = 0;
+let GROUP_SIZE = 120;
+let PLOT_HEIGHT = 100;
+let PLOT_WIDTH = 100;
+
+let DURATION = 1000;
 
 export default function Group() {
-  // let plot = Plot();
-  let sy;
   let dims = [];
-  let measure = "";
+  let y_axis = YAxis();
+
+  let yScale = d3.scaleLinear().range([PLOT_HEIGHT, 0]);
 
   let x = d3.local();
-  let y = d3.local();
-
-  let move = d3.transition().duration(1500);
-  let opacity = d3.transition().duration(1500);
+  let plot = Plot().x(x);
 
   function loc(i) {
-    return `${i*GROUP_HEIGHT}px`;
-  }
-
-  function name(d) {
-    return name.alias && `${d.id}: ${d.name}` || `${d.id}`;
+    return `${GROUP_OFFSET + i * GROUP_SIZE}px`;
   }
 
   function group(selection) {
     selection
+      .transition().duration(DURATION)
+      .style('top', (d, i) => loc(i))
+      .style('opacity', 1);
+
+    selection
       .each(function(d, i) {
         let g = d3.select(this);
-        g.transition(move)
-          .style('top', loc(i))   // left or top
-          // .style('top', loc(i))
-          .transition(opacity)
-          .style('opacity', 1);
-
-        g.select('.header .name').text(d => name(d));
+        g.select('.header .id').text(d => `id: ${d.id}`);
+        g.select('.header .name').text(d => d.name);
+        g.select('.header .size').text(d => `${d.pts.length} pts`);
+        g.select('.y_axis').call(y_axis);
 
         let plots = g.select('.plots').selectAll('.plot').data(dims);
         plots.enter()
-          .append('div')
-          .classed('plot', true)
-        //   .call(plot.create)
+          .append('svg')
+          .call(plot.create)
           .merge(plots)
-          .text(d => `${d}x${measure}`);
-        //   .each( function(d, i) {
-        //     sy.set(this, d3.scaleLinear().range([plot_height]).domain(extents.y[i]));
-        //   })
-        //   .call(plot);
+          .each(function (dim) {
+            let sx = d3.scaleLinear().range([0, PLOT_WIDTH]).domain(dim.extent);
+            x.set(this, pt => sx(pt[dim.name]));
+          })
+          .datum(d.pts)
+          .call(plot);
       });
   }
 
@@ -56,10 +57,15 @@ export default function Group() {
       .style('top', (d, i)=> loc(i))
       .style('opacity', 0);
     selection.html(template);
-    // let header = selection.append('div')
-    //   .attr('class', 'header');
-    // header.append('')
-    // selection.append('div').attr('class', 'plots');
+
+    selection.selectAll('.y_axis').call(y_axis.create);
+  };
+
+  group.remove = function(selection) {
+    selection
+      .transition().duration(DURATION)
+      .style('opacity', 0)
+      .remove();
   };
 
   group.dims = function(_) {
@@ -68,20 +74,19 @@ export default function Group() {
   };
 
   group.measure = function(_) {
-    measure = _;
+    y_axis.domain(_);
+  };
+
+  group.color = function(_) {
+    plot.color(_);
     return this;
   };
 
-  // group.sx = function(_) {
-  //   plot.sx(_);
-  //   return this;
-  // };
-  //
-  // group.sy = function(_) {
-  //   sy = _;
-  //   plot.sy(_);
-  //   return this;
-  // };
+  group.y = function(_) {
+    plot.y(_);
+    return this;
+  };
+
 
   return group;
 }

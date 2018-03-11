@@ -59,12 +59,17 @@ export class MSC {
     return partition.pts;
   }
 
+  measure_by_name(name) {
+    return this.measures.find(m => m.name === name);
+  }
+
   set msc(_) {
     this.name = _.name;
     this.partitions = _.partitions;
     this.pts_idx = _.pts;
     this.tree = build_tree(this.partitions);
 
+    this.measure = this.measures.find( m => m.name === this.name);
     return this;
   }
 }
