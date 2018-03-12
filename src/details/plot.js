@@ -1,6 +1,7 @@
 import * as d3 from 'd3'
 window.d3 = d3;
 import {lasso as Lasso} from 'd3-lasso';
+import './lasso.css';
 
 export default function Plot() {
   let margin = {top: 0, right: 0, bottom: 0, left: 0},
