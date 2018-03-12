@@ -11,31 +11,34 @@ export default function Plot() {
   let line = null;
   let area = null;
 
+  function svg_render_pts(d ,i) {
+    let tx = x.get(this);
+    let ty = y.get(this);
+
+    let pts = d3.select(this).select('.pts').selectAll('circle')
+      .data(d.pts);
+
+    pts.enter().append('circle')
+      .attr('r', 1)
+      .attr('cx', d => tx(d))
+      .attr('cy', d => ty(d))
+      .merge(pts)
+      .style("fill", d => d.filtered && '#eee' || color(d))
+      .attr('z-index', d => d.filtered && -1 || 1);
+
+    pts.exit().remove();
+  }
+
   function plot(selection) {
     selection.each(function (d, i)  {
-      let tx = x.get(this);
-      let ty = y.get(this);
+      let root = d3.select(this);
 
-      let pts = d3.select(this).select('.pts').selectAll('circle')
-          .data(d.pts);
+      svg_render_pts.call(this, d, i);
 
-      pts.enter().append('circle')
-          .attr('r', 1.5)
-          .attr('cx', d => tx(d))
-          .attr('cy', d => ty(d))
-        .merge(pts)
-          .style("fill", d => d.filtered && '#eee' || color(d))
-          .attr('z-index', d => d.filtered && -1 || 1);
-
-      pts.exit().remove();
-
-      let test =  d3.select(this).select('.line');
-
-      d3.select(this).select('.line')
-        // .datum(d.line)
+      root.select('.line')
         .attr('d', line.get(this)(d.line));
 
-      d3.select(this).select('.area')
+      root.select('.area')
         .attr('d', area.get(this)(d.area));
     });
   }
