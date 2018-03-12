@@ -141,6 +141,7 @@ function update_filter(attr) {
     pt.filtered = !pts_filters(pt);
   }
   update(partitions, true);
+  publish('data.updated');
 }
 
 function update(list, all=false) {

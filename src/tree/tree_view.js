@@ -24,6 +24,7 @@ export function setup(el) {
   subscribe('partition.highlight', (topic, partition, on) => {
     tree.highlight(partition, on);
   });
+  subscribe('data.updated', () => tree.update());
 }
 
 

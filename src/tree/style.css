@@ -13,7 +13,12 @@
 }
 
 .tree_view .node {
-  user-select: none;
+  /*user-select: none;*/
+}
+
+.tree_view .node.foo {
+  color: red;
+  background-color: blue;
 }
 
 .tree_view .node.highlight {
