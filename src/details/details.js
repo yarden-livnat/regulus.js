@@ -1,14 +1,15 @@
 import * as d3 from 'd3';
+import {interpolateRdYlBu} from 'd3-scale-chromatic';
+
 import {publish, subscribe} from "../utils";
+import {and, or, not, AttrFilter} from '../model';
 
 import Group from './group';
 import XAxis from './x_axis';
 import template from './details.html';
 import './style.css';
-import {interpolateRdYlBu} from 'd3-scale-chromatic';
 
 let root = null;
-
 
 let msc = null;
 let dims = [];
@@ -19,15 +20,18 @@ let color_by = null;
 let color_by_opt = 'current';
 let colorScale = d3.scaleSequential(interpolateRdYlBu);
 
+let x_axis = XAxis()
+  .on('filter', update_filter);
+
 let sy = d3.scaleLinear().range([100, 0]);
-
-
-let x_axis = XAxis();
-
 let y = d3.local();
-let group = Group().y(y).color(pt => colorScale(pt[color_by.name]));
 
+let group = Group()
+    .y(y)
+    .color(pt => colorScale(pt[color_by.name]))
+    .on('filter', update_filter);
 
+let pts_filters = and();
 
 export function setup(el) {
   root = typeof el === 'string' && d3.select(el) || el;
@@ -47,7 +51,20 @@ function reset(data) {
   measure = msc.measure;
   sy.domain(measure.extent);
 
-  dims = msc.dims.concat();
+  dims = msc.dims.map( dim => ({
+    name: dim.name,
+    extent: dim.extent,
+    filter: AttrFilter(dim.name)
+  }));
+
+  pts_filters = and();
+  let y_filter = AttrFilter(measure.name);
+  pts_filters.add(y_filter);
+  group.filter(y_filter);
+  for (let dim of dims) {
+    pts_filters.add(dim.filter);
+  }
+
   group.dims(msc.dims);
   group.measure(measure);
 
@@ -114,6 +131,14 @@ function remove(partition){
   }
 
   update(partitions);
+}
+
+function update_filter(attr) {
+  console.log('updade filters');
+  for (let pt of msc.pts) {
+    pt.filtered = !pts_filters(pt);
+  }
+  update(partitions, true);
 }
 
 function update(list, all=false) {

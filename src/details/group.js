@@ -40,10 +40,7 @@ export default function Group() {
         g.select('.header .name').text(d => d.name);
         g.select('.header .size').text(d => `${d.pts.length} pts`);
 
-        // let w = g.select('.measure .name').attr('width');
-        // let h = g.select('.measure .name').attr('height');
-        // console.log('w,h', w, h);
-        g.select('.measure .name').text(measure.name); //.attr('width', w).attr('height', h);
+        g.select('.measure .name').text(measure.name);
         g.select('.measure .y_axis').call(y_axis);
 
         let plots = g.select('.plots').selectAll('.plot').data(dims);
@@ -113,6 +110,15 @@ export default function Group() {
     return this;
   };
 
+  group.filter = function(_) {
+    y_axis.filter(_);
+    return this;
+  };
+
+  group.on = function(event, cb) {
+    y_axis.on(event, cb);
+    return this;
+  };
 
   return group;
 }

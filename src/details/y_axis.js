@@ -7,27 +7,58 @@ export default function YAxis() {
 
   let scale = d3.scaleLinear().range([height, 0]);
   let axis = d3.axisLeft(scale).ticks(2, 's');
+
+  let brush_selection;
+  let brush = d3.brushY().extent([[2, 0], [12, height]])
+    .on('brush', brushed)
+    .on('end', brush_ended)
+    .on('start', brush_started);
+
+
   let name = 'y axis';
+  let filter = null;
+  let dispatch = d3.dispatch('filter');
 
   function brushed() {
+    let s = d3.brushSelection(this);
+    brush_selection = [[2, s[0]], [12, s[1]]];
+
     let range = d3.event.selection.map(scale.invert);
-    console.log('bushed', range);
+    if (filter) filter.range([range[1], range[0]]);
+    dispatch.call('filter');
   }
 
   function brush_ended() {
     if (!d3.event.sourceEvent) return; // Only transition after input.
     if (!d3.event.selection) return; // Ignore empty selections.
     let range = d3.event.selection.map(scale.invert);
-    console.log('end', range);
+    if (filter) filter.range([range[1], range[0]]);
+    dispatch.call('filter');
   }
 
   function brush_started() {
-    let range = d3.event.selection.map(scale.invert);
-    console.log('started', range);
+    brush_selection = [[2, 0], [12, 0]];
+    if (filter) filter.range(null);
+    dispatch.call('filter');
   }
 
   function y(selection) {
     selection.selectAll('.y').call(axis);
+    if (brush_selection) {
+      selection.selectAll('.brush')
+        .each(function() {
+          if (this.__brush ) {
+            this.__brush.selection = brush_selection;
+          }
+          // {
+          //   let s = this.__brush.selection;
+          //   console.log(s);
+          //   this.__brush.selection[0][1] = brush_selection[0];
+          //   this.__brush.selection[1][1] = brush_selection[1];
+          // }
+        });
+    }
+    selection.selectAll('.brush').call(brush);
   }
 
   y.create = function(selection) {
@@ -43,11 +74,7 @@ export default function YAxis() {
 
     svg.append('g')
       .attr('class', 'brush')
-      .call(d3.brushY()
-        .extent([[0, 0], [10, height]])
-        .on('brush', brushed)
-        .on('end', brush_ended)
-        .on('start', brush_started));
+      .call(brush);
   };
 
   y.domain = function(_) {
@@ -55,6 +82,17 @@ export default function YAxis() {
     scale.domain(_.extent);
     return this;
   };
+
+  y.filter = function(_) {
+    filter = _;
+    return this;
+  };
+
+  y.on = function(event, cb) {
+    dispatch.on(event, cb);
+    return this;
+  };
+
 
   return y;
 }

@@ -1,11 +1,12 @@
 
 
-export default function AttrFilter() {
-  let attr = null;
-  let range = null;
-  let active = false;
+export function AttrFilter(a=null, r=null) {
+  let attr = a;
+  let range = r;
+  let active = a && r;
 
   function filter(pt) {
+    if (!active) return true;
     let v = pt[attr];
     return range[0] <= v && v <= range[1];
   }

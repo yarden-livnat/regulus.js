@@ -8,22 +8,31 @@ export default function XAxis() {
   let scale = d3.scaleLinear().range([0, width]);
   let axis =  d3.axisBottom(scale).ticks(2, 's');
   let name = 'x axis';
+  let brush = d3.brushX().extent([[0, -10], [width, 0]])
+    .on('brush', brushed)
+    .on('end', brush_ended)
+    .on('start', brush_started);
+  let dispatch = d3.dispatch('filter');
 
   function brushed(dim) {
     let range = d3.event.selection.map(scale.domain(dim.extent).invert);
-    console.log('bushed', dim, range);
+    dim.filter.range(range);
+    dispatch.call('filter', this, dim, range);
   }
 
   function brush_ended(dim) {
     if (!d3.event.sourceEvent) return; // Only transition after input.
     if (!d3.event.selection) return; // Ignore empty selections.
     let range = d3.event.selection.map(scale.domain(dim.extent).invert);
-    console.log('end', dim, range);;
+    dim.filter.range(range);
+    dispatch.call('filter', this, dim, range);
   }
 
   function brush_started(dim) {
-    let range = d3.event.selection.map(scale.domain(dim.extent).invert);
-    console.log('started', dim, range);
+    if (!d3.event.sourceEvent) return;
+    if (!d3.event.selection) return;
+    dim.filter.range(null);
+    dispatch.call('filter');
   }
 
   function x(selection) {
@@ -31,6 +40,8 @@ export default function XAxis() {
       scale.domain(d.extent);
       d3.select(this).call(axis);
     });
+
+    selection.select('.brush').call(brush);
   }
 
   x.create = function(selection) {
@@ -46,11 +57,7 @@ export default function XAxis() {
 
     svg.append('g')
       .attr('class', 'brush')
-      .call(d3.brushX()
-        .extent([[0, -10], [width, 0]])
-        .on('brush', brushed)
-        .on('end', brush_ended)
-        .on('start', brush_started));
+      .call(brush);
 
     svg.append('text')
       .attr('class', 'label')
@@ -61,6 +68,11 @@ export default function XAxis() {
   x.domain = function(_) {
     name = _.name;
     scale.domain(_.extent);
+    return this;
+  };
+
+  x.on = function(event, cb) {
+    dispatch.on(event, cb);
     return this;
   };
 

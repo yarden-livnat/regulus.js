@@ -24,7 +24,9 @@ export default function Plot() {
           .attr('cx', d => tx(d))
           .attr('cy', d => ty(d))
         .merge(pts)
-          .style("fill", d => color(d));
+          .style("fill", d => d.filtered && '#eee' || color(d))
+          .attr('z-index', d => d.filtered && -1 || 1);
+
       pts.exit().remove();
 
       let test =  d3.select(this).select('.line');

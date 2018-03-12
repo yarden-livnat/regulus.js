@@ -4,6 +4,14 @@
   margin-bottom: 10px;
 }
 
+.details .brush .overlay {
+  fill: aliceblue;
+}
+.details .brush .selection {
+  fill: limegreen;
+  fill-opacity: 1;
+}
+
 .details .dims {
   margin-left: 110px;
   display: flex;
