@@ -47,7 +47,14 @@
   font-style: italic;
 }
 
-.details .y_axis label {
+.details .measure .name {
+  transform: rotate(-90deg);
+  transform-origin: 45px 45px;
+  position: absolute;
+  /*background-color: beige;*/
+}
+
+.details .measure .y_axis label {
   fill: black;
   font-size: 10pt;
 }
@@ -66,14 +73,24 @@
   fill: none;
   stroke: black;
   stroke-width: 0.5px;
-  /*shape-rendering: crispEdges;*/
 }
 
 .details .plot .line {
   fill: none;
   stroke: #666;
-  stroke-width: 1.5px;
-  shape-rendering: crispEdges;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-opacity: 0.7;
+  stroke-width: 1px;
+}
+
+.details .plot .area {
+  fill: #f1f1f1;
+  stroke: #f1f1f1;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-opacity: 1;
+  stroke-width: 1px;
 }
 
 .details .plot circle {

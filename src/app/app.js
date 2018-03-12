@@ -1,4 +1,4 @@
-import * as service from "../service";
+import * as service from "./service";
 import Panel from '../panel/panel';
 
 import * as info from '../info';

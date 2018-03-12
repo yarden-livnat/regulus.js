@@ -94,15 +94,14 @@ function select_color(name) {
 }
 
 function add(partition) {
-  if (!partition.pts) {
-    msc.partition_pts(partition);
-  }
+  let reg_curve = partition.regression_curve;
 
   partitions.push({
     id: partition.id,
     name: partition.alias,
     pts: partition.pts,
-    p: partition
+    line: reg_curve.curve,
+    area: reg_curve.curve.map((pt, i) => ({pt, std: reg_curve.std[i]}))
   });
 
   update(partitions);
@@ -131,8 +130,8 @@ function update(list, all=false) {
 
   groups.enter()
     .append('div')
-      .on('mouseenter', d => publish('partition.highlight', d.p, true))
-      .on('mouseleave', d => publish('partition.highlight', d.p, false))
+      // .on('mouseenter', d => publish('partition.highlight', d.p, true))
+      // .on('mouseleave', d => publish('partition.highlight', d.p, false))
       .call(group.create)
     .merge(groups)
       .call(group, all);

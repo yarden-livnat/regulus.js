@@ -8,6 +8,8 @@ export default function Plot() {
   let x = null;
   let y = null;
   let color = null;
+  let line = null;
+  let area = null;
 
   function plot(selection) {
     selection.each(function (d, i)  {
@@ -15,7 +17,7 @@ export default function Plot() {
       let ty = y.get(this);
 
       let pts = d3.select(this).select('.pts').selectAll('circle')
-          .data(d);
+          .data(d.pts);
 
       pts.enter().append('circle')
           .attr('r', 1.5)
@@ -24,6 +26,15 @@ export default function Plot() {
         .merge(pts)
           .style("fill", d => color(d));
       pts.exit().remove();
+
+      let test =  d3.select(this).select('.line');
+
+      d3.select(this).select('.line')
+        // .datum(d.line)
+        .attr('d', line.get(this)(d.line));
+
+      d3.select(this).select('.area')
+        .attr('d', area.get(this)(d.area));
     });
   }
 
@@ -39,7 +50,9 @@ export default function Plot() {
       .attr('width', width)
       .attr('height', height);
 
+    g.append('path').attr('class', 'area');
     g.append('g').attr('class', 'pts');
+    g.append('path').attr('class', 'line');
   };
 
   plot.size = function(_) {
@@ -55,6 +68,16 @@ export default function Plot() {
 
   plot.y = function(_) {
     y = _;
+    return this;
+  };
+
+  plot.line = function(_) {
+    line = _;
+    return this;
+  };
+
+  plot.area = function(_) {
+    area = _;
     return this;
   };
 

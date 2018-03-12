@@ -9,6 +9,23 @@ export default function YAxis() {
   let axis = d3.axisLeft(scale).ticks(2, 's');
   let name = 'y axis';
 
+  function brushed() {
+    let range = d3.event.selection.map(scale.invert);
+    console.log('bushed', range);
+  }
+
+  function brush_ended() {
+    if (!d3.event.sourceEvent) return; // Only transition after input.
+    if (!d3.event.selection) return; // Ignore empty selections.
+    let range = d3.event.selection.map(scale.invert);
+    console.log('end', range);
+  }
+
+  function brush_started() {
+    let range = d3.event.selection.map(scale.invert);
+    console.log('started', range);
+  }
+
   function y(selection) {
     selection.selectAll('.y').call(axis);
   }
@@ -24,14 +41,13 @@ export default function YAxis() {
       .attr('class', 'y axis')
       .call(axis);
 
-    svg.append('text')
-      .attr('class', 'label')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', -margin.left)
-      .attr('x', -height/2)
-      .attr('dy', '1em')
-      .style('text-anchor', 'middle')
-      .text(name);
+    svg.append('g')
+      .attr('class', 'brush')
+      .call(d3.brushY()
+        .extent([[0, 0], [10, height]])
+        .on('brush', brushed)
+        .on('end', brush_ended)
+        .on('start', brush_started));
   };
 
   y.domain = function(_) {

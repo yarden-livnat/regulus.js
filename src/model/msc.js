@@ -1,4 +1,5 @@
 import * as d3 from 'd3-array';
+import Partition from "./partition";
 
 function build_tree(partitions){
   let map = new Map();
@@ -65,8 +66,8 @@ export class MSC {
 
   set msc(_) {
     this.name = _.name;
-    this.partitions = _.partitions;
     this.pts_idx = _.pts;
+    this.partitions = _.partitions.map(p => new Partition(p, this));
     this.tree = build_tree(this.partitions);
 
     this.measure = this.measures.find( m => m.name === this.name);

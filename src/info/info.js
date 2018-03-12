@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-import * as service from "../service";
+import * as service from "../app/service";
 import {MSC} from '../model/msc';
 import {publish, subscribe} from '../utils/pubsub';
 import template from './info.html';

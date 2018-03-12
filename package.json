@@ -15,7 +15,11 @@
     "d3-component": "^3.1.0",
     "d3-fetch": "^1.1.0",
     "d3-scale-chromatic": "^1.2.0",
-    "html-loader": "^1.0.0-alpha.0"
+    "font-awesome": "^4.7.0",
+    "html-loader": "^1.0.0-alpha.0",
+    "kernel-smooth": "^0.2.3",
+    "validate.io-array": "^1.0.6",
+    "validate.io-function": "^1.0.2"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^0.1.18",

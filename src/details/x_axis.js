@@ -9,6 +9,23 @@ export default function XAxis() {
   let axis =  d3.axisBottom(scale).ticks(2, 's');
   let name = 'x axis';
 
+  function brushed(dim) {
+    let range = d3.event.selection.map(scale.domain(dim.extent).invert);
+    console.log('bushed', dim, range);
+  }
+
+  function brush_ended(dim) {
+    if (!d3.event.sourceEvent) return; // Only transition after input.
+    if (!d3.event.selection) return; // Ignore empty selections.
+    let range = d3.event.selection.map(scale.domain(dim.extent).invert);
+    console.log('end', dim, range);;
+  }
+
+  function brush_started(dim) {
+    let range = d3.event.selection.map(scale.domain(dim.extent).invert);
+    console.log('started', dim, range);
+  }
+
   function x(selection) {
     selection.select('.x').each(function (d) {
       scale.domain(d.extent);
@@ -25,14 +42,20 @@ export default function XAxis() {
 
     svg.append('g')
       .attr('class', 'x axis')
-      // .attr("transform", `translate(0,${height})`)
       .call(axis);
+
+    svg.append('g')
+      .attr('class', 'brush')
+      .call(d3.brushX()
+        .extent([[0, -10], [width, 0]])
+        .on('brush', brushed)
+        .on('end', brush_ended)
+        .on('start', brush_started));
 
     svg.append('text')
       .attr('class', 'label')
       .attr('transform', `translate(${width/2},${height + margin.top + 20})`)
       .style('text-anchor', 'middle');
-      // .text(name);
   };
 
   x.domain = function(_) {

@@ -12,12 +12,16 @@ let DURATION = 1000;
 
 export default function Group() {
   let dims = [];
+  let measure = null;
   let y_axis = YAxis();
+  let sy = d3.scaleLinear().range([100, 0]);
 
   let yScale = d3.scaleLinear().range([PLOT_HEIGHT, 0]);
 
   let x = d3.local();
-  let plot = Plot().x(x);
+  let area = d3.local();
+  let line = d3.local();
+  let plot = Plot().x(x).line(line).area(area);
 
   function loc(i) {
     return `${GROUP_OFFSET + i * GROUP_SIZE}px`;
@@ -35,7 +39,12 @@ export default function Group() {
         g.select('.header .id').text(d => `id: ${d.id}`);
         g.select('.header .name').text(d => d.name);
         g.select('.header .size').text(d => `${d.pts.length} pts`);
-        g.select('.y_axis').call(y_axis);
+
+        // let w = g.select('.measure .name').attr('width');
+        // let h = g.select('.measure .name').attr('height');
+        // console.log('w,h', w, h);
+        g.select('.measure .name').text(measure.name); //.attr('width', w).attr('height', h);
+        g.select('.measure .y_axis').call(y_axis);
 
         let plots = g.select('.plots').selectAll('.plot').data(dims);
         let list = plots.enter()
@@ -45,11 +54,23 @@ export default function Group() {
           list = list.merge(plots);
           // .merge(plots)
         list
-          .each(function (dim) {
+          .each(function (dim, i) {
             let sx = d3.scaleLinear().range([0, PLOT_WIDTH]).domain(dim.extent);
             x.set(this, pt => sx(pt[dim.name]));
+
+
+            let mi = dims.length;
+            line.set(this, d3.line()
+              .x(pt => sx(pt[i]))
+              .y(pt => sy(pt[mi])));
+
+            area.set(this, d3.area()
+              .y0((d,i) => sy(d.pt[mi]))
+              .y1((d,i) => sy(d.pt[mi]))
+              .x0((d,i) => sx(d.pt[i] - d.std[i]/2))
+              .x1((d,i) => sx(d.pt[i] + d.std[i]/2)));
           })
-          .datum(d.pts)
+          .datum(d)
           .call(plot);
       });
   }
@@ -61,7 +82,7 @@ export default function Group() {
       .style('opacity', 0);
     selection.html(template);
 
-    selection.selectAll('.y_axis').call(y_axis.create);
+    selection.select('.measure').selectAll('.y_axis').call(y_axis.create);
   };
 
   group.remove = function(selection) {
@@ -77,7 +98,9 @@ export default function Group() {
   };
 
   group.measure = function(_) {
+    measure = _;
     y_axis.domain(_);
+    sy.domain(_.extent);
   };
 
   group.color = function(_) {

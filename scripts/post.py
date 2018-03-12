@@ -1,11 +1,9 @@
 import numpy as np
 import json
 import csv
-import pandas as pd
-import fileinput, sys
 import argparse
 from pathlib import Path
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 
 from topopy.MorseSmaleComplex import MorseSmaleComplex as MSC
 
@@ -19,16 +17,16 @@ class Merge(object):
 
 
 class Partition(object):
-    _id = 0
+    _id_generator = -1
 
     @staticmethod
     def gen_id():
-        Partition._id += 1
-        return Partition._id
+        Partition._id_generator += 1
+        return Partition._id_generator
 
     @staticmethod
-    def reset_id():
-        Partition._id = 0
+    def reset():
+        Partition._id_generator = -1
 
     def __init__(self, persistence, base_pts=None, min_idx=None, max_idx=None, child=None):
         self.id = Partition.gen_id()
@@ -37,8 +35,8 @@ class Partition(object):
         self.parent = None
         self.children = []
 
-        self.extrema = None
-        self.base_pts = base_pts
+        self.extrema = []
+        self.base_pts = base_pts if base_pts is not None else []
         self.min_idx = min_idx
         self.max_idx = max_idx
 
@@ -65,6 +63,8 @@ class Post(object):
         self.original_pts = set()
         self.debug = debug
         self.mapping = dict()
+        self.unique = set()
+        self.all = dict()
 
     def load(self, path):
         with open(path / 'Base_Partition.json') as f:
@@ -82,13 +82,21 @@ class Post(object):
             self.merges.append(Merge(float(row[1]), row[0] == 'Maxima', int(row[2]), int(row[3])))
         return self
 
+    def find_loop(self, dest):
+        loop = [dest]
+        while dest in self.mapping:
+            dest = self.mapping[dest]
+            loop.append(dest)
+        return loop
+
     def build(self):
         self.prepare()
         for merge in self.merges:
             # print(merge.level, merge.is_max, merge.src, merge.dest)
             if merge.src == merge.dest:
-                # print('degenerate', merge.level, merge.is_max, merge.src, merge.dest)
                 continue
+            # if merge.src in [1399] or merge.dest in [1399]:
+            #     print('related merge')
             # merge.dest may have been merged already (same persistence level: degenerate)
             # if merge.src == 832 and merge.dest == 37:
             #     print('check')
@@ -96,13 +104,7 @@ class Post(object):
             while dest in self.mapping:
                 dest = self.mapping[dest]
             if merge.src == dest:
-                loop = []
-                d = merge.dest
-                loop.append(d)
-                while d in self.mapping:
-                    d = self.mapping[d]
-                    loop.append(d)
-                print('loop: dest points back to src', merge.src, loop)
+                print('loop: dest points back to src', self.find_loop(dest))
                 continue
 
             merge.dest = dest
@@ -121,6 +123,7 @@ class Post(object):
         self.visit(self.root, 0)
         if self.debug:
             self.statistics()
+            self.sanity_check()
         return self
 
     def save(self, path, name):
@@ -137,12 +140,33 @@ class Post(object):
         with open(path / filename, 'w') as f:
             json.dump(tree, f)
 
+    def find_unique(self):
+        count = defaultdict(int)
+        for p in self.active:
+            count[p.min_idx] += 1
+            count[p.max_idx] += 1
+        self.unique = {k for k, v in count.items() if v == 1}
+        print('unique:', self.unique)
+        self.all = count
+
+    def remove_non_unique(self):
+        for p in self.active:
+            for idx in [p.min_idx, p.max_idx]:
+                if idx not in self.unique:
+                    p.base_pts.remove(idx)
+
     # Private functions
     def prepare(self):
+        Partition.reset()
         for key, value in self.base.items():
             m, x = [int(s) for s in key.split(',')]
             p = Partition(0, list(value), m, x)
             self.add(p)
+            # if 1399 in p.base_pts:
+            #     print('1399 in', p.id, p.min_idx, p.max_idx)
+
+        self.find_unique()
+        self.remove_non_unique()
 
         self.merges.sort(key=lambda m: (m.level, m.src))
         high = self.merges[-1].level
@@ -154,24 +178,32 @@ class Post(object):
         add = []
         remove = set()
 
+        if merge.src in [8410] or merge.dest in [8410]:
+            print('related merge')
         for d in idx_map[merge.dest]:
             n = None
-            remove_s = set()
+            remove_src = set()
             for s in idx_map[merge.src]:
                 if idx(s) == idx(d):
                     if s.persistence == merge.level:
-                        if len(s.children) > 0:
-                            d.children.extend(s.children)
+                        # s is an intermediate and should be absorbed
+                        if len(s.children) == 0:
+                            # s is a base partition
+                            for p in s.base_pts:
+                                if p in d.base_pts:
+                                    print('adding duplicated base pts')
+                            d.base_pts.extend(s.base_pts)
                         else:
-                            d.add_child(s)
+                            for child in s.children:
+                                d.add_child(child)
                     else:
                         if n is None:
                             n = Partition(merge.level, child=d)
                             remove.add(d)  # can't be removed during the iterations
                             add.append(n)
                         n.add_child(s)
-                    remove_s.add(s)  # can't be removed during the iterations
-            for s in remove_s:
+                    remove_src.add(s)  # can't be removed during the iterations
+            for s in remove_src:
                 self.remove(s)
 
         for s in idx_map[merge.src]:
@@ -186,10 +218,15 @@ class Post(object):
             self.remove(r)
 
         # assign the eliminated extrema as an extra internal point to the first new partition
-        if len(add) > 0:
-            add[0].extrema = [merge.src]
-            for n in add:
-                self.add(n)
+        if merge.src not in self.unique:
+            if len(add) > 0:
+                target = add[0]
+            else:
+                target = next(iter(idx_map[merge.dest]))
+            target.extrema.append(merge.src)
+
+        for n in add:
+            self.add(n)
 
     def add(self, n):
         self.min_map[n.min_idx].add(n)
@@ -205,22 +242,18 @@ class Post(object):
         first = idx
         if len(partition.children) == 0:
             add = partition.base_pts
-            try:
-                add.remove(partition.min_idx)
-            except ValueError:
-                pass
-            try:
-                add.remove(partition.max_idx)
-            except ValueError:
-                pass
-
+            if partition.min_idx in add and partition.min_idx not in self.unique:
+                print('min in partition', partition.min_idx)
+                # add.remove(partition.min_idx)
+            if partition.max_idx in add and partition.max_idx not in self.unique:
+                print('max in partition', partition.max_idx)
+                # add.remove(partition.max_idx)
             if len(add) > 0:
                 self.pts.extend(add)
                 idx += len(add)
         else:
-            if partition.extrema is not None:
-                self.pts.extend(partition.extrema)
-                idx += len(partition.extrema)
+            self.pts.extend(partition.extrema)
+            idx += len(partition.extrema)
             for child in partition.children:
                 idx = self.visit(child, idx)
 
@@ -282,6 +315,42 @@ class Post(object):
             n += n1
             b += b1
         return n, b
+
+    def sanity_check(self, node=None, pts=None):
+        if node is not None:
+            for p in node.extrema:
+                if p in self.unique:
+                    print('extrema in unique {} i node:{}'.format(p, node.id))
+                if p in pts:
+                    print('duplicate extrema')
+                else:
+                    pts.add(p)
+                    del self.all[p]
+            if len(node.children) > 0:
+                for child in node.children:
+                    self.sanity_check(child, pts)
+            elif node.base_pts is not None:
+                # pts.extend(node.base_pts)
+                for p in node.base_pts:
+                    if p in pts:
+                        print('duplicate base {} in partition id:{} lvl:{}, min:{} max:{}, extrema:{}'.format(p,
+                                node.id, node.persistence, node.min_idx, node.max_idx, node.extrema))
+                    else:
+                        pts.add(p)
+                        if p in self.all:
+                            del self.all[p]
+        else:
+            pts = set()
+            n = len(self.all)
+            self.sanity_check(self.root, pts)
+            print('**** sanity check. pts:{}  #base min/max: {} {}'.format(len(pts), n, len(self.all)))
+            for k, v in self.all.items():
+                print('[all] {}: {}'.format(k,v))
+            for p in self.all:
+                if p in pts:
+                    print('minmax {} is in pts', p)
+            print('root min/max: {}  {}'.format(self.root.min_idx, self.root.max_idx))
+
 
 
 def post(args=None):
