@@ -23,6 +23,10 @@ export default function List() {
    */
 
   function render_partition(selection) {
+  //   let l = selection.select('li');
+  //   let la = selection.selectAll('li');
+  //   let n = selection.select('.node');
+
     selection
       .classed('foo', p => p.filtered)
       .text( p => `${format_lvl(p.lvl)} id: ${format_id(p.id)} size:${p.pts_idx[1]-p.pts_idx[0] + (p.extrema && p.extrema.length || 0)}`);
@@ -83,6 +87,7 @@ export default function List() {
 
   function api(_) {
     el = (typeof _ === 'string') && d3.select(_) || _;
+    el = el.append('ul');
     return api;
   }
 
@@ -110,9 +115,12 @@ export default function List() {
           break;
         }
       }
-      if (node.filtered) console.log('filtered node:', node.id);
+      // if (node.filtered) console.log('filtered node:', node.id);
     }
-    render();
+    // render();
+    // let items = el.selectAll('li').data(nodes, d => d.id)
+    //   .call(render_partition);
+
     return this;
   };
 

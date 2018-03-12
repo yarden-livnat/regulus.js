@@ -118,7 +118,8 @@ function add(partition) {
     name: partition.alias,
     pts: partition.pts,
     line: reg_curve.curve,
-    area: reg_curve.curve.map((pt, i) => ({pt, std: reg_curve.std[i]}))
+    area: reg_curve.curve.map((pt, i) => ({
+      pt, std: reg_curve.std[i]}))
   });
 
   update(partitions);

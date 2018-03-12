@@ -16,7 +16,6 @@ setup();
 init();
 
 function setup() {
-
   info.setup(dataset_panel('#dataset_view').content());
   details_view.setup( Panel('Details')('#details_view').content());
   tree_view.setup(Panel('Tree')('#tree_view').content());

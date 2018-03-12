@@ -62,10 +62,10 @@ export default function Group() {
               .y(pt => sy(pt[mi])));
 
             area.set(this, d3.area()
-              .y0((d,i) => sy(d.pt[mi]))
-              .y1((d,i) => sy(d.pt[mi]))
-              .x0((d,i) => sx(d.pt[i] - d.std[i]/2))
-              .x1((d,i) => sx(d.pt[i] + d.std[i]/2)));
+              .y0((p) => sy(p.pt[mi]))
+              .y1((p) => sy(p.pt[mi]))
+              .x0((p) => sx(p.pt[i] - p.std[i]/2))
+              .x1((p) => sx(p.pt[i] + p.std[i]/2)));
           })
           .datum(d)
           .call(plot);

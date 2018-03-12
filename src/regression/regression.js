@@ -21,22 +21,29 @@ function sum(vec) {
   return s;
 }
 
+
 // p-dimensional vector
 function matrixize( fun ) {
-  return function( X ) {
-    if ( isArray( X ) === true ) {
-      if ( isArray(X[0]) === false ) {
-        return fun( X );
-      } else {
-        return X.map( function( x_row ) {
-          return fun( x_row );
-        } );
-      }
-    } else {
-      throw new TypeError( 'Parameter expects array' );
-    }
-  };
+  return x => {
+    if (!isArray(x)) throw new TypeError('Parameter expects array');
+    return !isArray(x[0]) ? fun(x) : x.map(row => fun(row));
+  }
 }
+
+//   return function( X ) {
+//     if ( isArray( X ) === true ) {
+//       if ( isArray(X[0]) === false ) {
+//         return fun( X );
+//       } else {
+//         return X.map( function( x_row ) {
+//           return fun( x_row );
+//         } );
+//       }
+//     } else {
+//       throw new TypeError( 'Parameter expects array' );
+//     }
+//   };
+// }
 
 export function inverseMultipleRegression( Xs, ys, kernel, bandwidth ) {
   if ( bandwidth <= 0 ) {

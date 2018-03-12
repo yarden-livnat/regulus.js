@@ -93,12 +93,13 @@
 }
 
 .details .plot .area {
-  fill: #f1f1f1;
-  stroke: #f1f1f1;
+  fill: #f0f0f0;
+  stroke: gray;
   stroke-linejoin: round;
   stroke-linecap: round;
-  stroke-opacity: 1;
+  stroke-opacity: 0.3;
   stroke-width: 1px;
+  z-index: 0;
 }
 
 .details .plot circle {
