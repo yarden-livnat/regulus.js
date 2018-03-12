@@ -2,6 +2,7 @@ MANIFEST
 build
 dist
 lib
+data
 
 node_modules
 .cache

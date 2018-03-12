@@ -1,13 +1,15 @@
 import * as d3 from 'd3';
-
+import {publish, subscribe} from '../utils/pubsub';
 import template from './controls.html';
+import Chart from './chart';
 import './style.css';
 let root = null;
-let pchart =
+let msc = null;
+let pchart = Chart();
 
 export function setup(el) {
   root = typeof el === 'string' && d3.select(el) || el;
-  root.classed('partition_view', true);
+  root.classed('control_view', true);
   root.html(template);
 
   subscribe('data.new', (topic, data) => reset(data));
@@ -16,5 +18,5 @@ export function setup(el) {
 function reset(data) {
     msc = data;
 
-    controls.data(msc.tree);
+    pchart.data(msc.tree);
 }
