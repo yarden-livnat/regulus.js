@@ -22,8 +22,10 @@ export default function List() {
    * node rendering functions
    */
 
-  function render_partition(p) {
-    return `${format_lvl(p.lvl)} id: ${format_id(p.id)} size:${p.pts_idx[1]-p.pts_idx[0] + (p.extrema && p.extrema.length || 0)}`;
+  function render_partition(selection) {
+    selection
+      .classed('foo', p => p.filtered)
+      .text( p => `${format_lvl(p.lvl)} id: ${format_id(p.id)} size:${p.pts_idx[1]-p.pts_idx[0] + (p.extrema && p.extrema.length || 0)}`);
   }
 
 
@@ -53,7 +55,7 @@ export default function List() {
         .on('click', ensure_single(select))
         .on('dblclick', edit)
       .merge(items)
-        .text(render_partition);
+        .call(render_partition);
 
     items.exit().remove();
   }
@@ -79,7 +81,6 @@ export default function List() {
     });
   }
 
-
   function api(_) {
     el = (typeof _ === 'string') && d3.select(_) || _;
     return api;
@@ -98,6 +99,21 @@ export default function List() {
   api.highlight = function(node, on) {
     let n = el.selectAll('li label').data([node], d => d.id);
     n.classed('highlight', on);
+  };
+
+  api.update = function() {
+    for (let node of nodes) {
+      node.filtered = true;
+      for (let pt of node.pts) {
+        if (!pt.filtered) {
+          node.filtered = false;
+          break;
+        }
+      }
+      if (node.filtered) console.log('filtered node:', node.id);
+    }
+    render();
+    return this;
   };
 
   api.on = function(event, cb) {
