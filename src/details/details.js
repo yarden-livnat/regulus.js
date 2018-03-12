@@ -135,7 +135,6 @@ function remove(partition){
 }
 
 function update_filter(attr) {
-  console.log('updade filters');
   for (let pt of msc.pts) {
     pt.filtered = !pts_filters(pt);
   }
@@ -152,6 +151,8 @@ function update(list, all=false) {
       y.set(this, pt => sy(pt[measure.name]));
     });
 
+  let t0 = performance.now();
+
   let groups = root.select('.groups').selectAll('.group')
     .data(list, d => d.id);
 
@@ -164,5 +165,7 @@ function update(list, all=false) {
       .call(group, all);
 
   groups.exit().call(group.remove);
+  let t1 = performance.now();
+  console.log(`details update: ${t1-t0} msec`);
 }
 

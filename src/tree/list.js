@@ -11,6 +11,9 @@ export default function List() {
 
   let format_lvl = d3.format('4.2f'), format_id = d3.format('3d');
 
+  let pts2nodes = new Map();
+  let pts = new Set();
+
   function collect_nodes(node, list) {
     list.push(node);
     for (let child of node.children) {
@@ -18,23 +21,64 @@ export default function List() {
     }
   }
 
+  function map_pts_to_nodes() {
+    let t0 = performance.now();
+    pts2nodes = new Map();
+    pts = new Set();
+
+    for (let node of nodes) {
+      node.acitve = node.pts.length;
+      for (let pt of node.pts) {
+        pts.add(pt);
+        let entry = pts2nodes.get(pt.id);
+        if (!entry) {
+          entry = [];
+          pts2nodes.set(pt.id, entry);
+        }
+        entry.push(node);
+      }
+    }
+    let t1 = performance.now();
+    // console.log(`map pts to nodes: ${t1-t0}msec`);
+  }
+
+  function filter_nodes() {
+    let t0 = performance.now();
+    for (let node of nodes) {
+      node.filtered = false;
+      node.active = node.pts.length;
+    }
+    for (let pt of pts) {
+      if (pt.filtered) {
+        for (let node of pts2nodes.get(pt.id))
+          node.active--;
+      }
+    }
+    for (let node of nodes) {
+      node.filtered = node.active === 0;
+    }
+    let t1 = performance.now();
+    // console.log(`filter nodes: ${t1-t0}msec`);
+  }
+
+
   /*
    * node rendering functions
    */
 
   function render_partition(selection) {
-  //   let l = selection.select('li');
-  //   let la = selection.selectAll('li');
-  //   let n = selection.select('.node');
+    let l = selection.select('li');
+    let la = selection.selectAll('li');
+    let n = selection.select('.node');
+    let na = selection.selectAll('.node');
 
     selection
-      .classed('foo', p => p.filtered)
-      .text( p => `${format_lvl(p.lvl)} id: ${format_id(p.id)} size:${p.pts_idx[1]-p.pts_idx[0] + (p.extrema && p.extrema.length || 0)}`);
+      .classed('filtered', p => p.filtered)
+      .text( p => `${format_lvl(p.lvl)} id: ${format_id(p.id)} size:${p.pts_idx[1]-p.pts_idx[0]} active:${p.active}`);
   }
 
 
   function highlight(d, on) {
-    // d3.select(this).classed('highlight', on);
     dispatch.call('highlight', this, d, on);
   }
 
@@ -53,7 +97,7 @@ export default function List() {
 
     items.enter()
       .append('li')
-      .append('label')
+      // .append('label')
         .classed('node', true)
         .on('mouseover', on_hover(highlight, 100))
         .on('click', ensure_single(select))
@@ -97,6 +141,8 @@ export default function List() {
     render();
     collect_nodes(root, nodes);
     nodes = nodes.sort( (a, b) => b.lvl - a.lvl || a.id - b.id);
+    map_pts_to_nodes();
+
     render();
     return this;
   };
@@ -107,19 +153,8 @@ export default function List() {
   };
 
   api.update = function() {
-    for (let node of nodes) {
-      node.filtered = true;
-      for (let pt of node.pts) {
-        if (!pt.filtered) {
-          node.filtered = false;
-          break;
-        }
-      }
-      // if (node.filtered) console.log('filtered node:', node.id);
-    }
-    // render();
-    // let items = el.selectAll('li').data(nodes, d => d.id)
-    //   .call(render_partition);
+    filter_nodes();
+    render();
 
     return this;
   };

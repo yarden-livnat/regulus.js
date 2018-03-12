@@ -94,6 +94,7 @@
 
 .details .plot .area {
   fill: #f0f0f0;
+  fill-opacity: 0.4;
   stroke: gray;
   stroke-linejoin: round;
   stroke-linecap: round;

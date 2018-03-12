@@ -30,6 +30,7 @@ export default function Plot() {
   }
 
   function plot(selection) {
+    let t0 = performance.now();
     selection.each(function (d, i)  {
       let root = d3.select(this);
 
@@ -41,9 +42,12 @@ export default function Plot() {
       root.select('.area')
         .attr('d', area.get(this)(d.area));
     });
+    let t1 = performance.now();
+    // console.log(`details plot render: ${t1-t0} msec`);
   }
 
   plot.create = function(selection) {
+    let t0 = performance.now();
     let g = selection
         .attr('class', 'plot')
         .attr('width', width + margin.left + margin.right)
@@ -58,6 +62,8 @@ export default function Plot() {
     g.append('path').attr('class', 'area');
     g.append('g').attr('class', 'pts');
     g.append('path').attr('class', 'line');
+    let t1 = performance.now();
+    // console.log(`details plot create: ${t1-t0} msec`);
   };
 
   plot.size = function(_) {

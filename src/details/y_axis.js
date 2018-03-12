@@ -7,6 +7,7 @@ export default function YAxis() {
 
   let scale = d3.scaleLinear().range([height, 0]);
   let axis = d3.axisLeft(scale).ticks(2, 's');
+  let extent = [0, 0];
 
   let brush_selection;
   let brush = d3.brushY().extent([[2, 0], [12, height]])
@@ -32,7 +33,11 @@ export default function YAxis() {
     if (!d3.event.sourceEvent) return; // Only transition after input.
     if (!d3.event.selection) return; // Ignore empty selections.
     let range = d3.event.selection.map(scale.invert);
-    if (filter) filter.range([range[1], range[0]]);
+    if ((range[0]-range[1])/(extent[1]-extent[0]) < 0.01)
+      range = null;
+    else
+      range = [range[1], range[0]];
+    if (filter) filter.range(range);
     dispatch.call('filter');
   }
 
@@ -79,6 +84,7 @@ export default function YAxis() {
 
   y.domain = function(_) {
     name = _.name;
+    extent = _.extent;
     scale.domain(_.extent);
     return this;
   };

@@ -33,6 +33,7 @@ export default function Group() {
       .style('top', (d, i) => loc(i))
       .style('opacity', 1);
 
+    let t0 = performance.now();
     selection
       .each(function(d, i) {
         let g = d3.select(this);
@@ -70,9 +71,12 @@ export default function Group() {
           .datum(d)
           .call(plot);
       });
+    let t1 = performance.now();
+    // console.log(`details group render: ${t1-t0} msec`);
   }
 
   group.create = function(selection) {
+    let t0 = performance.now();
     selection
       .attr('class', 'group')
       .style('top', (d, i)=> loc(i))
@@ -80,6 +84,8 @@ export default function Group() {
     selection.html(template);
 
     selection.select('.measure').selectAll('.y_axis').call(y_axis.create);
+    let t1 = performance.now();
+    // console.log(`details group create: ${t1-t0} msec`);
   };
 
   group.remove = function(selection) {

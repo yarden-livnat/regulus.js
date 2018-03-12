@@ -16,9 +16,9 @@
   /*user-select: none;*/
 }
 
-.tree_view .node.foo {
-  color: red;
-  background-color: blue;
+.tree_view .node.filtered {
+  color: #f0f0f0;
+  /*background-color: blue;*/
 }
 
 .tree_view .node.highlight {

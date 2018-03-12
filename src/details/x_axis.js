@@ -23,9 +23,14 @@ export default function XAxis() {
   function brush_ended(dim) {
     if (!d3.event.sourceEvent) return; // Only transition after input.
     if (!d3.event.selection) return; // Ignore empty selections.
-    let range = d3.event.selection.map(scale.domain(dim.extent).invert);
-    dim.filter.range(range);
-    dispatch.call('filter', this, dim, range);
+    if (dim.filter) {
+      let range = d3.event.selection.map(scale.domain(dim.extent).invert);
+      if ((range[1] - range[0]) / (dim.extent[1] - dim.extent[0]) < 0.01)
+        dim.filter.range(null);
+      else
+        dim.filter.range(range);
+      dispatch.call('filter', this, dim, range);
+    }
   }
 
   function brush_started(dim) {

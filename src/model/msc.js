@@ -40,6 +40,10 @@ export class MSC {
 
   samples(pts, ndims) {
     this.pts = pts;
+    let id = 0;
+    for (let pt of pts) {
+      pt.id = id++;
+    }
     let n = pts.columns.length;
     this.attrs = pts.columns.map(name => ({name, extent: d3.extent(pts, pt => pt[name]) }));
     this.dims = this.attrs.slice(0, ndims).sort( (a,b) => a.name > b.name);
