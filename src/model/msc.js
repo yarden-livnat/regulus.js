@@ -1,4 +1,5 @@
 import * as d3 from 'd3-array';
+import Partition from "./partition";
 
 function build_tree(partitions){
   let map = new Map();
@@ -34,31 +35,42 @@ export class MSC {
     this.ndims = 0;
     this.attr = [];
     this.dims = [];
-    this.measure = "";
-    this.minmax = [];
+    this.measures = [];
   }
 
   samples(pts, ndims) {
     this.pts = pts;
     let n = pts.columns.length;
-    this.attrs = pts.columns;
-    this.dims = pts.columns.slice(0, ndims);
-    this.measure = pts.columns.slice(ndims);
-
-    this.minmax = this.attrs.map(name => ({
-      name: name,
-      minmax: d3.extent(pts, entry => entry[name])
-    }));
+    this.attrs = pts.columns.map(name => ({name, extent: d3.extent(pts, pt => pt[name]) }));
+    this.dims = this.attrs.slice(0, ndims).sort( (a,b) => a.name > b.name);
+    this.measures = this.attrs.slice(ndims).sort( (a,b) => a.name > b.name);
 
     return this;
+  }
+
+  partition_pts(partition) {
+    if (!partition.pts) {
+      let pts = [];
+      for (let i = partition.pts_idx[0]; i < partition.pts_idx[1]; i++) {
+        pts.push(this.pts[this.pts_idx[i]]);
+      }
+      // consider adding the min/max points
+      partition.pts = pts;
+    }
+    return partition.pts;
+  }
+
+  measure_by_name(name) {
+    return this.measures.find(m => m.name === name);
   }
 
   set msc(_) {
     this.name = _.name;
-    this.partitions = _.partitions;
+    this.pts_idx = _.pts;
+    this.partitions = _.partitions.map(p => new Partition(p, this));
     this.tree = build_tree(this.partitions);
-    // this.partitions.forEach( p => p.pts = this.pts);
+
+    this.measure = this.measures.find( m => m.name === this.name);
     return this;
   }
-
 }

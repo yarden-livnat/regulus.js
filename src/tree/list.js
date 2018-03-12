@@ -9,7 +9,7 @@ export default function List() {
   let nodes = [];
   let dispatch = d3.dispatch('highlight', 'select', 'edit');
 
-  let format_lvl = d3.format('3.2'), format_id = d3.format('3d');
+  let format_lvl = d3.format('4.2f'), format_id = d3.format('3d');
 
   function collect_nodes(node, list) {
     list.push(node);
@@ -88,6 +88,7 @@ export default function List() {
   api.data = function (root) {
     tree = root;
     nodes = [];
+    render();
     collect_nodes(root, nodes);
     nodes = nodes.sort( (a, b) => b.lvl - a.lvl || a.id - b.id);
     render();

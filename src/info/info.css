@@ -17,7 +17,7 @@
 
 .info ul li.selected {
   font-weight: bold;
-  /*color:lightblue;*/
+  background-color:lightblue;
 }
 
 .info ul li.disabled {
