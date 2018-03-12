@@ -51,6 +51,7 @@ export default function XAxis() {
 
   x.create = function(selection) {
     let svg = selection.append('svg')
+      .classed('filter', true)
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
       .append('g')

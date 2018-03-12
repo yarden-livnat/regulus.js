@@ -14,6 +14,7 @@
     "d3": "^4.13.0",
     "d3-component": "^3.1.0",
     "d3-fetch": "^1.1.0",
+    "d3-lasso": "^0.0.5",
     "d3-scale-chromatic": "^1.2.0",
     "font-awesome": "^4.7.0",
     "html-loader": "^1.0.0-alpha.0",

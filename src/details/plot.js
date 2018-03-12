@@ -1,4 +1,6 @@
 import * as d3 from 'd3'
+window.d3 = d3;
+import {lasso as Lasso} from 'd3-lasso';
 
 export default function Plot() {
   let margin = {top: 0, right: 0, bottom: 0, left: 0},
@@ -10,6 +12,74 @@ export default function Plot() {
   let color = null;
   let line = null;
   let area = null;
+  let lasso = Lasso()
+    .closePathSelect(true)
+    .closePathDistance(100)
+    // .items(circles)
+    // .targetArea(svg)
+    .on("start",lasso_start)
+    .on("draw",lasso_draw)
+    .on("end",lasso_end);
+
+  let use_lasso = true;
+
+  let brush = d3.brush().extent([[0, 0], [width, height]])
+    .on('brush', brushed)
+    .on('end', brush_ended)
+    .on('start', brush_started);
+
+  function brushed() {
+    console.log('brushed')
+    // let range = d3.event.selection.map(scale.domain(dim.extent).invert);
+    // dim.filter.range(range);
+    // dispatch.call('filter', this, dim, range);
+  }
+
+  function brush_started() {
+
+  }
+
+  function brush_ended() {
+  }
+
+  function lasso_start() {
+    console.log('lasso start');
+    lasso.items()
+      .attr("r",3.5) // reset size
+      .classed("not_possible",true)
+      .classed("selected",false);
+  }
+
+  function lasso_draw() {
+    console.log('lasso draw');
+    // Style the possible dots
+    lasso.possibleItems()
+      .classed("not_possible",false)
+      .classed("possible",true);
+
+    // Style the not possible dot
+    lasso.notPossibleItems()
+      .classed("not_possible",true)
+      .classed("possible",false);
+  }
+
+  function lasso_end() {
+    console.log('lasso end')
+    // Reset the color of all dots
+    lasso.items()
+      .classed("not_possible",false)
+      .classed("possible",false);
+
+    // Style the selected dots
+    lasso.selectedItems()
+      .classed("selected",true)
+      .attr("r",7);
+
+    // Reset the style of the not selected dots
+    lasso.notSelectedItems()
+      .attr("r",3.5);
+
+  }
 
   function svg_render_pts(d ,i) {
     let tx = x.get(this);
@@ -27,6 +97,12 @@ export default function Plot() {
       .attr('z-index', d => d.filtered && -1 || 1);
 
     pts.exit().remove();
+
+    if (use_lasso) {
+      let c = d3.select(this).select('.pts').selectAll('circle');
+      lasso.items(c);
+      // d3.select(this).call(lasso);
+    }
   }
 
   function plot(selection) {
@@ -48,20 +124,32 @@ export default function Plot() {
 
   plot.create = function(selection) {
     let t0 = performance.now();
-    let g = selection
+    let svg = selection
         .attr('class', 'plot')
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
       .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    g.append('rect')
+    svg.append('rect')
+      .classed('background', true)
       .attr('width', width)
       .attr('height', height);
 
-    g.append('path').attr('class', 'area');
-    g.append('g').attr('class', 'pts');
-    g.append('path').attr('class', 'line');
+    svg.append('path').attr('class', 'area');
+    svg.append('g').attr('class', 'pts');
+    svg.append('path').attr('class', 'line');
+
+    if (!use_lasso) {
+      svg.append('g')
+        .attr('class', 'brush')
+        .call(brush);
+    }
+    else {
+      lasso.targetArea(svg);
+      svg.call(lasso);
+    }
+
     let t1 = performance.now();
     // console.log(`details plot create: ${t1-t0} msec`);
   };

@@ -139,10 +139,10 @@ export default function List() {
     tree = root;
     nodes = [];
     render();
+
     collect_nodes(root, nodes);
     nodes = nodes.sort( (a, b) => b.lvl - a.lvl || a.id - b.id);
     map_pts_to_nodes();
-
     render();
     return this;
   };

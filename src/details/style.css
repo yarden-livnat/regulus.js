@@ -4,10 +4,10 @@
   margin-bottom: 10px;
 }
 
-.details .brush .overlay {
+.details .filter .brush .overlay {
   fill: aliceblue;
 }
-.details .brush .selection {
+.details .filter .brush .selection {
   fill: limegreen;
   fill-opacity: 1;
 }
@@ -77,7 +77,7 @@
   background-color: #fdfdfd;
 }
 
-.details .plot rect {
+.details .plot .background {
   fill: none;
   stroke: black;
   stroke-width: 0.5px;
