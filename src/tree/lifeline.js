@@ -3,7 +3,7 @@ import {ensure_single} from "../utils/events";
 import './lifeline.css';
 
 export default function Lifeline() {
-  let margin = {top: 10, right: 10, bottom: 10, left:40},
+  let margin = {top: 10, right: 10, bottom: 50, left:60},
     width = 800 - margin.left - margin.right,
     height = 300 - margin.top - margin.bottom;
 
@@ -12,15 +12,22 @@ export default function Lifeline() {
   let nodes = [];
   let edges = [];
 
-  let y_min = 0;
+  let pt_scale = d3.scaleLinear().domain([0,1]).range([0,width]);
+  let y_min = +Number.EPSILON;
+  let range = [0, 1];
+  let y_type = 'log';
   let sx = d3.scaleLinear().domain([0, 1]).range([0, width]);
-  let sy = d3.scaleLog().domain([y_min+Number.EPSILON, 1]).range([height, 0]).clamp(true);
+  let sy = d3.scaleLog().domain([y_min, 1]).range([height, 0]).clamp(true);
   let y_axis = d3.axisLeft(sy).ticks(4, '.1e');
+  let x_axis = d3.axisBottom(pt_scale).ticks(8, 's');
+
+  let value_scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0,1]).clamp(true);
 
   let dispatch = d3.dispatch('highlight', 'select', 'edit');
 
 
   function preprocess() {
+    pt_scale.domain([0, root.size]);
     edges = [];
     // visit(root);
 
@@ -64,6 +71,7 @@ export default function Lifeline() {
   function render() {
     if (!svg) return;
 
+    svg.select('.x').call(x_axis);
     svg.select('.y').call(y_axis);
 
     let d3nodes = svg.select('.nodes').selectAll('.node')
@@ -114,8 +122,28 @@ export default function Lifeline() {
     svg.append('g')
       .attr('class', 'edges');
 
+    svg.append("g")
+      .attr('class', 'x axis')
+      .attr("transform", "translate(0," + height + ")");
+      // .call(d3.axisBottom(pt_scale));
+
+    svg.append("text")
+      .attr("transform",
+        "translate(" + (width/2) + " ," +
+        (height + margin.top + 20) + ")")
+      .style("text-anchor", "middle")
+      .text("Points");
+
     svg.append('g')
       .attr('class', 'y axis');
+
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Persistence");
 
 
     return lifeline;
@@ -143,25 +171,33 @@ export default function Lifeline() {
   };
 
   lifeline.y_type = function(type) {
+    y_type = type;
     if (type === 'linear') {
-      sy = d3.scaleLinear().domain([y_min + Number.EPSILON, 1]).range([height, 0]).clamp(true);
+      sy = d3.scaleLinear().domain(range).range([height, 0]).clamp(true);
       y_axis.scale(sy);
     }
     else {
-      sy = d3.scaleLog().domain([y_min + Number.EPSILON, 1]).range([height, 0]).clamp(true);
+      sy = d3.scaleLog().domain(range).range([height, 0]).clamp(true);
       y_axis.scale(sy);
     }
     render();
     return this;
   };
 
-  lifeline.y_min = function(_) {
-    y_min = _;
-    sy.domain([y_min+Number.EPSILON, 1]);
+  lifeline.y_min = function(value) {
+    y_min = y_type === 'linear' ? value : value+Number.EPSILON;
+    sy.domain([y_min, 1]);
     render();
     return this;
   };
 
+  lifeline.range = function(_) {
+    range = _;
+    // y_min = y_type === 'linear' ? value : value+Number.EPSILON;
+    sy.domain(range);
+    render();
+    return this;
+  };
   lifeline.on = function(event, cb) {
     dispatch.on(event, cb);
     return this;

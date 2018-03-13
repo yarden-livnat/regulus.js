@@ -3,6 +3,7 @@ import {publish, subscribe} from "../utils/pubsub";
 
 // import Tree from './list';
 import Tree from './lifeline';
+import Slider from './slider'
 
 import template from './tree_view.html';
 import './style.css';
@@ -12,7 +13,9 @@ let msc = null;
 let tree = Tree();
 
 let y_min = 0.5;
-let y_type = 'log'
+let y_type = 'log';
+let slider = Slider();
+
 export function setup(el) {
   root = typeof el === 'string' && d3.select(el) || el;
   root.classed('tree_view', true);
@@ -32,6 +35,12 @@ export function setup(el) {
     .on('edit', node => publish('partition.edit', node))
     .y_type(y_type)
     .y_min(y_min);
+
+
+  root.select('#persistence-slider')
+    .call(slider);
+
+  slider.on('change', (range) => tree.range(range));
 
   subscribe('data.new', (topic, data) => reset(data));
   subscribe('partition.highlight', (topic, partition, on) => {

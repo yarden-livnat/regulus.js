@@ -55,12 +55,6 @@ export default function YAxis() {
           if (this.__brush ) {
             this.__brush.selection = brush_selection;
           }
-          // {
-          //   let s = this.__brush.selection;
-          //   console.log(s);
-          //   this.__brush.selection[0][1] = brush_selection[0];
-          //   this.__brush.selection[1][1] = brush_selection[1];
-          // }
         });
     }
     selection.selectAll('.brush').call(brush);
