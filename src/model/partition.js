@@ -1,7 +1,7 @@
-import {inverseMultipleRegression, averageStd, linspace, fun as kernel} from '../regression/regression';
-import * as kernel2 from '../regression/kernel';
+import {inverseMultipleRegression, averageStd, linspace, fun as kernel, subLinearSpace} from '../regression/regression';
 
 let default_bandwidth = 0.1;
+
 
 export default class Partition {
   constructor(data, msc) {
@@ -18,6 +18,7 @@ export default class Partition {
     this.alias = null;
     this.notes = null;
 
+    this.size = this.pts_idx[1]-this.pts_idx[0];
     this._pts = null;
     this._reg_curve = null;
   }
@@ -46,7 +47,12 @@ export default class Partition {
       let extent = current_measure.extent;
       let bandwidth = default_bandwidth * (extent[1] - extent[0]);
 
-      let py = linspace(extent[0], extent[1], 100);
+      let msc_pts = this.msc.pts;
+      let msc_idx = this.msc.pts_idx;
+      let min_value = msc_pts[msc_idx[this.minmax_idx[0]]];
+      let max_value = msc_pts[msc_idx[this.minmax_idx[1]]];
+      let py = subLinearSpace([min_value, max_value], extent);
+      // let py = linspace(extent[0], extent[1], 100);
       let hat = inverseMultipleRegression(dims, measure, kernel.gaussian, bandwidth);
       let px = hat(py);
 

@@ -37,6 +37,7 @@
   position: absolute;
   display: flex;
   flex-direction: row;
+  overflow: auto;
 }
 
 .details .group .header {

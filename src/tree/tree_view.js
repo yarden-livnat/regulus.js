@@ -1,13 +1,15 @@
 import * as d3 from 'd3';
 import {publish, subscribe} from "../utils/pubsub";
 
-import List from './list';
+// import Tree from './list';
+import Tree from './lifeline';
+
 import template from './tree_view.html';
 import './style.css';
 
 let root = null;
 let msc = null;
-let tree = List();
+let tree = Tree();
 
 
 export function setup(el) {
@@ -31,7 +33,7 @@ export function setup(el) {
 function reset(data) {
   msc = data;
 
-  tree.data(msc.tree);
+  tree.data(msc.partitions, msc.tree);
 }
 
 

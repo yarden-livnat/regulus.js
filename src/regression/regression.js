@@ -152,3 +152,18 @@ export function linspace(a, b, n) {
   }
   return ret;
 }
+
+export function subLinearSpace(subrange, extent, n) {
+  n--;
+  let d = extent[1] - extent[0];
+  let from = Math.ceil(n * (subrange[0] - extent[0])/d);
+  let to = Math.floor(n * (subrange[1] - extent[0])/d);
+
+  let vec = Array(to-from);
+  let offset = n * extent[0];
+  for (let i=from; i<=to; i++) {
+    vec[i-from] = offset + i*d;
+  }
+  vec.start = from;
+  return vec;
+}

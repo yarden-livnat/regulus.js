@@ -1,0 +1,10 @@
+.lifeline .node {
+  fill: node;
+  stroke: steelblue;
+  stroke-width: 1px;
+}
+
+.lifeline .edge {
+  stroke: #f0f0f0;
+  stroke-width: 0.5px
+}

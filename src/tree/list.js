@@ -135,11 +135,11 @@ export default function List() {
     return api;
   }
 
-  api.data = function (root) {
+  api.data = function (_nodes, _root) {
     tree = root;
-    nodes = [];
-    render();
-    collect_nodes(root, nodes);
+    nodes = _nodes;
+    // render();
+    // collect_nodes(root, nodes);
     nodes = nodes.sort( (a, b) => b.lvl - a.lvl || a.id - b.id);
     map_pts_to_nodes();
 

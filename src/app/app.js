@@ -6,6 +6,7 @@ import * as details_view from '../details';
 import * as tree_view from '../tree';
 import * as partition_view from '../partition';
 import * as controls_view from '../controls';
+import * as sample_view from '../sample';
 
 import './style.css';
 
@@ -21,6 +22,7 @@ function setup() {
   tree_view.setup(Panel('Tree')('#tree_view').content());
   partition_view.setup(Panel('Partition')('#partition_view').content());
   controls_view.setup(Panel('Controls')('#controls_view').content());
+  sample_view.setup(Panel('Sampling')('#sample_view').content());
 }
 
 function init() {
