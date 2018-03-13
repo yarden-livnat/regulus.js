@@ -8,6 +8,9 @@ export default function Chart(){
     let el = null;
     let tree = null;
     let nodes = [];
+    //let uniqueP = null;
+    //let cur_p = null;
+    //let cur_s = null;
 
     let dispatch = d3.dispatch('highlight', 'select', 'edit');
     //console.log("Inside Chart")
@@ -39,7 +42,7 @@ export default function Chart(){
     function create(pchart,schart){
         //console.log("render function");
 
-        console.log(pchart, schart);
+        //console.log(pchart, schart);
         let pc = d3.select("#persistence_chart")//.append("text").text("d","PC");
         let sc = d3.select("#size_chart")//.append("text").text("d","SC");
 
@@ -51,6 +54,9 @@ export default function Chart(){
 
         pc.call(chart1.create);
         sc.call(chart2.create);
+
+        //pc.call(chart1.updatechart);
+        //sc.call(chart2.updatechart);
 
     }
 

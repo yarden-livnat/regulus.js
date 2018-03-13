@@ -1,5 +1,7 @@
 import * as d3 from 'd3';
 import {Button} from './button'
+import {publish, subscribe} from "../utils";
+
 
 export default function DrawChart() {
     let margin = {top: 10, right: 10, bottom: 10, left: 10},
@@ -7,13 +9,16 @@ export default function DrawChart() {
         height = 120 - margin.top - margin.bottom,
         padding  = (margin.left+margin.right)/2;
 
-
     let line = null;
     let pts = null;
+    let uniqueP = [];
     let xScale = null;
     let yScale = null;
     let xattr = null;
     let yattr = null;
+    let cur_x = null;
+    let range_x = null;
+    let g = null;
 
     function plot(selection) {
         selection.each(function (d, i)  {
@@ -28,9 +33,8 @@ export default function DrawChart() {
                 .attr('d', area.get(this)(d.area));
         });
     }
-
     plot.create = function(selection) {
-        let g = selection
+        g = selection
             .attr('class', 'plot')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
@@ -45,7 +49,7 @@ export default function DrawChart() {
             .attr("transform", "translate(" + (2*padding) + "," + 0 + ")")
             .attr("d", line)
             .attr("fill","none")
-            .attr("stroke", "orange")
+            .attr("stroke", "cyan")
             .attr("stroke-width", 1);
 
         myplt.exit().remove();
@@ -92,11 +96,6 @@ export default function DrawChart() {
 
         g.selectAll(".tick").selectAll("text").style("font-size", 5 + "px");
 
-
-        let decrease = () => {
-            console.log("decrease");
-        }
-
         let btn = Button()
             .x(width-padding)// - padding) // X Location
             .y(height+padding/2) // Y Location
@@ -108,11 +107,13 @@ export default function DrawChart() {
             .fillHighlight("cyan") // Button fill when highlighted
             .opacity(0.8) // Opacity
 
-        g.call(btn)
-
-        let increase = () => {
-            console.log("increase");//this.option = "increase";
-        }
+        let mbutton = g.selectAll('.mbutton').data([0]);
+        mbutton.enter()
+            .append('g')
+            .merge(mbutton)
+            .attr('class', 'mbutton')
+            .call(btn);
+        mbutton.exit().remove();
 
         let btn2 = Button()
             .x(width) // X Location
@@ -125,40 +126,53 @@ export default function DrawChart() {
             .fillHighlight("cyan") // Button fill when highlighted
             .opacity(0.8) // Opacity
 
-        g.call(btn2)
+        let pbutton = g.selectAll('.pbutton').data([0]);
+
+        pbutton.enter()
+            .append('g')
+            .merge(pbutton)
+            .attr('class', 'pbutton')
+            .call(btn2);
+
+        pbutton.exit().remove();
+
+        let cx = (pts[0].length===2)?xScale(cur_x+Number.EPSILON):xScale(cur_x);
 
         let handle = g.selectAll(".pbar").data([0]);
 
         handle.enter()
             .append("rect")
             .merge(handle)
-            .attr("class", "pbar");
+            .attr("x", (2*padding+cx) )//+ padding*3/2 - 2)
+            .attr("y", 0)
+            .attr("width", 4)
+            .attr("height", height)
+            .attr("class", "pbar")
+            .attr("fill", "blue")
+            .attr("opacity", "0.5")
+            .call(d3.drag()
+            .on("start.interrupt", ()=>{ console.log("Inter")})
+            .on("start drag", () =>
+            {
+                //console.log("Dragging")
+                if(xattr === 'persistence'){
+                    g.select(".pbar").attr("x", padding*2 + xScale(xScale.invert(d3.event.x - padding*2)));
+                    cur_x = xScale.invert(d3.event.x - padding*2) - Number.EPSILON;
+                }
+                else
+                {
+                    //g.select(".pbar").attr("x", d3.event.x);
+                    g.select(".pbar").attr("x", 2*padding + xScale(xScale.invert(d3.event.x-2*padding)));
+                    cur_x = parseInt(xScale.invert(d3.event.x - padding*2));
+                }
+                //console.log("chart.change",xattr,cur_x);
+                publish("chart.change",xattr,cur_x);
+            }));
 
         handle.exit().remove();
+        subscribe('chart.change', updatechart);
 
     };
-/*
-    plot.size = function(_) {
-        if (!arguments.length) return [width, height];
-        [width, height] = _;
-        return this;
-    };
-
-    plot.x = function(_) {
-        x = _;
-        return this;
-    };
-
-    plot.y = function(_) {
-        y = _;
-        return this;
-    };
-
-    plot.line = function(_) {
-        line = _;
-        return this;
-    };
-*/
     plot.createline = function(data) {
 
         if(data[0].length===2)
@@ -181,6 +195,11 @@ export default function DrawChart() {
 
             xattr = "persistence";
             yattr = "partitions";
+            cur_x = data[0][0];
+            range_x = [data[data.length - 1][0],data[0][0]];
+            data.forEach(d=>{
+                uniqueP.push(d[0]);
+            });
         }
         else
         {
@@ -202,21 +221,84 @@ export default function DrawChart() {
 
             xattr = "size";
             yattr = "partitions";
+            cur_x = data.length-1;
+            range_x = [0,data.length - 1];
         }
         pts = data;
 
         return this;
     };
-/*
-    plot.area = function(_) {
-        area = _;
-        return this;
+
+    function increase(){
+        //console.log(xattr+".Increase"+cur_x, range_x);
+        if(xattr === 'persistence')
+        {
+            cur_x =(getindex(cur_x,uniqueP)>0)?uniqueP[getindex(cur_x,uniqueP)-1]:range_x[1];
+        }
+        else
+        {
+            cur_x =(cur_x<range_x[1])?cur_x+1:range_x[1];
+        }
+        publish("chart.change",xattr,cur_x);
+    }
+    function decrease(){
+        //console.log(xattr+".Decrease"+cur_x, range_x);
+        if(xattr === 'persistence')
+        {
+            cur_x =(getindex(cur_x,uniqueP)<uniqueP.length-1)?uniqueP[getindex(cur_x,uniqueP)+1]:range_x[0];
+        }
+        else
+        {
+            cur_x =(cur_x>range_x[0])?cur_x-1:range_x[0];
+        }
+        publish("chart.change",xattr,cur_x);
+    }
+    function getindex(val,arr){
+        let outindex;
+        let min;
+        outindex = arr.indexOf(val);
+        if(outindex === -1){
+            outindex = 0;
+            for (let i in arr) {
+                min = Math.abs(arr[outindex] - val);
+                if (Math.abs(arr[i] - val) < min) {
+                    outindex = i;
+                }
+            }
+        }
+        return outindex;
+    }
+    function updatechart(msg,attr,val){
+        //console.log(attr,val)
+        let cx;
+        if(xattr === 'persistence' && attr === 'persistence')
+        {
+            cur_x = val;
+            cx = xScale(cur_x+Number.EPSILON);
+            g.select(".pbar")//.data([cx])
+                .attr("x", cx + 2*padding)
+                .attr("y", 0)
+                .attr("width", 4)
+                .attr("height", height)
+                .attr("class", "pbar")
+                .attr("fill", "blue")
+                .attr("opacity", "0.5");
+        }
+        else if(xattr === 'size' && attr === 'size')
+        {
+            cur_x = val;
+            cx = xScale(cur_x);
+            g.select(".pbar")//.data([cx])
+                .attr("x", cx + 2*padding)
+                .attr("y", 0)
+                .attr("width", 4)
+                .attr("height", height)
+                .attr("class", "pbar")
+                .attr("fill", "blue")
+                .attr("opacity", "0.5");
+        }
+
     };
 
-    plot.color = function(_) {
-        color = _;
-        return this;
-    };
-*/
     return plot;
 }
