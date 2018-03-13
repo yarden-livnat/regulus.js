@@ -1,0 +1,7 @@
+.controls .plot {
+
+    margin:  10px 10px 0 10px;
+    background-color: #fdfdfd;
+    display: flex;
+    flex-direction: row;
+}

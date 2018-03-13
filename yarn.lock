@@ -3427,13 +3427,6 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-<<<<<<< HEAD
-keyv@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/keyv/-/keyv-3.0.0.tgz#44923ba39e68b12a7cec7df6c3268c031f2ef373"
-  dependencies:
-    json-buffer "3.0.0"
-=======
 kernel-smooth@^0.2.3:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/kernel-smooth/-/kernel-smooth-0.2.3.tgz#8a26daa0f7a719f22606e73dd7a7a0316a82f2cb"
@@ -3443,7 +3436,12 @@ kernel-smooth@^0.2.3:
     euclidean-distance "^0.1.0"
     validate.io-array "^1.0.6"
     validate.io-function "^1.0.2"
->>>>>>> b3ba7e32f3b97ac4b2e08438b8e918d54ef1582a
+
+keyv@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/keyv/-/keyv-3.0.0.tgz#44923ba39e68b12a7cec7df6c3268c031f2ef373"
+  dependencies:
+    json-buffer "3.0.0"
 
 kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
   version "3.2.2"
@@ -4030,11 +4028,7 @@ object-copy@^0.1.0:
     define-property "^0.2.5"
     kind-of "^3.0.3"
 
-<<<<<<< HEAD
-object-keys@^1.0.8:
-=======
-object-keys@^1.0.9:
->>>>>>> b3ba7e32f3b97ac4b2e08438b8e918d54ef1582a
+object-keys@^1.0.8, object-keys@^1.0.9:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/object-keys/-/object-keys-1.0.11.tgz#c54601778ad560f1142ce0e01bcca8b56d13426d"
 
