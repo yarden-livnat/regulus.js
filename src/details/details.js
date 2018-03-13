@@ -116,6 +116,7 @@ function add(partition) {
   partitions.push({
     id: partition.id,
     name: partition.alias,
+    p: partition,
     pts: partition.pts,
     line: reg_curve.curve,
     area: reg_curve.curve.map((pt, i) => ({
@@ -158,8 +159,8 @@ function update(list, all=false) {
 
   groups.enter()
     .append('div')
-      // .on('mouseenter', d => publish('partition.highlight', d.p, true))
-      // .on('mouseleave', d => publish('partition.highlight', d.p, false))
+      .on('mouseenter', d => publish('partition.highlight', d.p, true))
+      .on('mouseleave', d => publish('partition.highlight', d.p, false))
       .call(group.create)
     .merge(groups)
       .call(group, all);

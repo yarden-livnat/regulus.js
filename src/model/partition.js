@@ -47,12 +47,13 @@ export default class Partition {
       let extent = current_measure.extent;
       let bandwidth = default_bandwidth * (extent[1] - extent[0]);
 
-      let msc_pts = this.msc.pts;
-      let msc_idx = this.msc.pts_idx;
-      let min_value = msc_pts[msc_idx[this.minmax_idx[0]]];
-      let max_value = msc_pts[msc_idx[this.minmax_idx[1]]];
-      let py = subLinearSpace([min_value, max_value], extent);
-      // let py = linspace(extent[0], extent[1], 100);
+      // let msc_pts = this.msc.pts;
+      // let msc_idx = this.msc.pts_idx;
+      // let min_value = msc_pts[msc_idx[this.minmax_idx[0]]][current_measure.name];
+      // let max_value = msc_pts[msc_idx[this.minmax_idx[1]]][current_measure.name];
+      // if (min_value > max_value) [min_value, max_value] = [max_value, min_value];
+      // let py = subLinearSpace([min_value, max_value], extent, 100);
+      let py = linspace(extent[0], extent[1], 100);
       let hat = inverseMultipleRegression(dims, measure, kernel.gaussian, bandwidth);
       let px = hat(py);
 

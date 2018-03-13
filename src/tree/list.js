@@ -1,6 +1,7 @@
 import * as d3 from 'd3'
 
 import {ensure_single, on_hover} from "../utils";
+import './list.css';
 
 export default function List() {
   let width = 300, height = 300;
@@ -108,26 +109,26 @@ export default function List() {
     items.exit().remove();
   }
 
-
-  function capture_single(selection) {
-    let timer = null, orig=null;
-    let listener = selection.on('click');
-
-    selection.on('click', function (d) {
-      let self = this;
-      if (timer) {
-        timer.stop();
-        timer = null;
-      } else {
-        orig = JSON.parse(JSON.stringify(d3.event));
-        timer = d3.timeout( () => {
-          timer = null;
-          d3.customEvent(orig, listener, self, [d]);
-        }, 250);
-      }
-      d3.event.stopPropagation();
-    });
-  }
+  //
+  // function capture_single(selection) {
+  //   let timer = null, orig=null;
+  //   let listener = selection.on('click');
+  //
+  //   selection.on('click', function (d) {
+  //     let self = this;
+  //     if (timer) {
+  //       timer.stop();
+  //       timer = null;
+  //     } else {
+  //       orig = JSON.parse(JSON.stringify(d3.event));
+  //       timer = d3.timeout( () => {
+  //         timer = null;
+  //         d3.customEvent(orig, listener, self, [d]);
+  //       }, 250);
+  //     }
+  //     d3.event.stopPropagation();
+  //   });
+  // }
 
   function api(_) {
     el = (typeof _ === 'string') && d3.select(_) || _;

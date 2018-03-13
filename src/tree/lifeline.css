@@ -1,10 +1,35 @@
+/*.tree {*/
+  /*!*max-width: 800px;*!*/
+  /*max-height: 500px;*/
+  /*overflow: scroll;*/
+/*}*/
+
 .lifeline .node {
-  fill: node;
+  fill: white;
   stroke: steelblue;
-  stroke-width: 1px;
+  stroke-width: 0.5px;
+}
+
+.lifeline .node:hover {
+  fill: lightgray;
+  stroke-width: 2px;
+}
+
+.lifeline .node.selected {
+  fill: lightblue;
+}
+
+.lifeline .node.highlight {
+  stroke-width: 2px;
+  stroke: gray;
+}
+
+.lifeline .node.filtered {
+  color: #f0f0f0;
 }
 
 .lifeline .edge {
-  stroke: #f0f0f0;
+  stroke: none;
+  /*stroke: #f0f0f0;*/
   stroke-width: 0.5px
 }

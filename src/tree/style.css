@@ -11,20 +11,3 @@
   max-height: 300px;
   overflow: auto;
 }
-
-.tree_view .node {
-  /*user-select: none;*/
-}
-
-.tree_view .node.filtered {
-  color: #f0f0f0;
-  /*background-color: blue;*/
-}
-
-.tree_view .node.highlight {
-  background-color: #ddd;
-}
-
-.tree_view .node.selected {
-  font-weight: bold;
-}
