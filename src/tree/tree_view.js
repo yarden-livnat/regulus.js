@@ -25,10 +25,6 @@ export function setup(el) {
     .on('change', select_y_type)
     .property('value', y_type);
 
-  root.select('#tree-y-min')
-    .on('input', set_y_min)
-    .property('value', y_min);
-
   tree(root.select('.tree'))
     .on('highlight', (node, on) => publish('partition.highlight', node, on))
     .on('select', (node, on) => publish('partition.selected', node, on))
@@ -58,8 +54,4 @@ function reset(data) {
 
 function select_y_type() {
   tree.y_type(this.value);
-}
-
-function set_y_min() {
-  tree.y_min(+this.value);
 }
