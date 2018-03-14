@@ -14,6 +14,7 @@ let tree = Tree();
 
 let y_min = 0.5;
 let y_type = 'log';
+let y_range = [1e-5, 1];
 let slider = Slider();
 
 export function setup(el) {
@@ -33,10 +34,14 @@ export function setup(el) {
     .y_min(y_min);
 
 
+  slider
+    .range(y_range)
+    .on('change', (range) => tree.range(range));
+
   root.select('#persistence-slider')
     .call(slider);
 
-  slider.on('change', (range) => tree.range(range));
+
 
   subscribe('data.new', (topic, data) => reset(data));
   subscribe('partition.highlight', (topic, partition, on) => {

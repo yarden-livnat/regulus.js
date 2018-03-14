@@ -17,12 +17,6 @@ let dataset_panel = Panel('Dataset');
 setup();
 init();
 
-service.submit_resample({
-  spec: 'test',
-  n: 4
-})
-  .then( r => console.log('submit:',r));
-
 function setup() {
   info.setup(dataset_panel('#dataset_view').content());
   details_view.setup( Panel('Details')('#details_view').content());

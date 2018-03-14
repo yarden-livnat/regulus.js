@@ -8,6 +8,7 @@ export default function Slider() {
   let scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0, width]);
   let axis =  d3.axisBottom(scale).ticks(3, '.1e');
 
+  let range = [0, width];
   let name = 'x axis';
   let brush = d3.brushX().extent([[0, -10], [width, 0]])
     .on('brush', brushed)
@@ -42,8 +43,7 @@ export default function Slider() {
       .attr('class', 'brush')
       .call(brush);
 
-    brush.move(svg.select('.brush'), [0, width]);
-      // .call(brush.move, [, 1]);
+    brush.move(svg.select('.brush'), range);
 
     svg.append('text')
       .attr('class', 'label')
@@ -51,6 +51,11 @@ export default function Slider() {
       .style('text-anchor', 'middle')
       .text('Persistence')
   }
+
+  slider.range = function(_) {
+    range = [scale(_[0]), scale(_[1])];
+    return this;
+  };
 
   slider.on = function(event, cb) {
     dispatch.on(event, cb);
