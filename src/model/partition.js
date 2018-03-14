@@ -9,6 +9,7 @@ export default class Partition {
     this.id = data.id;
     this.lvl = data.lvl;
     this.minmax_idx = data.minmax_idx;
+    this.minmax = [msc.pts[data.minmax_idx[0]][msc.name], msc.pts[data.minmax_idx[1]][msc.name]];
     this.pts_idx = data.pts_idx;
 
     this.parent = data.parent;
@@ -33,6 +34,8 @@ export default class Partition {
       for (let i = this.pts_idx[0]; i < to; i++) {
         pts.push(msc_pts[msc_idx[i]]);
       }
+
+      // consider adding the min and max pts
       this._pts = pts;
     }
     return this._pts;
@@ -42,25 +45,15 @@ export default class Partition {
     if (!this._reg_curve) {
       let current_measure = this.msc.measure_by_name(this.msc.name);
 
+      // todo: consider adding the min/max points
+      //       maybe only if they are not too dissimilar from the rest of the points
       let dims = this.pts.map( pt => this.msc.dims.map( d => pt[d.name] ));
       let measure = this.pts.map( pt => pt[current_measure.name]);
 
       let extent = current_measure.extent;
       let bandwidth = default_bandwidth * (extent[1] - extent[0]);
 
-      let msc_pts = this.msc.pts;
-      let msc_idx = this.msc.pts_idx;
-      let min_value = msc_pts[msc_idx[this.minmax_idx[0]]][current_measure.name];
-      let max_value = msc_pts[msc_idx[this.minmax_idx[1]]][current_measure.name];
-
-      let e = d3.extent(msc_pts, pt => pt[current_measure.name]);
-      console.log(`extent ${extent}  min/max: ${[min_value, max_value]}  d3:${e}`);
-      if (min_value > max_value) {
-        console.log('regression curve: flipped min/max values', min_value, max_value);
-        [min_value, max_value] = [max_value, min_value];
-      }
-
-      let py = subLinearSpace([min_value, max_value], extent, 100);
+      let py = subLinearSpace(this.minmax, extent, 100);
       let hat = inverseMultipleRegression(dims, measure, kernel.gaussian, bandwidth);
       let px = hat(py);
 
