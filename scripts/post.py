@@ -65,6 +65,7 @@ class Post(object):
         self.mapping = dict()
         self.unique = set()
         self.all = dict()
+        self.data_pts = []
 
     def load(self, path):
         with open(path / 'Base_Partition.json') as f:
@@ -72,22 +73,49 @@ class Post(object):
 
         with open(path / 'Hierarchy.csv') as f:
             self.merges = [Merge(float(row[0]), row[1] == '1', int(row[2]), int(row[3])) for row in csv.reader(f)]
-
         return self
 
-    def data(self, base, hierarchy):
+    def data(self, pts):
+        self.data_pts = pts
+        return self
+
+    def msc(self, base, hierarchy):
         self.base = base
         for entry in hierarchy:
             row = entry.split(',')
             self.merges.append(Merge(float(row[1]), row[0] == 'Maxima', int(row[2]), int(row[3])))
         return self
 
-    def find_loop(self, dest):
-        loop = [dest]
-        while dest in self.mapping:
-            dest = self.mapping[dest]
-            loop.append(dest)
-        return loop
+    def prepare(self):
+        Partition.reset()
+        for key, value in self.base.items():
+            m, x = [int(s) for s in key.split(',')]
+            p = Partition(0, list(value), m, x)
+            if self.debug:
+                self.check_partition(p)
+            self.add(p)
+
+        self.find_unique()
+        self.remove_non_unique()
+
+        self.merges.sort(key=lambda m: (m.level, m.src))
+        high = self.merges[-1].level
+        for merge in self.merges:
+            merge.level /= high
+        return self
+
+    def check_partition(self, p):
+        min_v = self.data_pts[p.min_idx]
+        max_v = self.data_pts[p.max_idx]
+        for pt_idx in p.base_pts:
+            if pt_idx != p.min_idx and self.data_pts[pt_idx] < min_v:
+                print('Partition check p:{} min:{} at {} found min:{} at {}'.format(p.id, min_v, p.min_idx, self.data_pts[pt_idx], pt_idx))
+            if pt_idx != p.max_idx and self.data_pts[pt_idx] > max_v:
+                print('Partition check p:{} max:{} at {} found max:{} at {}'.format(p.id, max_v, p.max_idx, self.data_pts[pt_idx], pt_idx))
+
+    #
+    # build
+    #
 
     def build(self):
         self.prepare()
@@ -121,24 +149,15 @@ class Post(object):
         self.root = self.active.pop()
         self.root.extrema.extend([self.root.min_idx, self.root.max_idx])
         self.visit(self.root, 0)
-        if self.debug:
-            self.statistics()
-            self.sanity_check()
+        self.rename(self.root, 0)
         return self
 
-    def save(self, path, name):
-        self.rename(self.root, 0)
-
-        partitions = []
-        self.collect(self.root, partitions)
-        tree = {
-            'name': name,
-            'partitions': partitions,
-            'pts': self.pts
-        }
-        filename = name + ".json"
-        with open(path / filename, 'w') as f:
-            json.dump(tree, f)
+    def find_loop(self, dest):
+        loop = [dest]
+        while dest in self.mapping:
+            dest = self.mapping[dest]
+            loop.append(dest)
+        return loop
 
     def find_unique(self):
         count = defaultdict(int)
@@ -155,31 +174,12 @@ class Post(object):
                 if idx not in self.unique:
                     p.base_pts.remove(idx)
 
-    # Private functions
-    def prepare(self):
-        Partition.reset()
-        for key, value in self.base.items():
-            m, x = [int(s) for s in key.split(',')]
-            p = Partition(0, list(value), m, x)
-            self.add(p)
-            # if 1399 in p.base_pts:
-            #     print('1399 in', p.id, p.min_idx, p.max_idx)
-
-        self.find_unique()
-        self.remove_non_unique()
-
-        self.merges.sort(key=lambda m: (m.level, m.src))
-        high = self.merges[-1].level
-        for merge in self.merges:
-            merge.level /= high
-        return self
-
     def update(self, merge, idx_map, idx):
         add = []
         remove = set()
 
-        if merge.src in [8410] or merge.dest in [8410]:
-            print('related merge')
+        # if merge.src in [8410] or merge.dest in [8410]:
+        #     print('related merge')
         for d in idx_map[merge.dest]:
             n = None
             remove_src = set()
@@ -244,10 +244,8 @@ class Post(object):
             add = partition.base_pts
             if partition.min_idx in add and partition.min_idx not in self.unique:
                 print('min in partition', partition.min_idx)
-                # add.remove(partition.min_idx)
             if partition.max_idx in add and partition.max_idx not in self.unique:
                 print('max in partition', partition.max_idx)
-                # add.remove(partition.max_idx)
             if len(add) > 0:
                 self.pts.extend(add)
                 idx += len(add)
@@ -268,6 +266,22 @@ class Post(object):
                 idx = self.rename(child, idx)
         return idx
 
+    #
+    # save
+    #
+
+    def save(self, path, name):
+        partitions = []
+        self.collect(self.root, partitions)
+        tree = {
+            'name': name,
+            'partitions': partitions,
+            'pts': self.pts
+        }
+        filename = name + ".json"
+        with open(path / filename, 'w') as f:
+            json.dump(tree, f)
+
     def collect(self, node, array):
         array.append({
             'id': node.id,
@@ -279,11 +293,23 @@ class Post(object):
             'children': [child.id for child in node.children] if node.persistence > 0 else []
         })
 
+        self.check_partition(node)
+
         if node.persistence > 0:
             if len(node.children) > 2:
                 print('{} has {} children at level {}'.format(node.id, len(node.children), node.persistence))
             for child in node.children:
                 self.collect(child, array)
+
+    #
+    # verify
+    #
+
+    def verify(self):
+        if self.debug:
+            self.statistics()
+            self.sanity_check()
+        return self
 
     def statistics(self):
         levels = defaultdict(list)
@@ -352,7 +378,6 @@ class Post(object):
             print('root min/max: {}  {}'.format(self.root.min_idx, self.root.max_idx))
 
 
-
 def post(args=None):
     p = argparse.ArgumentParser(prog='analyze', description='Extract input dimension and a single measure')
     p.add_argument('filename', help='input data file [.csv format]')
@@ -368,6 +393,7 @@ def post(args=None):
     p.add_argument('-a', '--all', action='store_true', help='process all measures')
 
     p.add_argument('--name', default=None, help='dataset name')
+
 
     p.add_argument('--debug', action='store_true', help='process all measures')
 
@@ -419,8 +445,10 @@ def post(args=None):
             msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm)
             msc.build(X=x, Y=y, names=header[:dims]+[name])
             Post(ns.debug)\
-                .data(msc.base_partitions, msc.hierarchy)\
+                .data(y)\
+                .msc(msc.base_partitions, msc.hierarchy)\
                 .build()\
+                .verify()\
                 .save(path, name)
             available.add(name)
         except RuntimeError as error:
