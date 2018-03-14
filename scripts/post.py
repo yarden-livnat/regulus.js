@@ -109,9 +109,9 @@ class Post(object):
         max_v = self.data_pts[p.max_idx]
         for pt_idx in p.base_pts:
             if pt_idx != p.min_idx and self.data_pts[pt_idx] < min_v:
-                print('Partition check p:{} min:{} at {} found min:{} at {}'.format(p.id, min_v, p.min_idx, self.data_pts[pt_idx], pt_idx))
+                print('*** Partition check p:{} min:{} at {} found min:{} at {}'.format(p.id, min_v, p.min_idx, self.data_pts[pt_idx], pt_idx))
             if pt_idx != p.max_idx and self.data_pts[pt_idx] > max_v:
-                print('Partition check p:{} max:{} at {} found max:{} at {}'.format(p.id, max_v, p.max_idx, self.data_pts[pt_idx], pt_idx))
+                print('*** Partition check p:{} max:{} at {} found max:{} at {}'.format(p.id, max_v, p.max_idx, self.data_pts[pt_idx], pt_idx))
 
     #
     # build
@@ -132,7 +132,7 @@ class Post(object):
             while dest in self.mapping:
                 dest = self.mapping[dest]
             if merge.src == dest:
-                print('loop: dest points back to src', self.find_loop(dest))
+                print('*** loop: dest points back to src', self.find_loop(dest))
                 continue
 
             merge.dest = dest
@@ -165,7 +165,7 @@ class Post(object):
             count[p.min_idx] += 1
             count[p.max_idx] += 1
         self.unique = {k for k, v in count.items() if v == 1}
-        print('unique:', self.unique)
+        print('   unique:', self.unique)
         self.all = count
 
     def remove_non_unique(self):
@@ -191,7 +191,7 @@ class Post(object):
                             # s is a base partition
                             for p in s.base_pts:
                                 if p in d.base_pts:
-                                    print('adding duplicated base pts')
+                                    print('*** adding duplicated base pts')
                             d.base_pts.extend(s.base_pts)
                         else:
                             for child in s.children:
@@ -243,9 +243,9 @@ class Post(object):
         if len(partition.children) == 0:
             add = partition.base_pts
             if partition.min_idx in add and partition.min_idx not in self.unique:
-                print('min in partition', partition.min_idx)
+                print('*** min in partition', partition.min_idx)
             if partition.max_idx in add and partition.max_idx not in self.unique:
-                print('max in partition', partition.max_idx)
+                print('*** max in partition', partition.max_idx)
             if len(add) > 0:
                 self.pts.extend(add)
                 idx += len(add)
@@ -297,7 +297,7 @@ class Post(object):
 
         if node.persistence > 0:
             if len(node.children) > 2:
-                print('{} has {} children at level {}'.format(node.id, len(node.children), node.persistence))
+                print('\t{} has {} children at level {}'.format(node.id, len(node.children), node.persistence))
             for child in node.children:
                 self.collect(child, array)
 
@@ -321,7 +321,7 @@ class Post(object):
                 n += len(levels[level])
             else:
                 b = len(levels[level])
-        print('statistics: {} levels {} base, {} new'.format(len(levels), b, n))
+        print('\tstatistics: {} levels {} base, {} new'.format(len(levels), b, n))
         # for level in sorted(levels.keys()):
         #     print("{:.2g} {}".format(level, len(levels[level])))
 
@@ -346,9 +346,9 @@ class Post(object):
         if node is not None:
             for p in node.extrema:
                 if p in self.unique:
-                    print('extrema in unique {} i node:{}'.format(p, node.id))
+                    print('*** extrema in unique {} i node:{}'.format(p, node.id))
                 if p in pts:
-                    print('duplicate extrema')
+                    print('*** duplicate extrema')
                 else:
                     pts.add(p)
                     del self.all[p]
@@ -359,7 +359,7 @@ class Post(object):
                 # pts.extend(node.base_pts)
                 for p in node.base_pts:
                     if p in pts:
-                        print('duplicate base {} in partition id:{} lvl:{}, min:{} max:{}, extrema:{}'.format(p,
+                        print('*** duplicate base {} in partition id:{} lvl:{}, min:{} max:{}, extrema:{}'.format(p,
                                 node.id, node.persistence, node.min_idx, node.max_idx, node.extrema))
                     else:
                         pts.add(p)
@@ -371,11 +371,11 @@ class Post(object):
             self.sanity_check(self.root, pts)
             print('**** sanity check. pts:{}  #base min/max: {} {}'.format(len(pts), n, len(self.all)))
             for k, v in self.all.items():
-                print('[all] {}: {}'.format(k,v))
+                print('*** [all] {}: {}'.format(k,v))
             for p in self.all:
                 if p in pts:
-                    print('minmax {} is in pts', p)
-            print('root min/max: {}  {}'.format(self.root.min_idx, self.root.max_idx))
+                    print('*** minmax {} is in pts', p)
+            # print('root min/max: {}  {}'.format(self.root.min_idx, self.root.max_idx))
 
 
 def post(args=None):
@@ -440,7 +440,7 @@ def post(args=None):
     for measure in measures:
         try:
             name = header[measure]
-            print('post ', name)
+            print('\npost ', name)
             y = data[:, measure]
             msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm)
             msc.build(X=x, Y=y, names=header[:dims]+[name])
