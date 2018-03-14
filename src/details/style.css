@@ -73,9 +73,30 @@
   flex-direction: row;
 }
 
+
 .details .plot {
+  position: relative;
   margin:  10px 10px 0 10px;
   background-color: #fdfdfd;
+}
+
+.details .plot .canvas-bg {
+  /*position: absolute;*/
+  top: 1px;
+  left: 1px;
+}
+
+.details .plot .canvas-fg {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+}
+
+
+.details .plot svg {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .details .plot rect {

@@ -31,7 +31,8 @@ export default function Group() {
     selection
       .transition().duration(DURATION)
       .style('top', (d, i) => loc(i))
-      .style('opacity', 1);
+      .style('opacity', 1)
+    ;
 
     let t0 = performance.now();
     selection
@@ -46,7 +47,7 @@ export default function Group() {
 
         let plots = g.select('.plots').selectAll('.plot').data(dims);
         let list = plots.enter()
-          .append('svg')
+          .append('div')
           .call(plot.create);
         if (all)
           list = list.merge(plots);
@@ -80,7 +81,8 @@ export default function Group() {
     selection
       .attr('class', 'group')
       .style('top', (d, i)=> loc(i))
-      .style('opacity', 0);
+      .style('opacity', 0)
+    ;
     selection.html(template);
 
     selection.select('.measure').selectAll('.y_axis').call(y_axis.create);
@@ -123,6 +125,11 @@ export default function Group() {
 
   group.show_filtered = function(_) {
     plot.show_filtered(_);
+    return this;
+  };
+
+  group.use_canvas = function(_) {
+    plot.use_canvas(_);
     return this;
   };
 
