@@ -7,11 +7,11 @@ module.exports = {
   entry: {
     app: './src/app/app.js'
   },
-  optimization: {
-    splitChunks: {
-      chunks: "all"
-    }
-  },
+  // optimization: {
+  //   splitChunks: {
+  //     chunks: "all"
+  //   }
+  // },
   plugins: [
     new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
@@ -19,7 +19,8 @@ module.exports = {
     }),
   ],
   output: {
-    filename: '[name].[chunkhash].js',
+    // filename: '[name].[chunkhash].js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist')
   },
   module: {
