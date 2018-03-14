@@ -15,6 +15,16 @@ export function load_msc(name) {
     .then( response => response.json());
 }
 
+export function submit_sampling(spec) {
+  return fetch('resample', {
+    method: 'post',
+    body: JSON.stringify(spec),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+}
+
 function parse_sample(sample) {
   for (let attr in sample) {
     if (sample.hasOwnProperty(attr))
