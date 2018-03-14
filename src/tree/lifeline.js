@@ -20,7 +20,6 @@ export default function Lifeline() {
   let sy = d3.scaleLog().domain([y_min, 1]).range([height, 0]).clamp(true);
   let y_axis = d3.axisLeft(sy).ticks(4, '.1e');
   let x_axis = d3.axisBottom(pt_scale).ticks(8, 's');
-  let zoom =
   let value_scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0,1]).clamp(true);
 
   let dispatch = d3.dispatch('highlight', 'select', 'edit');
