@@ -25,7 +25,7 @@ function build_tree(partitions){
   }
 }
 
-export class MSC {
+export class MultiMSC {
   constructor() {
     this.name = "";
     this.pts = [];

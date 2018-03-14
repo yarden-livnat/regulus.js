@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import {publish, subscribe} from "../utils/pubsub";
 
-import template from './sample.html';
+import template from './resample.html';
 import './style.css';
 
 let root = null;

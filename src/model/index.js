@@ -1,4 +1,4 @@
 export * from './filter';
 export * from './attr_filter';
-export * from './msc';
+export * from './multi_msc';
 export * from './partition';

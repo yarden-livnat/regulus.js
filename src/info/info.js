@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
 import * as service from "../app/service";
-import {MSC} from '../model/msc';
+import {MultiMSC} from '../model/multi_msc';
 import {publish, subscribe} from '../utils/pubsub';
 import template from './info.html';
 import './info.css';
@@ -21,7 +21,7 @@ export function setup(el) {
 
 export function set_catalog(_) {
   catalog = _;
-  msc = new MSC();
+  msc = new MultiMSC();
 
   service.load_data(catalog)
     .then(data => msc.samples(data, catalog.dims))
