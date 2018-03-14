@@ -42,8 +42,8 @@ export default function Slider() {
       .attr('class', 'brush')
       .call(brush);
 
-    brush.move(svg.select('.brush'), [0,1]);
-      // .call(brush.move, [0, 1]);
+    brush.move(svg.select('.brush'), [0, width]);
+      // .call(brush.move, [, 1]);
 
     svg.append('text')
       .attr('class', 'label')
