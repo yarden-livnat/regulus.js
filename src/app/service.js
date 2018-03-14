@@ -15,7 +15,7 @@ export function load_msc(name) {
     .then( response => response.json());
 }
 
-export function submit_sampling(spec) {
+export function submit_resample(spec) {
   return fetch('resample', {
     method: 'post',
     body: JSON.stringify(spec),
