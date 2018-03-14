@@ -10,13 +10,16 @@ export default function Plot() {
   let color = null;
   let line = null;
   let area = null;
+  let show_filtered = true;
 
   function svg_render_pts(d ,i) {
     let tx = x.get(this);
     let ty = y.get(this);
 
+    let visible_pts = show_filtered ? d.pts : d.pts.filter( pt => !pt.filtered);
+
     let pts = d3.select(this).select('.pts').selectAll('circle')
-      .data(d.pts);
+      .data(visible_pts, pt => pt.id);
 
     pts.enter().append('circle')
       .attr('r', 1)
@@ -94,6 +97,11 @@ export default function Plot() {
 
   plot.color = function(_) {
     color = _;
+    return this;
+  };
+
+  plot.show_filtered = function(_) {
+    show_filtered = _;
     return this;
   };
 

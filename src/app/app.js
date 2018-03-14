@@ -16,8 +16,8 @@ let dataset_panel = Panel('Dataset');
 setup();
 init();
 
-service.submit_sampling({
-  spec: 'foo',
+service.submit_resample({
+  spec: 'test',
   n: 4
 })
   .then( r => console.log('submit:',r));

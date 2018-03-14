@@ -121,6 +121,11 @@ export default function Group() {
     return this;
   };
 
+  group.show_filtered = function(_) {
+    plot.show_filtered(_);
+    return this;
+  };
+
   group.on = function(event, cb) {
     y_axis.on(event, cb);
     return this;

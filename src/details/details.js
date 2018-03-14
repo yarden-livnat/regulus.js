@@ -41,6 +41,10 @@ export function setup(el) {
   root.select('.config').select('select')
     .on('change', function(d) {select_color(this.value);});
 
+  root.select('#details_show_filtered')
+    .property('checked', true)
+    .on('change', on_show_filtered);
+
   subscribe('data.new', (topic, data) => reset(data));
   subscribe('partition.selected', (topic, partition, on) => on ? add(partition) : remove(partition));
 }
@@ -107,6 +111,11 @@ function select_color(name) {
   color_by = name === 'current' && measure || msc.measure_by_name(name);
   colorScale.domain([color_by.extent[1], color_by.extent[0]]);
 
+  update(partitions, true);
+}
+
+function on_show_filtered() {
+  group.show_filtered(this.checked);
   update(partitions, true);
 }
 
