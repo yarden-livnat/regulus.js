@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {interpolateRdYlBu} from 'd3-scale-chromatic';
+import * as chromatic from 'd3-scale-chromatic';
 
 import {publish, subscribe} from "../utils";
 import {and, or, not, AttrFilter} from '../model';
@@ -16,9 +16,55 @@ let dims = [];
 let partitions = [];
 let measure = null;
 
+let cmaps = [
+  // multi-hue
+  {name: 'Viridis'},
+  {name: 'Inferno'},
+  {name: 'Magma'},
+  {name: 'Plasma'},
+  {name: 'Warm'},
+  {name: 'Cool'},
+  {name: 'Rainbow'},
+  {name: 'CubehelixDefault'},
+  //
+  {name: 'BuGn'},
+  {name: 'BuPu'},
+  {name: 'GnBu'},
+  {name: 'OrRd'},
+  {name: 'PuBuGn'},
+  {name: 'PuBu'},
+  {name: 'PuRd'},
+  {name: 'RdPu'},
+  {name: 'YlGnBu'},
+  {name: 'YlGn'},
+  {name: 'YlOrBr'},
+  {name: 'YlOrRd'},
+
+  // diverging
+  {name: 'BrBG'},
+  {name: 'PRGn'},
+  {name: 'PiYG'},
+  {name: 'PuOr'},
+  {name: 'RdBu'},
+  {name: 'RdGy'},
+  {name: 'RdYlBu'},
+  {name: 'RdYlGn'},
+  {name: 'Spectral'},
+
+  // single hue
+  {name: 'Blues'},
+  {name: 'Greens'},
+  {name: 'Greys'},
+  {name: 'Oranges'},
+  {name: 'Purples'},
+  {name: 'Reds'}
+  ];
+
+
+let initial_cmap = 'RdYlBu';
 let color_by = null;
 let color_by_opt = 'current';
-let colorScale = d3.scaleSequential(interpolateRdYlBu);
+let colorScale = d3.scaleSequential(chromatic['interpolate'+initial_cmap]);
 
 let x_axis = XAxis()
   .on('filter', update_filter);
@@ -38,12 +84,28 @@ export function setup(el) {
   root.classed('details', true);
   root.html(template);
 
-  root.select('.config').select('select')
+  root.select('.config').select('#color-by')
     .on('change', function(d) {select_color(this.value);});
+
+  root.select('.config').select('#cmap')
+    .on('change', function(d) {
+      select_cmap(chromatic['interpolate' + this.value])
+    })
+    .selectAll('option').data(cmaps)
+    .enter()
+    .append('option')
+    .attr('value', d => d.name)
+    .property('selected', d => d.name === initial_cmap)
+    .text(d => d.name);
 
   root.select('#details_show_filtered')
     .property('checked', true)
     .on('change', on_show_filtered);
+
+  root.select('#details_use_canvas')
+    .property('checked', true)
+    .on('change', on_use_canvas);
+
 
   subscribe('data.new', (topic, data) => reset(data));
   subscribe('partition.selected', (topic, partition, on) => on ? add(partition) : remove(partition));
@@ -105,6 +167,11 @@ function show_dims() {
   axis.exit().remove();
 }
 
+function select_cmap(cmap) {
+  colorScale.interpolator(cmap);
+  update(partitions, true);
+}
+
 function select_color(name) {
   color_by_opt = name;
 
@@ -116,6 +183,11 @@ function select_color(name) {
 
 function on_show_filtered() {
   group.show_filtered(this.checked);
+  update(partitions, true);
+}
+
+function on_use_canvas() {
+  group.use_canvas(this.checked);
   update(partitions, true);
 }
 
