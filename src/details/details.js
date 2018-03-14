@@ -145,6 +145,7 @@ function remove(partition){
 }
 
 function update_filter(attr) {
+  console.log('details update filter');
   for (let pt of msc.pts) {
     pt.filtered = !pts_filters(pt);
   }

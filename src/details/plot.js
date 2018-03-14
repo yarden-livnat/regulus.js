@@ -26,6 +26,7 @@ export default function Plot() {
       .attr('cx', d => tx(d))
       .attr('cy', d => ty(d))
       .merge(pts)
+      // .attr('display', d => !show_filtered && d.filtered && 'none' || 'visible')
       .style("fill", d => d.filtered && '#eee' || color(d))
       .attr('z-index', d => d.filtered && -1 || 1);
 

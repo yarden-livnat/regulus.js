@@ -208,7 +208,7 @@ class Post(object):
 
         for s in idx_map[merge.src]:
             n = Partition(merge.level, child=s)
-            if idx(s) == s.min_idx:
+            if merge.is_max:
                 n.max_idx = merge.dest
             else:
                 n.min_idx = merge.dest

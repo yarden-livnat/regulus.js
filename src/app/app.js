@@ -6,7 +6,7 @@ import * as details_view from '../details';
 import * as tree_view from '../tree';
 import * as partition_view from '../partition';
 import * as controls_view from '../controls';
-import * as sample_view from '../sample';
+import * as sample_view from '../resample';
 
 import './style.css';
 

@@ -5,7 +5,6 @@ import isFunction from 'validate.io-function';
 export {fun} from 'kernel-smooth';
 
 // from kernel-smooth (not exported)
-
 function weight( kernel, bandwidth, x_0, x_i ) {
   return kernel( (x_i - x_0) / bandwidth );
 }
@@ -30,21 +29,6 @@ function matrixize( fun ) {
   }
 }
 
-//   return function( X ) {
-//     if ( isArray( X ) === true ) {
-//       if ( isArray(X[0]) === false ) {
-//         return fun( X );
-//       } else {
-//         return X.map( function( x_row ) {
-//           return fun( x_row );
-//         } );
-//       }
-//     } else {
-//       throw new TypeError( 'Parameter expects array' );
-//     }
-//   };
-// }
-
 export function inverseMultipleRegression( Xs, ys, kernel, bandwidth ) {
   if ( bandwidth <= 0 ) {
     throw new RangeError( 'Bandwidth has to be a positive number.' );
@@ -66,31 +50,21 @@ export function inverseMultipleRegression( Xs, ys, kernel, bandwidth ) {
   let _p  = Xs[0].length;
   let weight_fun = weight.bind( null, kernel, bandwidth );
 
-  let kernel_smoother = function( y ) {
-
-    // Write Inverse Kernel Smoother Here
-    //console.log("y",y);
-
+  function kernel_smoother( y ) {
     let arr = [];
     for (let ii = 0; ii < y.length; ii++) {
-      let weights = _ys.map(function (y_i) {
-        return weight_fun(y[ii], y_i);
-      });
+      let weights = _ys.map( y_i => weight_fun(y[ii], y_i));
       let denom = sum(weights);
 
       let curarr = [];
       for(let jj = 0;jj<_Xs[0].length;jj++){
-        curarr.push(sum(weights.map(function (w, i) {
-          return w * _Xs[i][jj];
-        })) / denom)
-
+        curarr.push(sum(weights.map( (w, i) => w * _Xs[i][jj])) / denom);
       }
       arr.push(curarr);
     }
 
     return arr;
-
-  };
+  }
 
   return matrixize( kernel_smoother );
 }
@@ -116,26 +90,20 @@ export function averageStd( Xs, ys, kernel, bandwidth ) {
   let _p  = Xs[0].length;
   let weight_fun = weight.bind( null, kernel, bandwidth );
 
-  let kernel_smoother = function( y,x ) {
-
+  function kernel_smoother( y,x ) {
     let arr = [];
     for (let ii = 0; ii < y.length; ii++) {
-      let weights = _ys.map(function (y_i) {
-        return weight_fun(y[ii], y_i);
-      });
+      let weights = _ys.map( (y_i) => weight_fun(y[ii], y_i)) ;
       let denom = sum(weights);
 
       let curarr = [];
       for(let jj = 0;jj<_Xs[0].length;jj++){
-        curarr.push(Math.sqrt(sum(weights.map(function (w, i) {
-          return w * (Math.pow((x[ii][jj]-_Xs[i][jj]),2));
-        })) / denom))
-
+        curarr.push(Math.sqrt(sum(weights.map((w, i) => w * (Math.pow((x[ii][jj]-_Xs[i][jj]),2)))) / denom));
       }
       arr.push(curarr);
     }
     return arr;
-  };
+  }
 
   return kernel_smoother;//matrixize( kernel_smoother );
 }
@@ -155,14 +123,15 @@ export function linspace(a, b, n) {
 
 export function subLinearSpace(subrange, extent, n) {
   n--;
-  let d = extent[1] - extent[0];
-  let from = Math.ceil(n * (subrange[0] - extent[0])/d);
-  let to = Math.floor(n * (subrange[1] - extent[0])/d);
+  let a = extent[0];
+  let d = extent[1] - a;
+  let from = Math.ceil(n * (subrange[0] - a)/d);
+  let to = Math.floor(n * (subrange[1] - a)/d);
 
   let vec = Array(to-from);
-  let offset = n * extent[0];
+  d = d/n;
   for (let i=from; i<=to; i++) {
-    vec[i-from] = offset + i*d;
+    vec[i-from] = a + i * d;
   }
   vec.start = from;
   return vec;
