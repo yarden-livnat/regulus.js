@@ -36,6 +36,8 @@ export class MultiMSC {
     this.attr = [];
     this.dims = [];
     this.measures = [];
+    this.measure = null;
+    this.as_partition = null;
   }
 
   samples(pts, ndims) {
@@ -52,6 +54,16 @@ export class MultiMSC {
     }));
     this.dims = this.attrs.slice(0, ndims).sort( (a,b) => a.name > b.name);
     this.measures = this.attrs.slice(ndims).sort( (a,b) => a.name > b.name);
+
+    this.as_partition = new Partition( {
+      id: 'data',
+      lvl: 1,
+      pts: this.pts,
+      minmax_idx: [0, 1],
+      pts_idx: [0, this.pts.length-1],
+      parent: null,
+      children: []
+    }, this);
 
     return this;
   }
@@ -70,6 +82,10 @@ export class MultiMSC {
 
   measure_by_name(name) {
     return this.measures.find(m => m.name === name);
+  }
+
+  get root() {
+    return this.tree;
   }
 
   set msc(_) {

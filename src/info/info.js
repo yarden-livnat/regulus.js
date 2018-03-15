@@ -25,7 +25,8 @@ export function set_catalog(_) {
 
   service.load_data(catalog)
     .then(data => msc.samples(data, catalog.dims))
-    .then(show);
+    .then(show)
+    .then(() => publish('data.pts', msc));
 
   return catalog;
 }

@@ -12,6 +12,8 @@ export default class Partition {
     this.minmax = [msc.pts[data.minmax_idx[0]][msc.name], msc.pts[data.minmax_idx[1]][msc.name]];
     this.pts_idx = data.pts_idx;
 
+    this._pts = data.pts;
+
     this.parent = data.parent;
     this.children = data.children;
 
@@ -21,7 +23,7 @@ export default class Partition {
     this.notes = null;
 
     this.size = this.pts_idx[1]-this.pts_idx[0];
-    this._pts = null;
+
     this._reg_curve = null;
     this._stat = null;
   }

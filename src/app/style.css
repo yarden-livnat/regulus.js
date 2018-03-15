@@ -30,6 +30,10 @@ body {
   flex: 1 1 auto;
 }
 
+.shrink {
+  flex: 0 1 auto;
+}
+
 .row {
   flex-direction: row;
 }
@@ -47,6 +51,6 @@ body {
   flex: 0 1 auto;
 }
 
-#sample_view {
+#resample_view {
   flex: 0 1 auto;
 }
