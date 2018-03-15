@@ -6,6 +6,15 @@
   /*margin-top: 0.5em;*/
 /*}*/
 
+.partition_view .partition_id.highlight {
+  background-color: lightgray;
+}
+
+.partition_view .partition_id.selected {
+  background-color: lightblue;
+}
+
+
 .partition_view .entry {
   display: inline-block;
   width: 30px;
@@ -18,7 +27,7 @@
 
 .partition_view input {
   /*font: 10pt arial;*/
-  max-width: 40px;
+  max-width: 60px;
   box-sizing: border-box;
   border: none;
   border-bottom: 1px solid #999;
@@ -27,13 +36,19 @@
 
 .partition_view textarea {
   vertical-align: top;
-  max-width: 200px;
+  width: 170px;
+  max-width: 170px;
   box-sizing: border-box;
+  margin-left: 20px;
 }
 
 .partition_view input:focus, .partition_view textarea:focus {
   outline: none;
 }
+
+/*
+ * stats
+ */
 
 .partition_view .stat {
   margin: 5px;
@@ -45,12 +60,20 @@
   width: 80px
 }
 
+.partition_view .name:hover {
+  background-color: lightgray;
+}
+
+.partition_view .name.selected {
+  background-color: lightblue;
+}
+
 .partition_view .box-plot {
   font: 10px sans-serif;
   padding-left: 20px;
 }
+
 .box-plot .frame {
-  /*fill: lightblue;*/
   display: none;
 }
 

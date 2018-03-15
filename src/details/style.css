@@ -40,15 +40,29 @@
   overflow: auto;
 }
 
-.details .group .header {
+.details .group .group-header {
   display: flex;
   flex-direction: column;
-  background-color: lavender;
   width: 3em;
   height: 100px;
   padding: 0 5px 0 5px;
   margin-top: 10px;
   font-size: 10pt;
+
+  background-color: lightgreen;
+}
+
+.details .group.highlight .group-header {
+  background-color: lightgray;
+}
+
+.details .group.selected .group-header {
+  stroke-width: 3px;
+  stroke: lightgreen;
+}
+
+.details .group.edit .group-header {
+  background-color: lightsalmon;
 }
 
 .details .group .header .size {

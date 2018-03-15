@@ -1,13 +1,16 @@
 import * as d3 from 'd3';
 import * as chromatic from 'd3-scale-chromatic';
 
+import {cmaps} from '../utils/colors';
 import {publish, subscribe} from "../utils";
 import {and, or, not, AttrFilter} from '../model';
+import {ensure_single} from "../utils/events";
 
 import Group from './group';
 import XAxis from './x_axis';
 import template from './details.html';
 import './style.css';
+
 
 let root = null;
 
@@ -15,56 +18,15 @@ let msc = null;
 let dims = [];
 let partitions = [];
 let measure = null;
-
-let cmaps = [
-  // multi-hue
-  {name: 'Viridis'},
-  {name: 'Inferno'},
-  {name: 'Magma'},
-  {name: 'Plasma'},
-  {name: 'Warm'},
-  {name: 'Cool'},
-  {name: 'Rainbow'},
-  {name: 'CubehelixDefault'},
-  //
-  {name: 'BuGn'},
-  {name: 'BuPu'},
-  {name: 'GnBu'},
-  {name: 'OrRd'},
-  {name: 'PuBuGn'},
-  {name: 'PuBu'},
-  {name: 'PuRd'},
-  {name: 'RdPu'},
-  {name: 'YlGnBu'},
-  {name: 'YlGn'},
-  {name: 'YlOrBr'},
-  {name: 'YlOrRd'},
-
-  // diverging
-  {name: 'BrBG'},
-  {name: 'PRGn'},
-  {name: 'PiYG'},
-  {name: 'PuOr'},
-  {name: 'RdBu'},
-  {name: 'RdGy'},
-  {name: 'RdYlBu'},
-  {name: 'RdYlGn'},
-  {name: 'Spectral'},
-
-  // single hue
-  {name: 'Blues'},
-  {name: 'Greens'},
-  {name: 'Greys'},
-  {name: 'Oranges'},
-  {name: 'Purples'},
-  {name: 'Reds'}
-  ];
+let selected = null;
 
 
 let initial_cmap = 'RdYlBu';
 let color_by = null;
 let color_by_opt = 'current';
 let colorScale = d3.scaleSequential(chromatic['interpolate'+initial_cmap]);
+
+let pattern = null;
 
 let x_axis = XAxis()
   .on('filter', update_filter);
@@ -108,7 +70,9 @@ export function setup(el) {
 
 
   subscribe('data.new', (topic, data) => reset(data));
-  subscribe('partition.selected', (topic, partition, on) => on ? add(partition) : remove(partition));
+  subscribe('partition.details', (topic, partition, on) => on ? add(partition) : remove(partition));
+  subscribe('partition.highlight', (topic, partition, on) => on_highlight(partition, on));
+  subscribe('partition.selected', (topic, partition, on) => on_selected(partition, on));
 }
 
 function reset(data) {
@@ -148,6 +112,20 @@ function reset(data) {
   colors.exit().remove();
 
   select_color(color_by_opt);
+}
+
+function on_highlight(partition, on) {
+  root.select('.groups').selectAll('.group')
+    .data(partitions, d => d.id)
+    .classed('highlight', d => on && d.id === partition.id)
+}
+
+function on_selected(partition, on) {
+  selected = on && partition || null;
+
+  root.select('.groups').selectAll('.group')
+    .data(partitions, d => d.id)
+    .classed('selected', d => selected && d.id === selected.id)
 }
 
 function show_dims() {
@@ -243,6 +221,8 @@ function update(list, all=false) {
     .append('div')
       .on('mouseenter', d => publish('partition.highlight', d.p, true))
       .on('mouseleave', d => publish('partition.highlight', d.p, false))
+      .on('click', ensure_single(select))
+      .on('dblclick', d => publish('partition.details', d.p, false))
       .call(group.create)
     .merge(groups)
       .call(group, all);
@@ -252,3 +232,6 @@ function update(list, all=false) {
   console.log(`details update: ${t1-t0} msec`);
 }
 
+function select(d) {
+  publish('partition.selected', d.p, !selected || d.p.id !== selected.id);
+}

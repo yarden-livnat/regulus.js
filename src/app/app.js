@@ -4,7 +4,6 @@ import {publish, subscribe} from '../utils/pubsub';
 
 import Panel from '../panel/panel';
 
-// import * as info from '../info';
 import * as details_view from '../details';
 import * as tree_view from '../tree';
 import * as partition_view from '../partition_view';
@@ -22,7 +21,6 @@ setup();
 init();
 
 function setup() {
-  // info.setup(dataset_panel('#dataset_view').content());
   details_view.setup( Panel('Details')('#details_view').content());
   tree_view.setup(Panel('Topology')('#tree_view').content());
   partition_view.setup(Panel('Partition')('#partition_view').content());

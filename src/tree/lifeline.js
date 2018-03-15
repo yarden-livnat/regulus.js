@@ -11,6 +11,7 @@ export default function Lifeline() {
   let root = null;
   let nodes = [];
   let edges = [];
+  let selected = null;
 
   let pt_scale = d3.scaleLinear().domain([0,1]).range([0,width]);
   let y_min = +Number.EPSILON;
@@ -22,7 +23,7 @@ export default function Lifeline() {
   let x_axis = d3.axisBottom(pt_scale).ticks(8, 's');
   let value_scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0,1]).clamp(true);
 
-  let dispatch = d3.dispatch('highlight', 'select', 'edit');
+  let dispatch = d3.dispatch('highlight', 'select', 'details');
 
 
   function preprocess() {
@@ -43,13 +44,27 @@ export default function Lifeline() {
   }
 
   function select(d) {
-    d.selected = !d.selected;
-    d3.select(this).classed('selected', d.selected);
-    dispatch.call('select', this, d, d.selected);
+    if (d === selected) {
+      d3.select(this).classed('selected', false);
+      selected = null;
+      dispatch.call('select', this, d, false);
+      return;
+    }
+
+    if (selected)
+      svg.selectAll('.node').filter(node => node === selected)
+        // .data([selected])
+        .classed('selected', false);
+
+    selected = d;
+    d3.select(this).classed('selected', true);
+    dispatch.call('select', this, d, true);
   }
 
-  function edit(d) {
-    dispatch.call('edit', this, d);
+  function details(d) {
+    d.details = !d.details;
+    d3.select(this).classed('details', d.details);
+    dispatch.call('details', this, d, d.details);
   }
 
   function layout() {
@@ -82,7 +97,7 @@ export default function Lifeline() {
       .on('mouseenter', d => hover(d, true))
       .on('mouseleave', d => hover(d, false))
       .on('click', ensure_single(select))
-      .on('dblclick', edit)
+      .on('dblclick', details)
       .merge(d3nodes)
         .attr('x', d => sx(d.pos.x))
         .attr('y', d => sy(d.pos.yp))
@@ -144,7 +159,6 @@ export default function Lifeline() {
       .style("text-anchor", "middle")
       .text("Persistence");
 
-    svg
     return lifeline;
   }
 
@@ -160,6 +174,12 @@ export default function Lifeline() {
   lifeline.highlight = function(node, on) {
     svg.selectAll('.node').data([node], d => d.id)
       .classed('highlight', on);
+    return this;
+  };
+
+  lifeline.details = function(node, on) {
+    svg.selectAll('.node').data([node], d => d.id)
+      .classed('details', on);
     return this;
   };
 

@@ -52,5 +52,5 @@ body {
 }
 
 #resample_view {
-  flex: 0 1 auto;
+  flex: 0 1 0;
 }

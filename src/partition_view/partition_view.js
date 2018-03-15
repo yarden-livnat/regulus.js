@@ -29,12 +29,12 @@ export function setup(el) {
   root.on('mouseenter', d => current && publish('partition.highlight', current, true));
   root.on('mouseleave',  d => current && publish('partition.highlight', current, false));
 
-  root.select('#partition_alias')
+  root.select('.partition_alias')
     .property('disabled', true)
     .on('change', alias_changed)
     .on('input', d => console.log('input', d));
 
-  root.select('#partition_notes')
+  root.select('.partition_notes')
     .property('disabled', true)
     .on('change', notes_changed)
     .on('input', d => console.log('input', d));
@@ -67,7 +67,7 @@ function select_partition(partition, show) {
 
 function highlight_partition(partition, show) {
   if (!show) {
-    timer = d3.timeout( () => {highlight = null; show_partition(); }, 250);
+    timer = d3.timeout( () => {highlight = null; show_partition(); }, 150);
   } else {
     if (timer) {
       timer.stop();
@@ -81,14 +81,19 @@ function highlight_partition(partition, show) {
 function show_partition() {
   current = highlight || selected || msc.as_partition;
 
-  root.select('#partition_id')
+  root.select('.partition_id')
+    .classed('selected', current === selected)
+    .classed('highlight', current === highlight)
     .text(current && current.id || "");
 
-  root.select('#partition_alias')
+  root.select('.partition_alias')
     .property('value', current && current.alias || "")
     .attr('disabled', current ? null : true);
 
-  root.select('#partition_notes')
+  root.select('.partition_size')
+    .text(current && current.size || '');
+
+  root.select('.partition_notes')
     .property('value', current && current.notes || "")
     .attr('disabled', current ? null : true);
 
@@ -139,7 +144,7 @@ function select_measure(d) {
   if (measure) measure.selected = false;
   measure = d;
   measure.selected = true;
-  root.select('.measures').selectAll('li')
+  root.select('.measures').selectAll('.name')
     .classed('selected', d => d.selected);
 
   publish('load.measure', measure.name);

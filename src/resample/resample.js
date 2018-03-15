@@ -15,16 +15,14 @@ export function setup(el) {
   root.html(template);
 
   subscribe('data.new', (topic, data) => reset(data));
-  subscribe('partition.edit', (topic, partition) => edit(partition));
+  subscribe('partition.selected', (topic, partition) => selected(partition));
 }
 
 function reset(data) {
   msc = data;
 }
 
-function edit(partition) {
+function selected(partition) {
   root.select('#resample-id')
     .text(partition.id);
-  root.select('#resample-lvl')
-    .text(format(partition.lvl));
 }

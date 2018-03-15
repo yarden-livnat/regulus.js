@@ -1,7 +1,6 @@
 import * as d3 from 'd3';
 import {publish, subscribe} from "../utils/pubsub";
 
-// import Tree from './list';
 import Tree from './lifeline';
 import Slider from './slider'
 
@@ -29,7 +28,7 @@ export function setup(el) {
   tree(root.select('.tree'))
     .on('highlight', (node, on) => publish('partition.highlight', node, on))
     .on('select', (node, on) => publish('partition.selected', node, on))
-    .on('edit', node => publish('partition.edit', node))
+    .on('details', (node, on) => publish('partition.details', node, on))
     .y_type(y_type)
     .y_min(y_min);
 
@@ -44,9 +43,8 @@ export function setup(el) {
 
 
   subscribe('data.new', (topic, data) => reset(data));
-  subscribe('partition.highlight', (topic, partition, on) => {
-    tree.highlight(partition, on);
-  });
+  subscribe('partition.highlight', (topic, partition, on) => tree.highlight(partition, on));
+  subscribe('partition.details', (topic, partition, on) => tree.details(partition, on))
   subscribe('data.updated', () => tree.update());
 }
 

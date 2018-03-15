@@ -38,9 +38,9 @@ export default function Group() {
     selection
       .each(function(d, i) {
         let g = d3.select(this);
-        g.select('.header .id').text(d => `id: ${d.id}`);
-        g.select('.header .name').text(d => d.name);
-        g.select('.header .size').text(d => `${d.pts.length} pts`);
+        g.select('.group-header .id').text(d => `id: ${d.id}`);
+        g.select('.group-header .name').text(d => d.name);
+        g.select('.group-header .size').text(d => `${d.pts.length} pts`);
 
         g.select('.measure .name').text(measure.name);
         g.select('.measure .y_axis').call(y_axis);
@@ -112,6 +112,7 @@ export default function Group() {
     plot.color(_);
     return this;
   };
+
 
   group.y = function(_) {
     plot.y(_);
