@@ -27,6 +27,7 @@ export default class Partition {
 
   get pts() {
     if (!this._pts) {
+      let t0 = performance.now();
       let pts = [];
       let msc_pts = this.msc.pts;
       let msc_idx = this.msc.pts_idx;
@@ -37,12 +38,15 @@ export default class Partition {
 
       // consider adding the min and max pts
       this._pts = pts;
+      let t1 = performance.now();
+      console.log(`compute pts in ${d3.format('d')(t1-t0)} msec`);
     }
     return this._pts;
   }
 
   get regression_curve() {
     if (!this._reg_curve) {
+      let t0 = performance.now();
       let current_measure = this.msc.measure_by_name(this.msc.name);
 
       // todo: consider adding the min/max points
@@ -50,6 +54,7 @@ export default class Partition {
       let dims = this.pts.map( pt => this.msc.dims.map( d => pt[d.name] ));
       let measure = this.pts.map( pt => pt[current_measure.name]);
 
+      let t1 = performance.now();
       let extent = current_measure.extent;
       let bandwidth = default_bandwidth * (extent[1] - extent[0]);
 
@@ -67,6 +72,8 @@ export default class Partition {
       curve.columns = dims.map(d => d.name).concat(current_measure.name);
 
       this._reg_curve = {curve, std};
+      let t2 = performance.now();
+      console.log(`compute regression curve in ${d3.format('d')(t2-t0)} msec  [get pts in ${d3.format('d')(t1-t0)} msec]`);
     }
     return this._reg_curve;
   }
