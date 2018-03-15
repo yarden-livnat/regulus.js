@@ -8,7 +8,6 @@ import * as partition_view from '../partition';
 import * as controls_view from '../controls';
 import * as resample_view from '../resample';
 
-
 import './style.css';
 
 

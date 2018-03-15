@@ -45,7 +45,11 @@ export class MultiMSC {
       pt.id = id++;
     }
     let n = pts.columns.length;
-    this.attrs = pts.columns.map(name => ({name, extent: d3.extent(pts, pt => pt[name]) }));
+    this.attrs = pts.columns.map((name, i) => ({
+      name,
+      type: i< ndims && 'dim' || 'measure',
+      extent: d3.extent(pts, pt => pt[name])
+    }));
     this.dims = this.attrs.slice(0, ndims).sort( (a,b) => a.name > b.name);
     this.measures = this.attrs.slice(ndims).sort( (a,b) => a.name > b.name);
 

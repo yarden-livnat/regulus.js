@@ -23,6 +23,19 @@ export default class Partition {
     this.size = this.pts_idx[1]-this.pts_idx[0];
     this._pts = null;
     this._reg_curve = null;
+    this._stat = null;
+  }
+
+  get dims() {
+    return this.msc.dims;
+  }
+
+  get measures() {
+    return this.msc.measures;
+  }
+
+  get measure() {
+    return this.msc.name;
   }
 
   get pts() {
@@ -42,6 +55,33 @@ export default class Partition {
       console.log(`compute pts in ${d3.format('d')(t1-t0)} msec`);
     }
     return this._pts;
+  }
+
+  get statistics() {
+    if (!this._stat) {
+      this._stat = new Map();
+
+      let pts = this.pts;
+      for (let attr of this.msc.attrs) {
+        let values = pts.map(pt => pt[attr.name]);
+        values.sort((a, b) => a - b);
+
+        this._stat.set(attr.name, {
+          name: attr.name,
+          type: attr.type,
+          measure: attr.name === this.measure,
+          n: values.length,
+          quantile: [
+            d3.quantile(values, 0.25),
+            d3.quantile(values, 0.5),
+            d3.quantile(values, 0.75)],
+          min: values[0],
+          max: values[values.length - 1],
+          extent: attr.extent
+        });
+      }
+    }
+    return this._stat;
   }
 
   get regression_curve() {
