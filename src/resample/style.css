@@ -1,0 +1,51 @@
+.resample {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.resample .stat {
+  padding: 5px;
+}
+
+.resample label {
+  vertical-align: top;
+  display: inline-block;
+  width: 80px
+}
+
+.resample .box-plot {
+  font: 10px sans-serif;
+  padding-left: 20px;
+}
+.box-plot .frame {
+  /*fill: lightblue;*/
+  display: none;
+}
+
+.box-plot rect {
+  fill: lightblue;
+  stroke: #000;
+  stroke-width: 0.5px;
+}
+
+.box-plot line,
+.box-plot circle {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 0.5px;
+}
+
+.box-plot .center {
+  stroke-dasharray: 3,3;
+}
+
+.box-plot .outlier {
+  fill: none;
+  stroke: #ccc;
+}
+
+.section {
+  padding-bottom: 10px;
+}
+
+.section-header {
+  font-weight: bold;
+}
