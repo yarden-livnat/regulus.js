@@ -5,7 +5,7 @@ import './lifeline.css';
 export default function Lifeline() {
   let margin = {top: 10, right: 10, bottom: 50, left:60},
     width = 800 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
+    height = 500 - margin.top - margin.bottom;
 
   let svg = null;
   let root = null;
