@@ -28,6 +28,7 @@ def parse(args):
     ## New
     p.add_argument('-p', '--parameters', default='', dest='params', help='parameters to resample')
 
+
     p.add_argument('-d', '--demand', default='10000', type=float, dest='initial_demand', help='initial demand')
     p.add_argument('-r', '--report', default='params.csv',  dest='report', help='report file')
     ns = p.parse_args(args)
@@ -53,6 +54,7 @@ def sim(args=None):
         report.writerow(generator.header + measures.header)
 
     if ns.params == '':
+
         for i in range(ns.samples):
             print('sim',i)
             os.system('rm '+db)

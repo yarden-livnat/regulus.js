@@ -7,6 +7,7 @@ from collections import defaultdict
 from datetime import date
 from getpass import getuser
 
+
 from topopy.MorseSmaleComplex import MorseSmaleComplex as MSC
 
 
@@ -43,6 +44,7 @@ class Partition(object):
         self.max_idx = max_idx
         self.is_max_merge = is_max
 
+
         if child is not None:
             self.min_idx = child.min_idx
             self.max_idx = child.max_idx
@@ -55,6 +57,7 @@ class Partition(object):
         if child.min_idx != self.min_idx and child.max_idx != self.max_idx:
             print("ERROR: child {} [{} {}] merged into parent {} [{} {}] without a matching extrema".format(child.id,
                     child.min_idx, child.max_id, self.id, self.min_idx, self.max_idx))
+
 
 
 class Post(object):
@@ -73,6 +76,7 @@ class Post(object):
         self.all = dict()
         self.data_pts = []
         self.single = 0
+
 
     def load(self, path):
         with open(path / 'Base_Partition.json') as f:
@@ -103,6 +107,7 @@ class Post(object):
             self.add(p)
 
         # self.find_unique()
+
         self.remove_non_unique()
 
         self.merges.sort(key=lambda m: (m.level, m.src))
@@ -132,6 +137,7 @@ class Post(object):
                 continue
 
             # merge.dest may have been merged already (same persistence level: degenerate case)
+
             dest = merge.dest
             while dest in self.mapping:
                 dest = self.mapping[dest]
@@ -195,6 +201,7 @@ class Post(object):
                         # s is an intermediate and should be absorbed
                         if len(s.children) == 0:
                             # s is a base partition
+
                             d.base_pts.extend(s.base_pts)
                         else:
                             for child in s.children:
@@ -202,6 +209,7 @@ class Post(object):
                     else:
                         if n is None:
                             n = Partition(merge.level, child=d, is_max=merge.is_max)
+
                             remove.add(d)  # can't be removed during the iterations
                             add.append(n)
                         n.add_child(s)
@@ -229,6 +237,7 @@ class Post(object):
             if target.extrema is not None:
                 print("*** target ({}) extrema is not empty: {}".format(target.id, target.extrema))
             target.extrema = merge.src
+
 
         for n in add:
             self.add(n)
@@ -266,6 +275,7 @@ class Post(object):
                 idx = self.visit(child, idx)
 
         partition.span = (first, idx)
+
         return idx
 
     def rename(self, node, idx):
@@ -281,6 +291,7 @@ class Post(object):
     #
 
     def get_tree(self, name, params=''):
+
         partitions = []
         self.collect(self.root, partitions)
         tree = {
@@ -293,6 +304,7 @@ class Post(object):
 
     def save(self, path, name, params):
         tree = self.get_tree(name, params)
+
         filename = name + ".json"
         with open(path / filename, 'w') as f:
             json.dump(tree, f)
@@ -302,6 +314,7 @@ class Post(object):
             'id': node.id,
             'lvl': node.persistence,
             'span': [node.span[0], node.span[1]],
+
             'minmax_idx': [node.min_idx, node.max_idx],
             'parent': node.parent.id if node.parent is not None else None,
             'children': [child.id for child in node.children] if node.persistence > 0 else []
@@ -380,6 +393,7 @@ def save_regulus(filename, regulus):
 def post(args=None):
     p = argparse.ArgumentParser(prog='analyze', description='Extract input dimension and a single measure')
     p.add_argument('filename', help='input file [.csv data file or a regulus .json file]')
+
     p.add_argument('-k', '--knn', type=int, default=100, help='knn')
     p.add_argument('-b', '--beta', type=float, default=1.0, help='beta')
     p.add_argument('-n', '--norm', default='feature', help='norm')
@@ -472,6 +486,7 @@ def post(args=None):
                     .get_tree(measure, params)
                 mscs[measure] = tree
             available.add(measure)
+
         except RuntimeError as error:
             print(error)
 
@@ -483,6 +498,7 @@ def post(args=None):
     else:
         with open(path / 'catalog.json', 'w') as f:
             json.dump(catalog, f, indent=2)
+
 
 
 if __name__ == '__main__':

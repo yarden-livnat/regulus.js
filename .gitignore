@@ -6,6 +6,7 @@ data
 sim
 old_datas
 
+
 node_modules
 .cache
 .vscode

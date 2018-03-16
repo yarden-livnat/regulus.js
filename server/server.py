@@ -5,6 +5,7 @@ import json
 import argparse
 from sample import createsample
 
+
 p = argparse.ArgumentParser(description='Regulus server')
 p.add_argument('-d', '--data', default=None, help='data directory')
 args = p.parse_args()
@@ -36,14 +37,16 @@ def data(path):
     print('dataset', filename)
     return static_file(filename, root=str(data_dir))
 
-@app.post('/resample')
+@app.route('/resample')
+#@app.post('/resample')
 def resample():
     #print('data_dir', data_dir)
     spec = request.json
     print('resample request received', spec)
     createsample(spec,data_dir)
     #print('resample', spec)
-    return
+    print('resample post received', spec)
+    sample.createsample(spec)
 
 
 run(app, host='localhost', port=8081, debug=True, reloader=True)
