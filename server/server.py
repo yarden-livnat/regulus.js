@@ -26,8 +26,8 @@ def data(path):
     print('dataset', path)
     return static_file(path, root=str(data_dir))
 
-@app.route('/resample')
-#@app.post('/resample')
+#@app.route('/resample')
+@app.post('/resample')
 def resample():
     spec = request.json
     print('resample post received', spec)

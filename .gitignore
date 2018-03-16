@@ -3,6 +3,7 @@ build
 dist
 lib
 data
+sim
 
 node_modules
 .cache
