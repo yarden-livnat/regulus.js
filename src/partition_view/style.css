@@ -27,7 +27,7 @@
 
 .partition_view input {
   /*font: 10pt arial;*/
-  max-width: 60px;
+  max-width: 80px;
   box-sizing: border-box;
   border: none;
   border-bottom: 1px solid #999;

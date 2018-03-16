@@ -59,6 +59,7 @@ function reset(data) {
 }
 
 function select_partition(partition, show) {
+  console.log('select. timer:', timer != null);
   selected = show && partition || null;
   current = selected || highlight;
   show_partition()
@@ -66,6 +67,7 @@ function select_partition(partition, show) {
 
 
 function highlight_partition(partition, show) {
+  console.log('highlight', show, timer != null);
   if (!show) {
     timer = d3.timeout( () => {highlight = null; show_partition(); }, 150);
   } else {
@@ -100,16 +102,18 @@ function show_partition() {
 
   let stat = current && Array.from(current.statistics.values()) || [];
 
-  let dims = stat.filter(s => s.type === 'dim').sort((a,b) => a.name < b.name);
+  let dims = stat.filter(s => s.type === 'dim')
+    .sort((a,b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
   show('.dims', dims);
 
-  let measures = stat.filter(s => s.type === 'measure').sort( (a,b) => a.measure || a.name < b.name ? -1 : 1);
+  let measures = stat.filter(s => s.type === 'measure')
+    .sort( (a,b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
   show('.measures', measures, true);
 }
 
 function show(selector, data, listen=false) {
   let stats = root.select(selector).selectAll('.stat')
-    .data(data);
+    .data(data, d => d.id);
 
   stats.exit().remove();
 
@@ -132,7 +136,9 @@ function show(selector, data, listen=false) {
     .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
   let b = boxes.merge(stats);
-  b.select('.name').text(d => d.name);
+  b.select('.name')
+    .text(d => d.name)
+    .classed('selected', d => d.selected);
 
   b.select('svg')
     .call(box_plot);
@@ -141,11 +147,11 @@ function show(selector, data, listen=false) {
 function select_measure(d) {
   if (measure === d /*|| !d.available*/) return;
 
-  if (measure) measure.selected = false;
+  // if (measure) measure.selected = false;
   measure = d;
-  measure.selected = true;
+  // measure.selected = true;
   root.select('.measures').selectAll('.name')
-    .classed('selected', d => d.selected);
+    .classed('selected', d => d.id =);
 
   publish('load.measure', measure.name);
 }

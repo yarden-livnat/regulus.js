@@ -10,12 +10,16 @@ let msc = null;
 let chart = Chart().width(300).height(150);
 let prevent = false;
 
+let sx = d3.scaleLinear();
+let sy = d3.scaleLinear();
+
+
 export function setup(el) {
   root = typeof el === 'string' && d3.select(el) || el;
   root.classed('controls_view', true);
   root.html(template);
 
-  // chart.on('range', range => {if (!prevent) { prevent = true; publish('persistence.range', range); prevent=false;}});
+  chart.on('range', range => {if (!prevent) { prevent = true; publish('persistence.range', range); prevent=false;}});
 
   subscribe('persistence.range', (topic, range) => move_range(range));
   subscribe('data.new', (topic, data) => reset(data));
@@ -30,7 +34,7 @@ function reset(data) {
 function move_range(range) {
   if (!prevent) {
     prevent = true;
-    root.select('.persistence_chart').selectAll('svg').call(chart.move, range);
+    root.select('.persistence_chart').selectAll('svg').call(chart.move, [sx(range[0]), sy(range[1])]);
     prevent = false;
   }
 }
@@ -59,8 +63,8 @@ function reset_persistence() {
 
   let opts = {
     curve: values,
-    sx: d3.scaleLinear().domain([d3.min(values, pt => pt[0]), 1]).clamp(true),
-    sy: d3.scaleLinear().domain([0, d3.max(values, pt => pt[1])])
+    sx: sx.domain([d3.min(values, pt => pt[0]), 1]).clamp(true),
+    sy: sy.domain([0, d3.max(values, pt => pt[1])])
   };
 
   root.select('.persistence_chart').selectAll('svg')

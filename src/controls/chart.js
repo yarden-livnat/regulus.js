@@ -1,6 +1,5 @@
 import * as d3 from 'd3';
 
-
 export default function Chart() {
   let margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = 150 - margin.left - margin.right,
@@ -15,12 +14,7 @@ export default function Chart() {
   let dispatch = d3.dispatch('range');
 
   function brushed(d) {
-      // console.log('brushed', this, d, this.__data__);
-    // let s = d3.brushSelection(this);
-    // brush_selection = [[2, s[0]], [12, s[1]]];
-
     let range = d3.event.selection.map(d.sx.invert);
-    // console.log('range:', range);
     dispatch.call('range', this, range);
   }
 
