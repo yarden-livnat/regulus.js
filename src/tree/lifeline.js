@@ -64,7 +64,15 @@ export default function Lifeline() {
 
   function details(d) {
     d.details = !d.details;
-    d3.select(this).classed('details', d.details);
+    d3.select(this)
+      .classed('details', d.details);
+
+    let name = d3.select(this)
+      .selectAll('text').data(d.details? [d] : [])
+      .enter()
+      .append('text').text(d => d.id);
+    name.exit().remove();
+
     dispatch.call('details', this, d, d.details);
   }
 
@@ -93,13 +101,13 @@ export default function Lifeline() {
     let d3nodes = svg.select('.nodes').selectAll('.node')
       .data(items, d => d.id);
 
-    d3nodes.enter()
+    let enter = d3nodes.enter()
       .append('rect')
-      .attr('class', 'node')
-      .on('mouseenter', d => hover(d, true))
-      .on('mouseleave', d => hover(d, false))
-      .on('click', ensure_single(select))
-      .on('dblclick', details)
+        .attr('class', 'node')
+        .on('mouseenter', d => hover(d, true))
+        .on('mouseleave', d => hover(d, false))
+        .on('click', ensure_single(select))
+        .on('dblclick', details)
       .merge(d3nodes)
         .attr('x', d => sx(d.pos.x))
         .attr('y', d => sy(d.pos.yp))
@@ -107,6 +115,19 @@ export default function Lifeline() {
         .attr('height', d => sy(d.pos.y) - sy(d.pos.yp));
 
     d3nodes.exit().remove();
+
+   let names = svg.select('.names').selectAll('.name')
+     .data(items.filter(d => d.details), d => d.id);
+
+   names.enter()
+     .append('text')
+     .attr('class', 'name')
+     .attr('dx', d => sx((d.pos.x +d.pos.w) - sx(d.pos.x))/2)
+     .attr('dy', d => (sy(d.pos.y) - sy(d.pos.yp))/2)
+     .text( d => d.id);
+
+   names.exit().remove();
+
 
     // let d3edges = svg.select('.edges').selectAll('.edge')
     //   .data(edges);
@@ -134,6 +155,9 @@ export default function Lifeline() {
 
     svg.append('g')
       .attr('class', 'nodes');
+
+    svg.append('g')
+      .attr('class', 'names');
 
     // svg.append('g')
     //   .attr('class', 'edges');

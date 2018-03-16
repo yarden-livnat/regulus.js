@@ -6,6 +6,24 @@ export default function Chart() {
     width = 150 - margin.left - margin.right,
     height = 120 - margin.top - margin.bottom;
 
+  let brush = d3.brushX().extent([[0, 0], [width, height]])
+    .on('brush', brushed)
+    // .on('end', brush_ended)
+    // .on('start', brush_started)
+    ;
+
+  let dispatch = d3.dispatch('range');
+
+  function brushed(d) {
+      // console.log('brushed', this, d, this.__data__);
+    // let s = d3.brushSelection(this);
+    // brush_selection = [[2, s[0]], [12, s[1]]];
+
+    let range = d3.event.selection.map(d.sx.invert);
+    // console.log('range:', range);
+    dispatch.call('range', this, range);
+  }
+
   function chart(selection)
   {
     let svg = selection.enter()
@@ -37,6 +55,10 @@ export default function Chart() {
         .style("text-anchor", "middle")
         .text("Num of partitions");
 
+    svg.append('g')
+      .attr('class', 'brush')
+      .call(brush);
+
     let g = svg.merge(selection)
       .each(function (d, i) {
         d.sx.range([0, width]);
@@ -51,6 +73,7 @@ export default function Chart() {
         g.select('.x').call(d3.axisBottom(d.sx));
         g.select('.y').call(d3.axisLeft(d.sy));
         g.select('path').attr('d', p => line(p.curve));
+        g.select('.brush').call(brush);
       });
 
     return chart;
@@ -59,12 +82,25 @@ export default function Chart() {
   chart.width = function (_) {
     if (!arguments.length) return width;
     width = _;
+    brush.extent([[0, 0], [width, height]]);
     return this;
   };
 
   chart.height = function (_) {
     if (!arguments.length) return height;
     height = _;
+    brush.extent([[0, 0], [width, height]]);
+    return this;
+  };
+
+  chart.move = function(selection, _) {
+    selection.select('.brush')
+      .call(brush.move, _);
+    return this;
+  };
+
+  chart.on = function(event, cb) {
+    dispatch.on(event, cb);
     return this;
   };
 

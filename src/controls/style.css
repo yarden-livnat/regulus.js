@@ -19,3 +19,7 @@
 .chart .axis  {
   fill: black;
 }
+
+.brush {
+  /*fill: lightgrey;*/
+}

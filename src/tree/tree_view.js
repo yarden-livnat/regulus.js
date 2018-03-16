@@ -15,6 +15,7 @@ let y_min = 0.5;
 let y_type = 'log';
 let y_range = [1e-5, 1];
 let slider = Slider();
+let prevent = false;
 
 export function setup(el) {
   root = typeof el === 'string' && d3.select(el) || el;
@@ -35,16 +36,15 @@ export function setup(el) {
 
   slider
     .range(y_range)
-    .on('change', (range) => tree.range(range));
+    .on('change', slider_range_update);
 
   root.select('#persistence-slider')
     .call(slider);
 
-
-
   subscribe('data.new', (topic, data) => reset(data));
   subscribe('partition.highlight', (topic, partition, on) => tree.highlight(partition, on));
-  subscribe('partition.details', (topic, partition, on) => tree.details(partition, on))
+  subscribe('partition.details', (topic, partition, on) => tree.details(partition, on));
+  subscribe('persistence.range', (topic, range) => set_persistence_range(range) );
   subscribe('data.updated', () => tree.update());
 }
 
@@ -57,4 +57,22 @@ function reset(data) {
 
 function select_y_type() {
   tree.y_type(this.value);
+}
+
+function set_persistence_range(range) {
+  if (!prevent) {
+    prevent = true;
+    root.select('#persistence-slider')
+      .call(slider.move, range);
+    prevent = false;
+  }
+}
+
+function slider_range_update(range) {
+  tree.range(range);
+  if (!prevent) {
+    prevent = true;
+    publish('persistence.range', range);
+    prevent = false;
+  }
 }
