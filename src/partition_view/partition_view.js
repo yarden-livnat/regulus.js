@@ -63,7 +63,7 @@ function reset(data) {
 }
 
 function select_partition(partition, show) {
-  console.log('select. timer:', timer !== null);
+  // console.log('select. timer:', timer !== null);
   selected = show && partition || null;
   current = selected || highlight;
   show_partition()
@@ -71,7 +71,7 @@ function select_partition(partition, show) {
 
 
 function highlight_partition(partition, show) {
-  console.log('highlight', show, timer !== null);
+  // console.log('highlight', show, timer !== null);
   if (!show) {
     timer = d3.timeout( () => {highlight = null; show_partition(); }, 250);
   } else {

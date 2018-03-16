@@ -16,6 +16,7 @@ let y_type = 'log';
 let y_range = [1e-5, 1];
 let slider = Slider();
 let prevent = false;
+let saved = [0, 0];
 
 export function setup(el) {
   root = typeof el === 'string' && d3.select(el) || el;
@@ -62,8 +63,10 @@ function select_y_type() {
 function set_persistence_range(range) {
   if (!prevent) {
     prevent = true;
-    root.select('#persistence-slider')
-      .call(slider.move, range);
+    if (saved[0] != range[0] || saved[1] != range[1]) {
+      root.select('#persistence-slider')
+        .call(slider.move, range);
+    }
     prevent = false;
   }
 }
@@ -72,6 +75,7 @@ function slider_range_update(range) {
   tree.range(range);
   if (!prevent) {
     prevent = true;
+    saved = range;
     publish('persistence.range', range);
     prevent = false;
   }

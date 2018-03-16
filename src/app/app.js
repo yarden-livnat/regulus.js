@@ -24,7 +24,7 @@ function setup() {
   details_view.setup( Panel('Details')('#details_view').content());
   tree_view.setup(Panel('Topology')('#tree_view').content());
   partition_view.setup(Panel('Partition')('#partition_view').content());
-  controls_view.setup(Panel('Controls')('#controls_view').content());
+  controls_view.setup(Panel('Filtering')('#controls_view').content());
   resample_view.setup(Panel('Resample')('#resample_view').content());
 }
 

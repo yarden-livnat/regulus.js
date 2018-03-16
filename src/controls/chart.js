@@ -14,6 +14,7 @@ export default function Chart() {
   let dispatch = d3.dispatch('range');
 
   function brushed(d) {
+    if (!d3.event.selection) return;
     let range = d3.event.selection.map(d.sx.invert);
     dispatch.call('range', this, range);
   }
@@ -64,8 +65,8 @@ export default function Chart() {
           .curve(d3.curveStepAfter);
 
         let g = d3.select(this);
-        g.select('.x').call(d3.axisBottom(d.sx));
-        g.select('.y').call(d3.axisLeft(d.sy));
+        g.select('.x').call(d3.axisBottom(d.sx).ticks(4));
+        g.select('.y').call(d3.axisLeft(d.sy).ticks(4));
         g.select('path').attr('d', p => line(p.curve));
         g.select('.brush').call(brush);
       });
@@ -88,6 +89,7 @@ export default function Chart() {
   };
 
   chart.move = function(selection, _) {
+    console.log('ctrl brush move', _);
     selection.select('.brush')
       .call(brush.move, _);
     return this;
