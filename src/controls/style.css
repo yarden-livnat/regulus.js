@@ -1,0 +1,21 @@
+.chart {
+  /*background-color: lightcyan;*/
+}
+
+.chart path {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart .axis path,
+.chart .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.chart .axis  {
+  fill: black;
+}

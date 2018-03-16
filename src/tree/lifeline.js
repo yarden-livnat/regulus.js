@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import {ensure_single} from "../utils/events";
+import {ensure_single} from '../utils/events';
 import './lifeline.css';
 
 export default function Lifeline() {
@@ -27,6 +27,7 @@ export default function Lifeline() {
 
 
   function preprocess() {
+    selected = null;
     pt_scale.domain([0, root.size]);
     edges = [];
     // visit(root);
@@ -82,14 +83,15 @@ export default function Lifeline() {
     }
   }
 
-  function render() {
+  function render(items = null) {
     if (!svg) return;
 
+    items = items || nodes;
     svg.select('.x').call(x_axis);
     svg.select('.y').call(y_axis);
 
     let d3nodes = svg.select('.nodes').selectAll('.node')
-      .data(nodes, d => d.id);
+      .data(items, d => d.id);
 
     d3nodes.enter()
       .append('rect')
@@ -133,36 +135,39 @@ export default function Lifeline() {
     svg.append('g')
       .attr('class', 'nodes');
 
-    svg.append('g')
-      .attr('class', 'edges');
+    // svg.append('g')
+    //   .attr('class', 'edges');
 
-    svg.append("g")
+    svg.append('g')
       .attr('class', 'x axis')
-      .attr("transform", "translate(0," + height + ")");
+      .attr('transform', `translate(0,${height})`);
       // .call(d3.axisBottom(pt_scale));
 
-    svg.append("text")
-      .attr("transform",
-        "translate(" + (width/2) + " ," +
-        (height + margin.top + 20) + ")")
-      .style("text-anchor", "middle")
-      .text("Points");
+    svg.append('text')
+      .attr('transform', `translate(${width/2},${height + margin.top + 20})`)
+      .style('text-anchor', 'middle')
+      .text('Points');
 
     svg.append('g')
       .attr('class', 'y axis');
 
-    svg.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 0 - margin.left)
-      .attr("x",0 - (height / 2))
-      .attr("dy", "1em")
-      .style("text-anchor", "middle")
-      .text("Persistence");
+    svg.append('text')
+      .attr('transform', 'rotate(-90)')
+      .attr('y', 0 - margin.left)
+      .attr('x',0 - (height / 2))
+      .attr('dy', '1em')
+      .style('text-anchor', 'middle')
+      .text('Persistence');
 
     return lifeline;
   }
 
+  let flag = false;
   lifeline.data = function(_nodes, _root) {
+    render([]);
+
+    if (flag) return;
+
     root = _root;
     nodes = _nodes;
     preprocess();
@@ -212,11 +217,11 @@ export default function Lifeline() {
 
   lifeline.range = function(_) {
     range = _;
-    // y_min = y_type === 'linear' ? value : value+Number.EPSILON;
     sy.domain(range);
     render();
     return this;
   };
+
   lifeline.on = function(event, cb) {
     dispatch.on(event, cb);
     return this;
