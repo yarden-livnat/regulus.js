@@ -26,20 +26,22 @@ export function setup(el) {
   root.classed('partition_view', true);
   root.html(template);
 
-  root.on('mouseenter', d => current && publish('partition.highlight', current, true));
-  root.on('mouseleave',  d => current && publish('partition.highlight', current, false));
+  // root.on('mouseenter', d => current && publish('partition.highlight', current, true));
+  // root.on('mouseleave',  d => current && publish('partition.highlight', current, false));
 
   root.select('.partition_alias')
     .property('disabled', true)
+    .attr('placeholder', 'assign alias')
     .on('change', alias_changed)
-    .on('input', d => console.log('input', d));
+    .on('input', alias_changed);
 
   root.select('.partition_notes')
     .property('disabled', true)
     .on('change', notes_changed)
-    .on('input', d => console.log('input', d));
+    .on('input', notes_changed);
 
   subscribe('data.pts', (topic, data) => reset(data));
+  subscribe('data.new', (topic, data) => reset(data));
   subscribe('partition.highlight', (topic, partition, show) => highlight_partition(partition, show));
   subscribe('partition.selected', (topic, partition, show) => select_partition(partition, show));
 }
@@ -55,11 +57,13 @@ function notes_changed() {
 
 function reset(data) {
   msc = data;
+  selected = null;
+  highlight = null;
   show_partition();
 }
 
 function select_partition(partition, show) {
-  console.log('select. timer:', timer != null);
+  console.log('select. timer:', timer !== null);
   selected = show && partition || null;
   current = selected || highlight;
   show_partition()
@@ -67,9 +71,9 @@ function select_partition(partition, show) {
 
 
 function highlight_partition(partition, show) {
-  console.log('highlight', show, timer != null);
+  console.log('highlight', show, timer !== null);
   if (!show) {
-    timer = d3.timeout( () => {highlight = null; show_partition(); }, 150);
+    timer = d3.timeout( () => {highlight = null; show_partition(); }, 250);
   } else {
     if (timer) {
       timer.stop();
@@ -113,7 +117,7 @@ function show_partition() {
 
 function show(selector, data, listen=false) {
   let stats = root.select(selector).selectAll('.stat')
-    .data(data, d => d.id);
+    .data(data, d => d.name);
 
   stats.exit().remove();
 
@@ -138,7 +142,7 @@ function show(selector, data, listen=false) {
   let b = boxes.merge(stats);
   b.select('.name')
     .text(d => d.name)
-    .classed('selected', d => d.selected);
+    .classed('selected', d => measure && d.name === measure.name);
 
   b.select('svg')
     .call(box_plot);
@@ -147,11 +151,10 @@ function show(selector, data, listen=false) {
 function select_measure(d) {
   if (measure === d /*|| !d.available*/) return;
 
-  // if (measure) measure.selected = false;
   measure = d;
-  // measure.selected = true;
   root.select('.measures').selectAll('.name')
-    .classed('selected', d => d.id =);
+    .classed('selected', d => d.name === measure.name);
+  selected = highlight = null;
 
   publish('load.measure', measure.name);
 }

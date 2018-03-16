@@ -56,7 +56,7 @@ export class MultiMSC {
     this.measures = this.attrs.slice(ndims).sort( (a,b) => a.name > b.name);
 
     this.as_partition = new Partition( {
-      id: 'data',
+      id: 'ALL',
       lvl: 1,
       pts: this.pts,
       minmax_idx: [0, 1],
