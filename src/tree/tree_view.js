@@ -68,7 +68,9 @@ function set_persistence_range(range) {
         .call(slider.move, range);
     }
     prevent = false;
-  }
+  } else
+  if (prevent) console.log('tree set prevent');
+
 }
 
 function slider_range_update(range) {
@@ -79,4 +81,6 @@ function slider_range_update(range) {
     publish('persistence.range', range);
     prevent = false;
   }
+  else
+  if (prevent) console.log('tree slider prevent');
 }

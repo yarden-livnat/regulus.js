@@ -31,7 +31,7 @@ export function setup(el) {
 
   root.select('.partition_alias')
     .property('disabled', true)
-    .attr('placeholder', 'assign alias')
+    // .attr('placeholder', 'assign alias')
     .on('change', alias_changed)
     .on('input', alias_changed);
 
@@ -63,7 +63,6 @@ function reset(data) {
 }
 
 function select_partition(partition, show) {
-  // console.log('select. timer:', timer !== null);
   selected = show && partition || null;
   current = selected || highlight;
   show_partition()

@@ -20,6 +20,6 @@
   fill: black;
 }
 
-.brush {
-  /*fill: lightgrey;*/
+.brush .selection {
+  fill: lightgray;
 }

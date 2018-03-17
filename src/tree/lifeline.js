@@ -59,6 +59,7 @@ export default function Lifeline() {
 
     selected = d;
     d3.select(this).classed('selected', true);
+    render_names();
     dispatch.call('select', this, d, true);
   }
 
@@ -66,12 +67,6 @@ export default function Lifeline() {
     d.details = !d.details;
     d3.select(this)
       .classed('details', d.details);
-
-    let name = d3.select(this)
-      .selectAll('text').data(d.details? [d] : [])
-      .enter()
-      .append('text').text(d => d.id);
-    name.exit().remove();
 
     dispatch.call('details', this, d, d.details);
   }
@@ -103,45 +98,43 @@ export default function Lifeline() {
 
     let enter = d3nodes.enter()
       .append('rect')
-        .attr('class', 'node')
-        .on('mouseenter', d => hover(d, true))
-        .on('mouseleave', d => hover(d, false))
-        .on('click', ensure_single(select))
-        .on('dblclick', details)
+      .attr('class', 'node')
+      .on('mouseenter', d => hover(d, true))
+      .on('mouseleave', d => hover(d, false))
+      .on('click', ensure_single(select))
+      .on('dblclick', details)
       .merge(d3nodes)
-        .attr('x', d => sx(d.pos.x))
-        .attr('y', d => sy(d.pos.yp))
-        .attr('width', d => sx(d.pos.x +d.pos.w) - sx(d.pos.x))
-        .attr('height', d => sy(d.pos.y) - sy(d.pos.yp));
+      .attr('x', d => sx(d.pos.x))
+      .attr('y', d => sy(d.pos.yp))
+      .attr('width', d => sx(d.pos.x + d.pos.w) - sx(d.pos.x))
+      .attr('height', d => sy(d.pos.y) - sy(d.pos.yp));
 
     d3nodes.exit().remove();
 
-   let names = svg.select('.names').selectAll('.name')
-     .data(items.filter(d => d.details), d => d.id);
+    // show id and names of partitioned that are also in detailed
+    // if there's enought space
+    render_names(items.filter(d => d.details || d.highlight || d === selected ));
+  }
 
-   names.enter()
+  function render_names(items = null) {
+    items = items || nodes.filter(d => d.details || d.highlight || d === selected );
+    let names = svg.select('.names').selectAll('.name')
+     .data(items, d => d.id);
+
+    names.enter()
      .append('text')
      .attr('class', 'name')
-     .attr('dx', d => sx((d.pos.x +d.pos.w) - sx(d.pos.x))/2)
-     .attr('dy', d => (sy(d.pos.y) - sy(d.pos.yp))/2)
-     .text( d => d.id);
-
-   names.exit().remove();
-
-
-    // let d3edges = svg.select('.edges').selectAll('.edge')
-    //   .data(edges);
-    //
-    // d3edges.enter()
-    //   .append('line')
-    //     .attr('class', 'edge')
-    //   .merge(d3edges)
-    //     .attr('x1', d => sx(d.parent.pos.x))
-    //     .attr('x2', d => sx(d.child.pos.x))
-    //     .attr('y1', d => sy(d.parent.pos.y))
-    //     .attr('y2', d => sy(d.parent.pos.y));
-    //
-    // d3edges.exit().remove();
+     .merge(names)
+      .text( d => d.alias ? d.alias : d.id)
+       .attr('x', d => sx((d.pos.x + d.pos.w/2)))
+       .attr('y', d => (sy(d.pos.y) + sy(d.pos.yp))/2)
+       .each( function(d)  {
+         let bbox = this.getBBox();
+         let w = sx(d.pos.x + d.pos.w)- sx(d.pos.x);
+         let h = sy(d.pos.y) - sy(d.pos.yp);
+         d3.select(this).attr('visibility', (w > bbox.width && h > bbox.height) ? 'visible' : 'hidden');
+       });
+    names.exit().remove();
   }
 
   function lifeline(selection) {
@@ -203,12 +196,16 @@ export default function Lifeline() {
   lifeline.highlight = function(node, on) {
     svg.selectAll('.node').data([node], d => d.id)
       .classed('highlight', on);
+    node.highlight = on;
+    if (on) render_names();
     return this;
   };
 
   lifeline.details = function(node, on) {
-    svg.selectAll('.node').data([node], d => d.id)
-      .classed('details', on);
+    // svg.selectAll('.node').data([node], d => d.id)
+    //   .classed('details', on);
+    console.log('tree.details:', node, on, node.details);
+    render();
     return this;
   };
 

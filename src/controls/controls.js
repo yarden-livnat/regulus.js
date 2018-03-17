@@ -19,10 +19,16 @@ export function setup(el) {
   root.classed('controls_view', true);
   root.html(template);
 
-  chart.on('range', range => {if (!prevent) { prevent = true;
-  saved = range;
-  publish('persistence.range', range);
-  prevent=false;}});
+  chart.on('range', range => {
+    if (!prevent) {
+      prevent = true;
+      saved = range;
+      publish('persistence.range', range);
+      prevent = false;
+    }
+    else console.log('ctrl move prevent');
+  }
+);
 
   subscribe('persistence.range', (topic, range) => move_range(range));
   subscribe('data.new', (topic, data) => reset(data));
@@ -35,9 +41,9 @@ function reset(data) {
 }
 
 function move_range(range) {
+  if (prevent) console.log('ctrl move prevent');
   if (!prevent) {
     prevent = true;
-    console.log('ctrl move: ', saved == range, saved[0] == range[0], saved[1] == range[1]);
     if (saved[0] !== range[0] || saved[1] != range[1]) {
       console.log('ctrl: range', range, 'mapped', sx(range[0]), sx(range[1]));
       root.select('.persistence_chart').selectAll('svg').call(chart.move, [sx(range[0]), sx(range[1])]);
