@@ -286,7 +286,7 @@ class Post(object):
         array.append({
             'id': node.id,
             'lvl': node.persistence,
-            'pts_idx': [node.pts_idx[0], node.pts_idx[1]],
+            'span': [node.pts_idx[0], node.pts_idx[1]],
             # 'extrema': node.extrema,
             'minmax_idx': [node.min_idx, node.max_idx],
             'parent': node.parent.id if node.parent is not None else None,
