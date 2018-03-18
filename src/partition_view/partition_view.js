@@ -26,9 +26,6 @@ export function setup(el) {
   root.classed('partition_view', true);
   root.html(template);
 
-  // root.on('mouseenter', d => current && publish('partition.highlight', current, true));
-  // root.on('mouseleave',  d => current && publish('partition.highlight', current, false));
-
   root.select('.partition_alias')
     .property('disabled', true)
     // .attr('placeholder', 'assign alias')

@@ -46,30 +46,14 @@ export default function Lifeline() {
 
   function select(d) {
     d.selected = !d.selected;
-    // if (d === selected) {
-    //   d3.select(this).classed('selected', false);
-    //   selected = null;
-    //   dispatch.call('select', this, d, false);
-    //   return;
-    // }
-    //
-    // if (selected)
-    //   svg.selectAll('.node').filter(node => node === selected)
-    //     // .data([selected])
-    //     .classed('selected', false);
-    //
-    // selected = d;
-    // d3.select(this).classed('selected', true);
     render_names();
     dispatch.call('select', this, d, d.selected);
   }
 
   function details(d) {
     d.details = !d.details;
-    // d3.select(this)
-    //   .classed('details', d.details);
-
     dispatch.call('details', this, d, d.details);
+    if (d.details) select(d);
   }
 
   function layout() {

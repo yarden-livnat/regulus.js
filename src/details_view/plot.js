@@ -33,6 +33,25 @@ export default function Plot() {
     pts.exit().remove();
   }
 
+  function svg_render_extra_pts(pts ,i) {
+    let tx = x.get(this);
+    let ty = y.get(this);
+
+    let extra = d3.select(this).select('.pts').selectAll('.extra')
+      .data(pts); //, pt => pt.id);
+
+    extra.enter().append('circle')
+      .attr('class', 'extra')
+      .attr('r', 2)
+      .style("fill", 'black')
+      .attr('z-index', 2)
+      .merge(extra)
+      .attr('cx', d => tx(d))
+      .attr('cy', d => ty(d));
+
+    extra.exit().remove();
+  }
+
   function canvas_render_pts(d, i) {
     let bg_ctx = d3.select(this).select('.canvas-bg').node().getContext('2d');
     let fg_ctx = d3.select(this).select('.canvas-fg').node().getContext('2d');
@@ -47,15 +66,14 @@ export default function Plot() {
     let tx = x.get(this);
     let ty = y.get(this);
 
-    // let visible_pts = show_filtered ? d.pts : d.pts.filter( pt => !pt.filtered);
     bg_ctx.fillStyle = '#eee';
     for (let pt of d.pts) {
       if (!pt.filtered) {
         fg_ctx.fillStyle = color(pt);
-        fg_ctx.fillRect(tx(pt), ty(pt), 1, 1);
+        fg_ctx.fillRect(tx(pt), ty(pt), 2, 2);
       }
       else if (show_filtered) {
-        bg_ctx.fillRect(tx(pt), ty(pt), 1, 1);
+        bg_ctx.fillRect(tx(pt), ty(pt), 2, 2);
       }
     }
 
@@ -69,13 +87,17 @@ export default function Plot() {
       let root = d3.select(this);
 
       if (!use_canvas)
-        svg_render_pts.call(this, d, i);
+        svg_render_pts.call(this, d.pts, i);
+
+      svg_render_extra_pts.call(this, d.extra || [], i);
 
       root.select('.line')
         .attr('d', line.get(this)(d.line));
 
       root.select('.area')
         .attr('d', area.get(this)(d.area));
+
+
     });
 
     if (use_canvas)

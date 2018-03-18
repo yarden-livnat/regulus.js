@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import PriorityQueue from 'js-priority-queue';
 import Chart from './chart';
 import {publish, subscribe} from "../utils";
-import template from './controls.html';
+import template from './filtering_view.html';
 import './style.css';
 
 let root = null;

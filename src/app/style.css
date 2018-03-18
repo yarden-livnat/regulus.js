@@ -59,5 +59,6 @@ body text {
 }
 
 #resample_view {
-  flex: 0 0 0;
+  flex: 1 0 0;
+  max-width: 250px;
 }

@@ -74,6 +74,7 @@ export function setup(el) {
   subscribe('partition.details', (topic, partition, on) => on ? add(partition) : remove(partition));
   subscribe('partition.highlight', (topic, partition, on) => on_highlight(partition, on));
   subscribe('partition.selected', (topic, partition, on) => on_selected(partition, on));
+  subscribe('resample.pts', (topic, pts) => on_resample_pts(pts));
 }
 
 function reset(data) {
@@ -171,6 +172,16 @@ function on_use_canvas() {
   update(partitions, true);
 }
 
+function on_resample_pts(pts) {
+  if (!selected) {
+    console.log('no selected partition. ignored');
+    return;
+  }
+  let p = partitions.find(pr => pr.id === selected.id);
+  p.extra = pts;
+  update(partitions, true);
+}
+
 function add(partition) {
   let reg_curve = partition.regression_curve;
 
@@ -180,8 +191,7 @@ function add(partition) {
     p: partition,
     pts: partition.pts,
     line: reg_curve.curve,
-    area: reg_curve.curve.map((pt, i) => ({
-      pt, std: reg_curve.std[i]}))
+    area: reg_curve.curve.map((pt, i) => ({pt, std: reg_curve.std[i]}))
   });
 
   update(partitions);

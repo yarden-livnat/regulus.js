@@ -1,11 +1,11 @@
 
 
-export default function resample(spec, n) {
-  let dims = spec.map(d => d.name);
-  let len = spec[0].from.length;
+export function resample(spec, n) {
+  let dims = spec.dims.map(d => d.name);
+  let len = spec.measure.length;
 
   let weights = Array(len).fill(0);
-  for (let dim of spec) {
+  for (let dim of spec.dims) {
     let total = dim.to.reduce((s,v) => s + v) - dim.from.reduce((s,v) => s+v);
     for (let i = 0; i < len; i++) {
       weights[i] += (dim.to[i] - dim.from[i])/total;
@@ -24,10 +24,13 @@ export default function resample(spec, n) {
 
     let r = Math.random() * total;
     let idx = stairs.findIndex(v => v > r);
-    for (let dim of spec) {
-      sample.push(dim.from[idx] + Math.random()*(dim.to[idx] - dim.from[idx]));
+    for (let dim of spec.dims) {
+      let r2 = Math.random();
+      sample.push(dim.from[idx] + r2*(dim.to[idx] - dim.from[idx]));
+      console.log(idx, dim.name, r2, dim.from[idx], dim.to[idx])
+      // sample.push(dim.from[idx] + Math.random()*(dim.to[idx] - dim.from[idx]));
     }
-    samples.push(sample);
+    samples.push([spec.measure[idx], sample]);
   }
 
   return samples;

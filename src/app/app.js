@@ -5,11 +5,11 @@ import {publish, subscribe} from '../utils/pubsub';
 import Panel from '../panel/panel';
 
 import * as dataset_view from '../dataset_view';
-import * as details_view from '../details';
+import * as details_view from '../details_view';
 import * as tree_view from '../tree';
 import * as partition_view from '../partition_view';
-import * as controls_view from '../controls';
-import * as resample_view from '../resample';
+import * as controls_view from '../filtering_view';
+import * as resample_view from '../resample_view';
 
 import './style.css';
 

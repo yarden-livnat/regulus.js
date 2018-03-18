@@ -4,12 +4,23 @@
   width: 200px;
 }
 
-.resample .resample-size {
+.resample .samples {
   width: 4em;
 }
 
-.resample .sumbit {
+.resample .sigma {
+  width: 4em;
+}
 
+.resample .submit {
+  float: right;
+}
+
+.resample .separator {
+  width: 80%;
+  height: 1px;
+  margin: 5px;
+  background-color: #666666;
 }
 
 .resample .border {
@@ -18,7 +29,6 @@
   background-color: #999999;
   margin: 5px;
 }
-
 
 
 .section {

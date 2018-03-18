@@ -89,7 +89,7 @@ export default class Partition {
   get regression_curve() {
     if (!this._reg_curve) {
       let t0 = performance.now();
-      let current_measure = this.msc.measure; //this.msc.measure_by_name(this.msc.name);
+      let current_measure = this.msc.measure; //
 
       // todo: consider adding the min/max points
       //       maybe only if they are not too dissimilar from the rest of the points
@@ -111,9 +111,9 @@ export default class Partition {
       for (let i=0; i<py.length; i++) {
         curve.push(px[i].concat([py[i]]));
       }
-      curve.columns = dims.map(d => d.name).concat(current_measure.name);
+      let columns = this.dims.map(d => d.name).concat(current_measure.name);
 
-      this._reg_curve = {curve, std};
+      this._reg_curve = {curve, std, columns};
       let t2 = performance.now();
       console.log(`compute regression curve in ${d3.format('d')(t2-t0)} msec  [get pts in ${d3.format('d')(t1-t0)} msec]`);
     }
