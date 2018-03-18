@@ -42,4 +42,6 @@ export class MSC {
   }
 
   get root() { return this.tree; }
+
+  measure_by_name(name) { return this.measures.find(m => m.name === name); }
 }

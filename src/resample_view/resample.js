@@ -25,10 +25,7 @@ export function resample(spec, n) {
     let r = Math.random() * total;
     let idx = stairs.findIndex(v => v > r);
     for (let dim of spec.dims) {
-      let r2 = Math.random();
-      sample.push(dim.from[idx] + r2*(dim.to[idx] - dim.from[idx]));
-      console.log(idx, dim.name, r2, dim.from[idx], dim.to[idx])
-      // sample.push(dim.from[idx] + Math.random()*(dim.to[idx] - dim.from[idx]));
+      sample.push(dim.from[idx] + Math.random() * (dim.to[idx] - dim.from[idx]));
     }
     samples.push([spec.measure[idx], sample]);
   }

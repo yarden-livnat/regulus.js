@@ -1,9 +1,10 @@
 import * as d3 from 'd3'
+import config from './config';
 
 export default function Plot() {
   let margin = {top: 1, right: 1, bottom: 1, left: 1},
-    width = 102 - margin.left - margin.right,
-    height = 102 - margin.top - margin.bottom;
+    width = config.plot_width,
+    height = config.plot_height;
 
   let x = null;
   let y = null;
@@ -23,7 +24,7 @@ export default function Plot() {
       .data(visible_pts, pt => pt.id);
 
     pts.enter().append('circle')
-      .attr('r', 1)
+      .attr('r', config.pt_radius)
       .attr('cx', d => tx(d))
       .attr('cy', d => ty(d))
       .merge(pts)
@@ -42,7 +43,7 @@ export default function Plot() {
 
     extra.enter().append('circle')
       .attr('class', 'extra')
-      .attr('r', 2)
+      .attr('r', config.extra_pt_radius)
       .style("fill", 'black')
       .attr('z-index', 2)
       .merge(extra)
@@ -70,10 +71,10 @@ export default function Plot() {
     for (let pt of d.pts) {
       if (!pt.filtered) {
         fg_ctx.fillStyle = color(pt);
-        fg_ctx.fillRect(tx(pt), ty(pt), 2, 2);
+        fg_ctx.fillRect(tx(pt), ty(pt), config.pt_radius, config.pt_radius);
       }
       else if (show_filtered) {
-        bg_ctx.fillRect(tx(pt), ty(pt), 2, 2);
+        bg_ctx.fillRect(tx(pt), ty(pt), config.pt_radius, config.pt_radius);
       }
     }
 

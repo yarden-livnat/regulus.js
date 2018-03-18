@@ -13,11 +13,6 @@ import * as resample_view from '../resample_view';
 
 import './style.css';
 
-let catalog = null;
-let msc = null;
-
-let dataset_panel = Panel('Dataset');
-
 setup();
 init();
 
@@ -32,29 +27,4 @@ function setup() {
 
 function init() {
   dataset_view.init();
-  // subscribe('load.measure', load_measure);
-
-  // service.load_catalog()
-  //   .then(set_catalog)
-  //   // .then(catalog => dataset_panel.title(`Dataset: ${catalog.name}`))
-  //   ;
 }
-
-function set_catalog(_) {
-  catalog = _;
-  msc = new MultiMSC();
-
-  service.load_data(catalog)
-    .then(data => msc.samples(data, catalog.dims))
-    .then(() => publish('data.pts', msc));
-
-  return catalog;
-}
-
-
-function load_measure(topic, name) {
-  service.load_msc(name)
-    .then( tree => msc.msc = tree )
-    .then( () => publish('data.new', msc));
-}
-

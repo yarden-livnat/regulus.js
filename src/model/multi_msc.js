@@ -89,9 +89,9 @@ export class MultiMSC {
   //   return partition.pts;
   // }
 
-  // measure_by_name(name) {
-  //   return this.measures.find(m => m.name === name);
-  // }
+  measure_by_name(name) {
+    return this.measures.find(m => m.name === name);
+  }
 
   // get root() {
   //   return this.tree;

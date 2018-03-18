@@ -6,6 +6,7 @@ import {publish, subscribe} from "../utils";
 import {and, or, not, AttrFilter} from '../model';
 import {ensure_single} from "../utils/events";
 
+import config from './config';
 import Group from './group';
 import XAxis from './x_axis';
 import template from './details.html';
@@ -32,7 +33,7 @@ let pattern = null;
 let x_axis = XAxis()
   .on('filter', update_filter);
 
-let sy = d3.scaleLinear().range([100, 0]);
+let sy = d3.scaleLinear().range([config.plot_height, 0]);
 let y = d3.local();
 
 let group = Group()
@@ -41,6 +42,8 @@ let group = Group()
     .on('filter', update_filter);
 
 let pts_filters = and();
+
+// TODO: simplify or break up code
 
 export function setup(el) {
   root = typeof el === 'string' && d3.select(el) || el;
