@@ -38,7 +38,8 @@ export default function Plot() {
     let fg_ctx = d3.select(this).select('.canvas-fg').node().getContext('2d');
 
     bg_ctx.save();
-    bg_ctx.clearRect(0, 0, width, height);
+    bg_ctx.fillStyle = 'white';
+    bg_ctx.fillRect(0, 0, width, height);
 
     fg_ctx.save();
     fg_ctx.clearRect(0, 0, width, height);
@@ -91,13 +92,13 @@ export default function Plot() {
 
     selection.append('canvas')
       .attr('class', 'canvas-bg')
-        .attr('width', width-2)
-        .attr('height', height-2);
+        .attr('width', width)
+        .attr('height', height);
 
     selection.append('canvas')
         .attr('class', 'canvas-fg')
-        .attr('width', width-2)
-        .attr('height', height-2);
+        .attr('width', width)
+        .attr('height', height);
 
     let svg = selection.append('svg')
         .attr('width', width + margin.left + margin.right)

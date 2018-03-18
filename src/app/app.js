@@ -4,6 +4,7 @@ import {publish, subscribe} from '../utils/pubsub';
 
 import Panel from '../panel/panel';
 
+import * as dataset_view from '../dataset_view';
 import * as details_view from '../details';
 import * as tree_view from '../tree';
 import * as partition_view from '../partition_view';
@@ -21,6 +22,7 @@ setup();
 init();
 
 function setup() {
+  dataset_view.setup( Panel('Dataset')('#dataset_view').content());
   details_view.setup( Panel('Details')('#details_view').content());
   tree_view.setup(Panel('Topology')('#tree_view').content());
   partition_view.setup(Panel('Partition')('#partition_view').content());
@@ -29,12 +31,13 @@ function setup() {
 }
 
 function init() {
-  subscribe('load.measure', load_measure);
+  dataset_view.init();
+  // subscribe('load.measure', load_measure);
 
-  service.load_catalog()
-    .then(set_catalog)
-    // .then(catalog => dataset_panel.title(`Dataset: ${catalog.name}`))
-    ;
+  // service.load_catalog()
+  //   .then(set_catalog)
+  //   // .then(catalog => dataset_panel.title(`Dataset: ${catalog.name}`))
+  //   ;
 }
 
 function set_catalog(_) {

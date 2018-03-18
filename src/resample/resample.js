@@ -1,28 +1,35 @@
-import * as d3 from 'd3';
-import {publish, subscribe} from "../utils/pubsub";
 
-import template from './resample.html';
-import './style.css';
 
-let root = null;
-let msc = null;
+export default function resample(spec, n) {
+  let dims = spec.map(d => d.name);
+  let len = spec[0].from.length;
 
-let format = d3.format('.2g');
+  let weights = Array(len).fill(0);
+  for (let dim of spec) {
+    let total = dim.to.reduce((s,v) => s + v) - dim.from.reduce((s,v) => s+v);
+    for (let i = 0; i < len; i++) {
+      weights[i] += (dim.to[i] - dim.from[i])/total;
+    }
+  }
 
-export function setup(el) {
-  root = typeof el === 'string' && d3.select(el) || el;
-  root.classed('resample', true);
-  root.html(template);
+  let stairs = [weights[0]];
+  for (let i=1; i<len; i++) {
+    stairs.push(weights[i] + stairs[i-1]);
+  }
 
-  subscribe('data.new', (topic, data) => reset(data));
-  subscribe('partition.selected', (topic, partition) => selected(partition));
+  let total = stairs[len-1];
+  let samples = [];
+  for (let s=0; s<n; s++) {
+    let sample = [];
+
+    let r = Math.random() * total;
+    let idx = stairs.findIndex(v => v > r);
+    for (let dim of spec) {
+      sample.push(dim.from[idx] + Math.random()*(dim.to[idx] - dim.from[idx]));
+    }
+    samples.push(sample);
+  }
+
+  return samples;
 }
 
-function reset(data) {
-  msc = data;
-}
-
-function selected(partition) {
-  root.select('#resample-id')
-    .text(partition.id);
-}

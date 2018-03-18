@@ -1,1 +1,1 @@
-export * from './resample';
+export * from './resample_view';

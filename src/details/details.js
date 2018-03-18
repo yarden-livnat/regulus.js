@@ -195,7 +195,7 @@ function remove(partition){
 }
 
 function update_filter(attr) {
-  console.log('details update filter');
+  // console.log('details update filter');
   for (let pt of msc.pts) {
     pt.filtered = !pts_filters(pt);
   }
@@ -229,7 +229,7 @@ function update(list, all=false) {
 
   groups.exit().call(group.remove);
   let t1 = performance.now();
-  console.log(`details update: ${t1-t0} msec`);
+  console.log(`details update: ${Math.round(t1-t0)} msec`);
 }
 
 function select(d) {

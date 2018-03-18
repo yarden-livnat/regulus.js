@@ -40,6 +40,10 @@
   overflow: auto;
 }
 
+.details .group.highlight {
+  background-color: #f0f0f0;
+}
+
 .details .group .group-header {
   display: flex;
   flex-direction: column;
@@ -91,7 +95,7 @@
 .details .plot {
   position: relative;
   margin:  10px 10px 0 10px;
-  background-color: #fdfdfd;
+  /*background-color: #fdfdfd;*/
 }
 
 .details .plot .canvas-bg {

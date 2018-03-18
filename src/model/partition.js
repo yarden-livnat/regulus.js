@@ -8,10 +8,10 @@ export default class Partition {
   constructor(data, msc) {
     this.id = data.id;
     this.lvl = data.lvl;
+
     this.minmax_idx = data.minmax_idx;
     this.minmax = [msc.pts[data.minmax_idx[0]][msc.name], msc.pts[data.minmax_idx[1]][msc.name]];
-    this.pts_idx = data.pts_idx;
-
+    this.pts_idx = data.span;
     this._pts = data.pts;
 
     this.parent = data.parent;
@@ -36,7 +36,7 @@ export default class Partition {
     return this.msc.measures;
   }
 
-  get measure() {
+  get measure_name() {
     return this.msc.name;
   }
 
@@ -71,7 +71,7 @@ export default class Partition {
         this._stat.set(attr.name, {
           name: attr.name,
           type: attr.type,
-          measure: attr.name === this.measure,
+          measure: attr.name === this.measure_name,
           n: values.length,
           quantile: [
             d3.quantile(values, 0.25),
@@ -89,7 +89,7 @@ export default class Partition {
   get regression_curve() {
     if (!this._reg_curve) {
       let t0 = performance.now();
-      let current_measure = this.msc.measure_by_name(this.msc.name);
+      let current_measure = this.msc.measure; //this.msc.measure_by_name(this.msc.name);
 
       // todo: consider adding the min/max points
       //       maybe only if they are not too dissimilar from the rest of the points

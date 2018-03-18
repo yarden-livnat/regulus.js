@@ -1,100 +1,109 @@
 import * as d3 from 'd3-array';
+// import Partition from "./partition";
+import {MSC} from './msc';
 import Partition from "./partition";
 
-function build_tree(partitions){
-  let map = new Map();
-  let root = null;
-
-  if (partitions.length === 0) return root;
-  root = partitions[0];
-
-  for (let partition of partitions) {
-    if (partition.lvl > root.lvl) root = partition;
-    map.set(partition.id, partition);
-  }
-
-  visit(root, map);
-  return root;
-
-  function visit(node) {
-    node.children = node.children.map(child => map.get(child));
-    for (let child of node.children) {
-      child.parent = node;
-      visit(child);
-    }
-  }
-}
 
 export class MultiMSC {
-  constructor() {
-    this.name = "";
-    this.pts = [];
-    this.tree = [];
-    this.partitions = [];
-
-    this.ndims = 0;
-    this.attr = [];
-    this.dims = [];
-    this.measures = [];
+  constructor(_) {
+    this.name = _.name;
+    this.version = _.version;
+    this.notes = _.notes;
     this.measure = null;
-    this.as_partition = null;
-  }
 
-  samples(pts, ndims) {
-    this.pts = pts;
-    let id = 0;
-    for (let pt of pts) {
-      pt.id = id++;
-    }
-    let n = pts.columns.length;
-    this.attrs = pts.columns.map((name, i) => ({
+    let attr = _.dims.concat(_.measures);
+    this.pts = _.pts.map((pt, id) => { let p = {id}; pt.forEach((v, i) => p[attr[i]] = v); return p;});
+
+    this.ndims = _.dims.length;
+
+    this.dims = _.dims.map(name => ({
       name,
-      type: i< ndims && 'dim' || 'measure',
-      extent: d3.extent(pts, pt => pt[name])
-    }));
-    this.dims = this.attrs.slice(0, ndims).sort( (a,b) => a.name > b.name);
-    this.measures = this.attrs.slice(ndims).sort( (a,b) => a.name > b.name);
+      type: 'dim',
+      extent: d3.extent(this.pts, pt => pt[name])
+    }), this).sort( (a,b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+
+    this.measures = _.measures.map(name => ({
+      name,
+      type: 'measure',
+      extent: d3.extent(this.pts, pt => pt[name])
+    }), this).sort( (a,b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+
+    this.attrs = this.dims.concat(this.measures);
+
+    // this.tree = [];
+    this.mscs = new Map();
+    for (let d of _.mscs) {
+      this.mscs.set(d.name, new MSC(d, this));
+    }
 
     this.as_partition = new Partition( {
       id: 'ALL',
       lvl: 1,
       pts: this.pts,
       minmax_idx: [0, 1],
-      pts_idx: [0, this.pts.length-1],
+      span: [0, this.pts.length-1],
       parent: null,
       children: []
     }, this);
-
-    return this;
   }
 
-  partition_pts(partition) {
-    if (!partition.pts) {
-      let pts = [];
-      for (let i = partition.pts_idx[0]; i < partition.pts_idx[1]; i++) {
-        pts.push(this.pts[this.pts_idx[i]]);
-      }
-      // consider adding the min/max points
-      partition.pts = pts;
-    }
-    return partition.pts;
-  }
+  msc(name) { return this.mscs.get(name); }
 
-  measure_by_name(name) {
-    return this.measures.find(m => m.name === name);
-  }
+  // samples(pts, ndims) {
+  //   this.pts = pts;
+  //   let id = 0;
+  //   for (let pt of pts) {
+  //     pt.id = id++;
+  //   }
+  //   let n = pts.columns.length;
+  //   this.attrs = pts.columns.map((name, i) => ({
+  //     name,
+  //     type: i< ndims && 'dim' || 'measure',
+  //     extent: d3.extent(pts, pt => pt[name])
+  //   }));
+  //   this.dims = this.attrs.slice(0, ndims).sort( (a,b) => a.name > b.name);
+  //   this.measures = this.attrs.slice(ndims).sort( (a,b) => a.name > b.name);
+  //
+  //   this.as_partition = new Partition( {
+  //     id: 'ALL',
+  //     lvl: 1,
+  //     pts: this.pts,
+  //     minmax_idx: [0, 1],
+  //     pts_idx: [0, this.pts.length-1],
+  //     parent: null,
+  //     children: []
+  //   }, this);
+  //
+  //   return this;
+  // }
 
-  get root() {
-    return this.tree;
-  }
+  // partition_pts(partition) {
+  //   if (!partition.pts) {
+  //     let pts = [];
+  //     for (let i = partition.pts_idx[0]; i < partition.pts_idx[1]; i++) {
+  //       pts.push(this.pts[this.pts_idx[i]]);
+  //     }
+  //     // consider adding the min/max points
+  //     partition.pts = pts;
+  //   }
+  //   return partition.pts;
+  // }
 
-  set msc(_) {
-    this.name = _.name;
-    this.pts_idx = _.pts;
-    this.partitions = _.partitions.map(p => new Partition(p, this));
-    this.tree = build_tree(this.partitions);
+  // measure_by_name(name) {
+  //   return this.measures.find(m => m.name === name);
+  // }
 
-    this.measure = this.measures.find( m => m.name === this.name);
-    return this;
-  }
+  // get root() {
+  //   return this.tree;
+  // }
+  //
+  // set msc(_) {
+  //   this.name = _.name;
+  //   this.pts_idx = _.pts;
+  //   this.partitions = _.partitions.map(p => new Partition(p, this));
+  //   this.tree = build_tree(this.partitions);
+  //
+  //   this.measure = this.measures.find( m => m.name === this.name);
+  //   return this;
+  // }
 }

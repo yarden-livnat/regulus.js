@@ -20,6 +20,9 @@ app = Bottle()
 def static(filename='index.html'):
     return static_file(filename, root='../dist')
 
+@app.route('/catalog')
+def catalog():
+    return json.dumps(['deployment']);
 
 @app.route('/data/<path:path>')
 def data(path):

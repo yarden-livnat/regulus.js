@@ -2,17 +2,13 @@ import {csv, json, text} from 'd3-fetch'
 
 
 export function load_catalog() {
-  return fetch('data/catalog.json')
+  return fetch('catalog')
     .then( response => response.json() )
 }
 
-export function load_data(catalog) {
-  return csv(`data/${catalog.data}`,  null, parse_sample)
-}
-
-export function load_msc(name) {
+export function load_dataset(name) {
   return fetch(`data/${name}.json`)
-    .then( response => response.json());
+    .then( d => d.json());
 }
 
 export function submit_resample(spec) {
@@ -23,6 +19,16 @@ export function submit_resample(spec) {
       'Content-Type': 'application/json'
     }
   });
+}
+
+
+export function load_data(catalog) {
+  return csv(`data/${catalog.data}`,  null, parse_sample)
+}
+
+export function load_msc(name) {
+  return fetch(`data/${name}.json`)
+    .then( response => response.json());
 }
 
 function parse_sample(sample) {

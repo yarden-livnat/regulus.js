@@ -12,6 +12,7 @@ module.exports = {
       chunks: "all"
     }
   },
+  // mode: development,
   plugins: [
     new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({

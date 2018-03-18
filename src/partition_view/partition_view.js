@@ -10,7 +10,7 @@ let highlight = null;
 let selected = null;
 let current = null;
 let timer = null;
-let msc = null;
+let shared_msc = null;
 let measure = null;
 
 let format = d3.format('.2g');
@@ -41,7 +41,7 @@ export function setup(el) {
     .on('input', notes_changed);
 
   subscribe('data.pts', (topic, data) => reset(data));
-  subscribe('data.new', (topic, data) => reset(data));
+  subscribe('data.loaded', (topic, data) => reset(data));
   subscribe('partition.highlight', (topic, partition, show) => highlight_partition(partition, show));
   subscribe('partition.selected', (topic, partition, show) => select_partition(partition, show));
 }
@@ -55,8 +55,8 @@ function notes_changed() {
   current.notes = this.value;
 }
 
-function reset(data) {
-  msc = data;
+function reset(_) {
+  shared_msc = _;
   selected = null;
   highlight = null;
   show_partition();
@@ -84,7 +84,7 @@ function highlight_partition(partition, show) {
 }
 
 function show_partition() {
-  current = highlight || selected || msc.as_partition;
+  current = highlight || selected || shared_msc.as_partition;
 
   root.select('.partition_id')
     .classed('selected', current === selected)
@@ -155,6 +155,6 @@ function select_measure(d) {
     .classed('selected', d => d.name === measure.name);
   selected = highlight = null;
 
-  publish('load.measure', measure.name);
+  publish('data.new', shared_msc.msc(d.name));
 }
 
