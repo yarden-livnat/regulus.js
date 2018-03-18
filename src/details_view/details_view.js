@@ -210,7 +210,6 @@ function remove(partition){
 }
 
 function update_filter(attr) {
-  // console.log('details update filter');
   for (let pt of msc.pts) {
     pt.filtered = !pts_filters(pt);
   }
@@ -232,14 +231,17 @@ function update(list, all=false) {
   let groups = root.select('.groups').selectAll('.group')
     .data(list, d => d.id);
 
-  groups.enter()
+  let g = groups.enter()
     .append('div')
       .on('mouseenter', d => publish('partition.highlight', d.p, true))
       .on('mouseleave', d => publish('partition.highlight', d.p, false))
-      .on('click', ensure_single(d => publish('partition.details', d.p, false)))
-      .on('dblclick', d => publish('partition.selected', d.p, d.p !== selected))
-      .call(group.create)
-    .merge(groups)
+      .call(group.create);
+
+  g.select('.group-header')
+    .on('click', ensure_single(d => publish('partition.details', d.p, false)))
+    .on('dblclick', d => publish('partition.selected', d.p, d.p !== selected));
+
+  g.merge(groups)
       .classed('highlight', d => highlight && d.id === highlight.id)
       .classed('selected', d => selected && d.id === selected.id)
       .call(group, all);
