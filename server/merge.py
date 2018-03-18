@@ -21,7 +21,7 @@ def rename(exp_name, new_ver):
 
     return exp_name+new_ver+'.json'
 
-def read_oldexp(old_reg, new_ver):
+def create_new(old_reg, new_ver):
 
     with open(old_reg) as json_data:
         reg_data = json.load(json_data)
@@ -65,7 +65,7 @@ def combine_data(new_reg, new_pts):
 def mergedata(sim_dir, sim_out, old_reg, new_ver):
 
     # New json file already created as json with new_reg as filename
-    new_reg  = read_oldexp(old_reg, new_ver)
+    new_reg  = create_new(old_reg, new_ver)
 
     new_pts = read_newdata(sim_dir, sim_out)
 
