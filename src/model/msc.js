@@ -27,6 +27,8 @@ function build_tree(partitions){
 export class MSC {
   constructor(_, shared) {
     this.name = _.name;
+    this.version = _.version;
+    this.shared = shared;
     this.parms = _.params;
     this.pts_idx = _.pts_idx;
     this.pts = shared.pts;

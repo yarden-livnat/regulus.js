@@ -138,8 +138,9 @@ function submit(n) {
   if (!current) return;
 
   service.submit_resample({
-    name: msc.name,
-    version: msc.version +'.1',
+    name: msc.shared.name,
+    version: msc.shared.version,
+    new_version: msc.shared.version+'.1',
     pts: current.pts
   })
 }
