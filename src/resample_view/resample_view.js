@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import {publish, subscribe} from "../utils/pubsub";
 import {resample} from './resample';
+import * as service from '../app/service'
 
 import template from './resample.html';
 import './style.css';

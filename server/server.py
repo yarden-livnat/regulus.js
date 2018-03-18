@@ -26,8 +26,9 @@ def catalog():
 
 @app.route('/data/<path:path>')
 def data(path):
-    print('dataset', path)
-    return static_file(path, root=str(data_dir))
+    filename = Path(path).with_suffix('.json')
+    print('dataset', filename)
+    return static_file(str(filename), root=str(data_dir))
 
 @app.post('/resample')
 def resample():

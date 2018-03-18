@@ -7,7 +7,7 @@ export function load_catalog() {
 }
 
 export function load_dataset(name) {
-  return fetch(`data/${name}.json`)
+  return fetch(`data/${name}`)
     .then( d => d.json());
 }
 
