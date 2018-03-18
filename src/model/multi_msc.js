@@ -49,61 +49,7 @@ export class MultiMSC {
 
   msc(name) { return this.mscs.get(name); }
 
-  // samples(pts, ndims) {
-  //   this.pts = pts;
-  //   let id = 0;
-  //   for (let pt of pts) {
-  //     pt.id = id++;
-  //   }
-  //   let n = pts.columns.length;
-  //   this.attrs = pts.columns.map((name, i) => ({
-  //     name,
-  //     type: i< ndims && 'dim' || 'measure',
-  //     extent: d3.extent(pts, pt => pt[name])
-  //   }));
-  //   this.dims = this.attrs.slice(0, ndims).sort( (a,b) => a.name > b.name);
-  //   this.measures = this.attrs.slice(ndims).sort( (a,b) => a.name > b.name);
-  //
-  //   this.as_partition = new Partition( {
-  //     id: 'ALL',
-  //     lvl: 1,
-  //     pts: this.pts,
-  //     minmax_idx: [0, 1],
-  //     pts_idx: [0, this.pts.length-1],
-  //     parent: null,
-  //     children: []
-  //   }, this);
-  //
-  //   return this;
-  // }
-
-  // partition_pts(partition) {
-  //   if (!partition.pts) {
-  //     let pts = [];
-  //     for (let i = partition.pts_idx[0]; i < partition.pts_idx[1]; i++) {
-  //       pts.push(this.pts[this.pts_idx[i]]);
-  //     }
-  //     // consider adding the min/max points
-  //     partition.pts = pts;
-  //   }
-  //   return partition.pts;
-  // }
-
   measure_by_name(name) {
     return this.measures.find(m => m.name === name);
   }
-
-  // get root() {
-  //   return this.tree;
-  // }
-  //
-  // set msc(_) {
-  //   this.name = _.name;
-  //   this.pts_idx = _.pts;
-  //   this.partitions = _.partitions.map(p => new Partition(p, this));
-  //   this.tree = build_tree(this.partitions);
-  //
-  //   this.measure = this.measures.find( m => m.name === this.name);
-  //   return this;
-  // }
 }
