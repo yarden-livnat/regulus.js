@@ -7,7 +7,7 @@ import merge
 import post
 import load_spec
 import run_sim
-
+import testfun
 
 
 def sample_in_thread(data,old_reg, new_ver):
@@ -15,13 +15,19 @@ def sample_in_thread(data,old_reg, new_ver):
     sim_out = 'newparams.csv'
 
     ##subprocess.run(['python', '-m', 'scenario', '-t', 'Transition_scenario.xml', '-o', output, '-p', data, '-r', newparam], check=True)
-    run_sim.runwithparam(['python', '-m', 'scenario', '-t', 'Transition_scenario.xml', '-o', sim_dir, '-p', data, '-r', sim_out])
+    #run_sim.runwithparam(['python', '-m', 'scenario', '-t', 'Transition_scenario.xml', '-o', sim_dir, '-p', data, '-r', sim_out])
+    new_input = testfun.readfile(data)
+    new_data = testfun.generateres(new_input)
+
+    testfun.savefile(new_data, sim_dir, sim_out)
+
     print("Simulation Finished")
 
     newdata = merge.mergedata(sim_dir, sim_out, old_reg, new_ver)
 
     # Post.py, this will be changed to something else
-    run_sim.runwithparam(['python', 'post.py', '-k', '500', '-d', '6', '--name', 'deployment', '--all', newdata])
+    #run_sim.runwithparam(['python', 'post.py', '-k', '500', '-d', '6', '--name', 'deployment', '--all', newdata])
+    run_sim.runwithparam(['python', 'post.py', '-k', '50', '-d', '6', '--name', 'test', '--all', newdata])
 
     print("New Results are available")
     return
