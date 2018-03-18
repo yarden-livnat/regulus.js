@@ -19,6 +19,7 @@ let dims = [];
 let partitions = [];
 let measure = null;
 let selected = null;
+let highlight = null;
 
 
 let initial_cmap = 'RdYlBu';
@@ -115,6 +116,7 @@ function reset(data) {
 }
 
 function on_highlight(partition, on) {
+  highlight = on && partition || null;
   root.select('.groups').selectAll('.group')
     .data(partitions, d => d.id)
     .classed('highlight', d => on && d.id === partition.id)
@@ -221,10 +223,12 @@ function update(list, all=false) {
     .append('div')
       .on('mouseenter', d => publish('partition.highlight', d.p, true))
       .on('mouseleave', d => publish('partition.highlight', d.p, false))
-      .on('click', ensure_single(select))
-      .on('dblclick', d => publish('partition.details', d.p, false))
+      .on('click', ensure_single(d => publish('partition.details', d.p, false)))
+      .on('dblclick', d => publish('partition.selected', d.p, d.p !== selected))
       .call(group.create)
     .merge(groups)
+      .classed('highlight', d => highlight && d.id === highlight.id)
+      .classed('selected', d => selected && d.id === selected.id)
       .call(group, all);
 
   groups.exit().call(group.remove);

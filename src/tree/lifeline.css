@@ -38,7 +38,8 @@
 }
 
 .lifeline .name {
-  color: red;
+  /*color: red;*/
   text-anchor: middle;
   alignment-baseline: middle;
+  pointer-events: none;
 }

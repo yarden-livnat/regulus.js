@@ -1,7 +1,10 @@
 
 body {
   font: 10pt Arial;
-  /*user-select: none;*/
+
+}
+body text {
+  user-select: none;
 }
 
 .page {

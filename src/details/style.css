@@ -41,7 +41,11 @@
 }
 
 .details .group.highlight {
-  background-color: #f0f0f0;
+  /*background-color: #f0f0f0;*/
+}
+
+.details .group.selected .plots {
+  background-color: lightblue;
 }
 
 .details .group .group-header {
