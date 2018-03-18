@@ -6,6 +6,7 @@ import {publish} from "../utils/pubsub";
 import {MultiMSC} from "../model/multi_msc";
 
 let root;
+let _init = true;
 
 export function setup(el) {
   root = typeof el === 'string' && d3.select(el) || el;
@@ -31,12 +32,23 @@ function set_catalog(_) {
     .attr('value', d => d)
     .text(d => d);
 
-  if (_.length === 1)
+  if (_.length === 1) {
     load_data(_[0]);
+  }
 }
 
 function load_data(name) {
+  if (!name) return;
+  remove_placeholder();
   service.load_dataset(name)
     .then( data => new MultiMSC(data))
     .then( msc => publish('data.loaded', msc));
+}
+
+function remove_placeholder() {
+  if (_init) {
+    root.select('select').selectAll('option')
+      .filter( d => d === 'select dataset')
+      .remove();
+  }
 }
