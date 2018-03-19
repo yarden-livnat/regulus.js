@@ -26,7 +26,7 @@ def parse(args):
 
     p.add_argument('-n', '--samples', default=1, dest='samples', type=int, help='number of scenarios to generate')
     ## New
-    p.add_argument('-p', '--parameters', default=[], dest='params', type=list, help='parameters to resample')
+    p.add_argument('-p', '--parameters', default='', dest='params', help='parameters to resample')
 
     p.add_argument('-d', '--demand', default='10000', type=float, dest='initial_demand', help='initial demand')
     p.add_argument('-r', '--report', default='params.csv',  dest='report', help='report file')
@@ -52,7 +52,7 @@ def sim(args=None):
         report = csv.writer(f)
         report.writerow(generator.header + measures.header)
 
-    if len(ns.params) == 0:
+    if ns.params == '':
         for i in range(ns.samples):
             print('sim',i)
             os.system('rm '+db)
@@ -87,16 +87,16 @@ def sim(args=None):
                 report.writerow(params + values)
 
     else:
-        #with open(ns.params, "r") as f:
-        #    reader = csv.reader(f, delimiter=",")
-        #    data = list()
-        for j in range(len(ns.params)):
+        with open(ns.params, "r") as f:
+            reader = csv.reader(f, delimiter=",")
+            data = [[float(x) for x in row] for row in reader]
+        for j in range(len(data)):
             print('sim', j)
             os.system('rm ' + db)
             print('\tcreate...', end="")
             t = time.time()
             ##scenario, params = generator.author()
-            scenario, params = generator.buthor(ns.params[j])
+            scenario, params = generator.buthor(data[j])
 
             save(xml_filename, scenario)
             print("{:.3f}".format(time.time() - t))
