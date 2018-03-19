@@ -12,7 +12,10 @@ def sample_in_thread(new_reg,dims,sample_input):
     sim_dir = 'sim'
     sim_out = 'newparams.csv'
 
-    #subprocess.run(['python', '-m', 'scenario', '-t', 'Transition_scenario.xml', '-o', sim_dir, '-p', sample_input, '-r', sim_out], check=True)
+    # CSV file as input for cyclus
+    param = load_spec.save_list(sample_input)
+
+    subprocess.run(['python', '-m', 'scenario', '-t', 'Transition_scenario.xml', '-o', sim_dir, '-p',param, '-r', sim_out], check=True)
 
     #run_sim.runwithparam(['python', '-m', 'scenario', '-t', 'Transition_scenario.xml', '-o', sim_dir, '-p', sample_input, '-r', sim_out])
 
