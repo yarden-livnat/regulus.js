@@ -12,6 +12,7 @@ export default function Plot() {
   let line = null;
   let area = null;
   let show_filtered = true;
+  let show_regression = true;
   let use_canvas = true;
 
   function svg_render_pts(d ,i) {
@@ -92,12 +93,15 @@ export default function Plot() {
 
       svg_render_extra_pts.call(this, d.extra || [], i);
 
-      root.select('.line')
-        .attr('d', line.get(this)(d.line));
+      if (show_regression) {
+        root.select('.line')
+          .attr('d', line.get(this)(d.line));
 
-      root.select('.area')
-        .attr('d', area.get(this)(d.area));
-
+        root.select('.area')
+          .attr('d', area.get(this)(d.area));
+      }
+      root.select('.line').style('display', show_regression && 'inline' || 'none');
+      root.select('.area').style('display', show_regression && 'inline' || 'none');
 
     });
 
@@ -176,6 +180,11 @@ export default function Plot() {
 
   plot.show_filtered = function(_) {
     show_filtered = _;
+    return this;
+  };
+
+  plot.show_regression= function(_) {
+    show_regression = _;
     return this;
   };
 

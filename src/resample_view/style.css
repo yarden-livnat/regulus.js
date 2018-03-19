@@ -4,12 +4,16 @@
   width: 200px;
 }
 
+.resample .params label {
+  padding-right: 5px;
+}
+
 .resample .samples {
-  width: 4em;
+  width: 3em;
 }
 
 .resample .sigma {
-  width: 4em;
+  width: 3em;
 }
 
 .resample .submit {
@@ -17,7 +21,7 @@
 }
 
 .resample .separator {
-  width: 80%;
+  width: 100%;
   height: 1px;
   margin: 5px;
   background-color: #666666;

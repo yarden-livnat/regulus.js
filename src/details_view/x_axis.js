@@ -70,6 +70,13 @@ export default function XAxis() {
       .style('text-anchor', 'middle');
   };
 
+  x.width = function(_) {
+    width = _;
+    scale.range([0, width]);
+    brush.extent([[0, -10], [width, 0]]);
+    return this;
+  };
+
   x.domain = function(_) {
     name = _.name;
     scale.domain(_.extent);

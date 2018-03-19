@@ -31,6 +31,7 @@ let colorScale = d3.scaleSequential(chromatic['interpolate'+initial_cmap]);
 let pattern = null;
 
 let x_axis = XAxis()
+  .width(config.plot_width)
   .on('filter', update_filter);
 
 let sy = d3.scaleLinear().range([config.plot_height, 0]);
@@ -67,6 +68,10 @@ export function setup(el) {
   root.select('#details_show_filtered')
     .property('checked', true)
     .on('change', on_show_filtered);
+
+  root.select('#details_show_regression')
+    .property('checked', true)
+    .on('change', on_show_regression);
 
   root.select('#details_use_canvas')
     .property('checked', true)
@@ -167,6 +172,11 @@ function select_color(name) {
 
 function on_show_filtered() {
   group.show_filtered(this.checked);
+  update(partitions, true);
+}
+
+function on_show_regression() {
+  group.show_regression(this.checked);
   update(partitions, true);
 }
 

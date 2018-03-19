@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {inverseMultipleRegression, averageStd, linspace, fun as kernel, subLinearSpace} from '../regression/regression';
+import {inverseMultipleRegression, averageStd, linspace, fun as kernel, subLinearSpace} from '../statistics/regression';
 
 let default_bandwidth = 0.1;
 

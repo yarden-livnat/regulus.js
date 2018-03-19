@@ -10,7 +10,7 @@ export default function Group() {
   let dims = [];
   let measure = null;
   let y_axis = YAxis();
-  let sy = d3.scaleLinear().range([config.plot_width, 0]);
+  let sy = d3.scaleLinear().range([config.plot_height, 0]);
 
   let yScale = d3.scaleLinear().range([config.plot_height, 0]);
 
@@ -122,6 +122,11 @@ export default function Group() {
 
   group.show_filtered = function(_) {
     plot.show_filtered(_);
+    return this;
+  };
+
+  group.show_regression = function(_) {
+    plot.show_regression(_);
     return this;
   };
 
