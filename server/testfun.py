@@ -3,6 +3,7 @@ import numpy as np
 import os
 
 
+
 def generateres(X):
     x1 = X[:,0]
     x2 = X[:,1]

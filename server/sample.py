@@ -17,7 +17,6 @@ def sample_in_thread(reg_file):
     if reg_file.name =='deployment':
         subprocess.run(['python', '-m', 'scenario', '-t', 'Transition_scenario.xml', '-o', sim_dir, '-p',sim_in, '-r', sim_out], check=True)
 
-
     if reg_file.name == 'test':
         new_input = testfun.load_input(sample_input)
         new_data = testfun.generateres(new_input)
@@ -49,5 +48,6 @@ def createsample(received, data_dir):
 
         thread = threading.Thread(target=sample_in_thread, args=[reg_file])
         thread.start()
+
 
     return

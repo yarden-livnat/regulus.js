@@ -1,8 +1,0 @@
-{
-  "name": "test",
-  "data": "test.csv",
-  "dims": 4,
-  "msc": [
-    "Y"
-  ]
-}

@@ -21,6 +21,14 @@ app = Bottle()
 def static(filename='index.html'):
     return static_file(filename, root='../dist')
 
+#@app.route('/catalog')
+#def catalog():
+#    return json.dumps(['deployment']);
+
+@app.route('/catalog')
+def catalog():
+    return json.dumps(['test'])
+
 
 @app.route('/catalog')
 def catalog():
@@ -37,8 +45,8 @@ def data(path):
     print('dataset', filename)
     return static_file(filename, root=str(data_dir))
 
-@app.route('/resample')
-#@app.post('/resample')
+
+@app.post('/resample')
 def resample():
     #print('data_dir', data_dir)
     spec = request.json
@@ -48,6 +56,7 @@ def resample():
     print('resample post received', spec)
 
     sample.createsample(spec)
+
 
 
 run(app, host='localhost', port=8081, debug=True, reloader=True)

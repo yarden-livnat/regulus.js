@@ -100,6 +100,7 @@ def sim(args=None):
 
             scenario, params = generator.buthor(data[j])
 
+
             save(xml_filename, scenario)
             print("{:.3f}".format(time.time() - t))
 
@@ -120,6 +121,7 @@ def sim(args=None):
             print("{:.1f}".format(time.time() - t))
 
             with open(path / ns.report, 'w') as f:
+
                 report = csv.writer(f)
                 report.writerow(params + values)
 
