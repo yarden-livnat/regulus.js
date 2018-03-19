@@ -26,7 +26,7 @@ def create_new(old_reg, new_ver):
     with open(old_reg) as json_data:
         reg_data = json.load(json_data)
 
-    del reg_data['msc']
+    del reg_data['mscs']
     reg_data['version'] = new_ver
 
     new_reg = rename(reg_data['name'], new_ver)
@@ -37,7 +37,7 @@ def create_new(old_reg, new_ver):
     return new_reg
 
 def read_newdata(output,newparam):
-    return output+newparam
+    return output+'/'+newparam
 
 def combine_data(new_reg, new_pts):
     ## Check unique here
@@ -49,7 +49,9 @@ def combine_data(new_reg, new_pts):
         #dialect = csv.Sniffer().sniff(csvfile.read(2048))
         #csvfile.seek(0)
         reader = csv.reader(csvfile)
-        data2 = list(reader)
+        header = next(reader)
+        data2 = [[float(x) for x in row] for row in reader]
+        #data2 = list(reader)
 
     with open(new_reg) as json_data:
         reg_data = json.load(json_data)
@@ -60,17 +62,18 @@ def combine_data(new_reg, new_pts):
 
     with open(new_reg, 'w') as f:
         json.dump(reg_data, f)
+
     return #new_reg
 
-def mergedata(sim_dir, sim_out, old_reg, new_ver):
+def mergedata(sim_dir, sim_out, new_reg, dims):
 
     # New json file already created as json with new_reg as filename
-    new_reg  = create_new(old_reg, new_ver)
+    #new_reg  = create_new(old_reg, new_ver)
 
     new_pts = read_newdata(sim_dir, sim_out)
 
     combine_data(new_reg,new_pts)
 
-    return new_reg
+    return
 
 

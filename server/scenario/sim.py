@@ -26,7 +26,7 @@ def parse(args):
 
     p.add_argument('-n', '--samples', default=1, dest='samples', type=int, help='number of scenarios to generate')
     ## New
-    p.add_argument('-p', '--parameters', default='NoParam',  dest='params', help='parameters to resample')
+    p.add_argument('-p', '--parameters', default=[], dest='params', type=list, help='parameters to resample')
 
     p.add_argument('-d', '--demand', default='10000', type=float, dest='initial_demand', help='initial demand')
     p.add_argument('-r', '--report', default='params.csv',  dest='report', help='report file')
@@ -52,7 +52,7 @@ def sim(args=None):
         report = csv.writer(f)
         report.writerow(generator.header + measures.header)
 
-    if(ns.params == 'NoParam'):
+    if len(ns.params) == 0:
         for i in range(ns.samples):
             print('sim',i)
             os.system('rm '+db)
@@ -87,39 +87,39 @@ def sim(args=None):
                 report.writerow(params + values)
 
     else:
-        with open(ns.params, "r") as f:
-            reader = csv.reader(f, delimiter=",")
-            data = list(reader)
-            for j in range(len(data)):
-                print('sim', j)
-                os.system('rm ' + db)
-                print('\tcreate...', end="")
-                t = time.time()
-                ##scenario, params = generator.author()
-                scenario, params = generator.buthor(data[j])
+        #with open(ns.params, "r") as f:
+        #    reader = csv.reader(f, delimiter=",")
+        #    data = list()
+        for j in range(len(ns.params)):
+            print('sim', j)
+            os.system('rm ' + db)
+            print('\tcreate...', end="")
+            t = time.time()
+            ##scenario, params = generator.author()
+            scenario, params = generator.buthor(ns.params[j])
 
-                save(xml_filename, scenario)
-                print("{:.3f}".format(time.time() - t))
+            save(xml_filename, scenario)
+            print("{:.3f}".format(time.time() - t))
 
-                print('\tcyclus...', end="")
-                t = time.time()
-                subprocess.run(['cyclus', xml_filename, '-o', db], check=True, stdout=log, stderr=log,
-                               universal_newlines=True)
-                print("{:.3f}".format(time.time() - t))
+            print('\tcyclus...', end="")
+            t = time.time()
+            subprocess.run(['cyclus', xml_filename, '-o', db], check=True, stdout=log, stderr=log,
+                           universal_newlines=True)
+            print("{:.3f}".format(time.time() - t))
 
-                print('\tpost...', end="")
-                t = time.time()
-                subprocess.run(['cyan', '-db', db, 'post'], check=True, stdout=log, stderr=log)
-                print("{:.3f}".format(time.time() - t))
+            print('\tpost...', end="")
+            t = time.time()
+            subprocess.run(['cyan', '-db', db, 'post'], check=True, stdout=log, stderr=log)
+            print("{:.3f}".format(time.time() - t))
 
-                print('\tmeasures...', end="")
-                t = time.time()
-                values = measures.compute(db)
-                print("{:.1f}".format(time.time() - t))
+            print('\tmeasures...', end="")
+            t = time.time()
+            values = measures.compute(db)
+            print("{:.1f}".format(time.time() - t))
 
-                with open(path / ns.report, 'a') as f:
-                    report = csv.writer(f)
-                    report.writerow(params + values)
+            with open(path / ns.report, 'a') as f:
+                report = csv.writer(f)
+                report.writerow(params + values)
 
 
 if __name__ == '__main__':

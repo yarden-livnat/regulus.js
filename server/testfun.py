@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 def generateres(X):
     x1 = X[:,0]
@@ -31,8 +32,11 @@ def evaluate4(x,y):
     return -1.0*beale
 
 def savefile(out,sim_dir, sim_out):
-    np.savetxt(sim_dir+sim_out, out, header='X1,X2,X3,X4,Y', delimiter=",")
 
-def readfile(input):
-    my_data = np.genfromtxt(input, skip_header=1 ,delimiter=',')
+    if not os.path.exists(sim_dir):
+        os.makedirs(sim_dir)
+    np.savetxt(sim_dir +'/'+ sim_out, out, header='X1,X2,X3,X4,Y', delimiter=",")
+
+def load_input(input):
+    my_data = np.asarray(input)#np.genfromtxt(input, skip_header=1 ,delimiter=',')
     return my_data

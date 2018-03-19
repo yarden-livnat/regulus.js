@@ -4,6 +4,7 @@ from pathlib import Path
 import json
 import argparse
 import sample
+# import rerunsim func as module
 
 p = argparse.ArgumentParser(description='Regulus server')
 p.add_argument('-d', '--data', default=None, help='data directory')
@@ -20,18 +21,28 @@ app = Bottle()
 def static(filename='index.html'):
     return static_file(filename, root='../dist')
 
+#@app.route('/catalog')
+#def catalog():
+#    return json.dumps(['deployment']);
+
+@app.route('/catalog')
+def catalog():
+    return json.dumps(['test'])
+
 
 @app.route('/data/<path:path>')
 def data(path):
-    print('dataset', path)
-    return static_file(path, root=str(data_dir))
+    filename = Path(path).with_suffix('.json')
+    print('dataset', filename)
+    return static_file(str(filename), root=str(data_dir))
 
-@app.route('/resample')
-#@app.post('/resample')
+@app.post('/resample')
 def resample():
     spec = request.json
     print('resample request received', spec)
+
     sample.createsample(spec)
+    #print('resample', spec)
     return
 
 
