@@ -1,23 +1,24 @@
 import json
 import os
 import csv
-def create_new(name, old_ver, new_ver):
-    #name, old_ver, new_ver
+def create_new(name, old_ver, new_ver,data_dir):
 
-    if os.path.isfile(name + '.json'):
+    data_dir = str(data_dir)
 
-        with open(name + '.json') as json_data:
+    if os.path.isfile(data_dir+'/'+name + '.json'):
+
+        with open(data_dir+'/'+name + '.json') as json_data:
             reg_data = json.load(json_data)
 
-    elif os.path.isfile(name + old_ver + '.json'):
+    elif os.path.isfile(data_dir+'/'+name + old_ver + '.json'):
 
-        with open(name + old_ver + '.json') as json_data:
+        with open(data_dir+'/'+name + old_ver + '.json') as json_data:
             reg_data = json.load(json_data)
 
     else:
         print("Can't find data")
 
-    new_reg = name + new_ver + '.json'
+    new_reg = data_dir+'/'+ name + new_ver + '.json'
 
     del reg_data['mscs']
 
@@ -37,7 +38,15 @@ def extract_input(data,dims):
     return sample_input
 
 
-def load(received):
+
+def save_list(sample_inputs):
+    with open('resample_params.csv', 'a') as f:
+        report = csv.writer(f)
+        report.writerows(sample_inputs)
+    return 'resample_params.csv'
+
+
+def load(received,data_dir):
     # extract spec, name of original, version number
     #data = 111#json.loads(received)
     #ver = "2.0"
@@ -48,16 +57,10 @@ def load(received):
     name = received['name']
     data = received['pts']
 
-    [new_reg,dims] = create_new(name, old_ver, new_ver)
+    [new_reg,dims] = create_new(name, old_ver, new_ver,data_dir)
 
     # sample_input is a list of new input parameters
 
     sample_input = extract_input(data,dims)
 
     return [new_reg,dims,sample_input]#[data,name,old_ver,new_ver]
-
-def save_list(sample_inputs):
-    with open('resample_params.csv', 'a') as f:
-        report = csv.writer(f)
-        report.writerows(sample_inputs)
-    return 'resample_params.csv'

@@ -35,7 +35,7 @@ def savefile(out,sim_dir, sim_out):
 
     if not os.path.exists(sim_dir):
         os.makedirs(sim_dir)
-    np.savetxt(sim_dir +'/'+ sim_out, out, header='X1,X2,X3,X4,Y', delimiter=",")
+    np.savetxt(sim_dir +'/'+ sim_out, out, header='X1,X2,X3,X4,Y', delimiter=",", comments='')
 
 def load_input(input):
     my_data = np.asarray(input)#np.genfromtxt(input, skip_header=1 ,delimiter=',')

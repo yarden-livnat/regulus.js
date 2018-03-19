@@ -24,7 +24,7 @@ def static(filename='index.html'):
 
 @app.route('/catalog')
 def catalog():
-    return json.dumps(['deployment']);
+    return json.dumps(['test'])
 
 @app.route('/data/<path:path>')
 def data(path):
@@ -34,10 +34,11 @@ def data(path):
 
 @app.post('/resample')
 def resample():
+    #print('data_dir', data_dir)
     spec = request.json
-    print('resample request received', spec)
+    print('resample request received')#, spec)
 
-    sample.createsample(spec)
+    sample.createsample(spec,data_dir)
     #print('resample', spec)
     return
 

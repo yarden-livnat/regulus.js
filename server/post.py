@@ -15,7 +15,6 @@ class Merge(object):
         self.src = src
         self.dest = dest
 
-
 class Partition(object):
     _id_generator = -1
 
@@ -31,7 +30,7 @@ class Partition(object):
     def __init__(self, persistence, base_pts=None, min_idx=None, max_idx=None, child=None):
         self.id = Partition.gen_id()
         self.persistence = persistence
-        self.pts_idx = []
+        self.span = []
         self.parent = None
         self.children = []
 
@@ -255,7 +254,7 @@ class Post(object):
             for child in partition.children:
                 idx = self.visit(child, idx)
 
-        partition.pts_idx = (first, idx)
+        partition.span = (first, idx)
         return idx
 
     def rename(self, node, idx):
@@ -270,23 +269,40 @@ class Post(object):
     # save
     #
 
-    def save(self, path, name):
+    def save(self, path, name, k):
         partitions = []
         self.collect(self.root, partitions)
         tree = {
             'name': name,
+            'params': '-k '+ str(k),
             'partitions': partitions,
-            'pts': self.pts
+            'pts_idx': self.pts
         }
         filename = name + ".json"
         with open(path / filename, 'w') as f:
             json.dump(tree, f)
 
+    def save_in_class(self, path, name, k,mscs):
+        partitions = []
+        self.collect(self.root, partitions)
+        tree = {
+            'name': name,
+            'params': '-k '+ str(k),
+            'partitions': partitions,
+            'pts_idx': self.pts
+        }
+        #filename = name + ".json"
+        #with open(path / filename, 'w') as f:
+        #    json.dump(tree, f)
+        #self.mscs.append(tree)
+        mscs.append(tree)
+
+
     def collect(self, node, array):
         array.append({
             'id': node.id,
             'lvl': node.persistence,
-            'pts_idx': [node.pts_idx[0], node.pts_idx[1]],
+            'span': [node.span[0], node.span[1]],
             # 'extrema': node.extrema,
             'minmax_idx': [node.min_idx, node.max_idx],
             'parent': node.parent.id if node.parent is not None else None,
@@ -387,6 +403,9 @@ def post(args=None):
     p.add_argument('-g', '--gradient', default='steepest', help='gradient')
     p.add_argument('-G', '--graph', default='relaxed beta skeleton', help='graph')
 
+    p.add_argument('-j', '--single', type=int, default=None, help='Whether to save to multiple jsons')
+    p.add_argument('-t', '--temp', type=str, default=None, help='Whether a template from the previous version is used')
+
     p.add_argument('-d', '--dims', type=int, default=None, help='number of input dimensions')
     p.add_argument('-m', '--measure', default=None, help='measure name')
     p.add_argument('-c', '--col', type=int, default=-1, help='measure column index starting at 0')
@@ -406,6 +425,7 @@ def post(args=None):
         data = [[float(x) for x in row] for row in reader]
 
     dims = ns.dims if ns.dims is not None else len(header) - 1
+    data2 = data[:]
     data = np.array(data)
     x = data[:, 0:dims]
 
@@ -437,6 +457,9 @@ def post(args=None):
         catalog['name'] = ns.name
 
     available = set(catalog['msc'])
+    if ns.single is not None:
+        mscs = [];
+
     for measure in measures:
         try:
             name = header[measure]
@@ -444,19 +467,55 @@ def post(args=None):
             y = data[:, measure]
             msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm)
             msc.build(X=x, Y=y, names=header[:dims]+[name])
-            Post(ns.debug)\
-                .data(y)\
-                .msc(msc.base_partitions, msc.hierarchy)\
-                .build()\
-                .verify()\
-                .save(path, name)
+
+            if ns.single is not None:
+                Post(ns.debug)\
+                    .data(y)\
+                    .msc(msc.base_partitions, msc.hierarchy)\
+                    .build()\
+                    .verify()\
+                    .save_in_class(path, name, ns.knn, mscs)
+
+            else:
+                Post(ns.debug)\
+                    .data(y)\
+                    .msc(msc.base_partitions, msc.hierarchy)\
+                    .build()\
+                    .verify()\
+                    .save(path, name, ns.knn)
+
             available.add(name)
         except RuntimeError as error:
             print(error)
 
     catalog['msc'] = sorted(list(available))
-    with open(catalog_path, 'w') as f:
-        json.dump(catalog, f, indent=2)
+
+    if ns.temp is not None:
+        with open(ns.temp) as f:
+            temp = json.load(f)
+        temp['mscs'] = mscs
+        print(temp)
+        with open(ns.temp, 'w') as f:
+            json.dump(temp, f, indent=2)
+
+    elif ns.single is not None:
+        new_msc = path / (ns.name+'.json')
+
+        temp = {
+            'name': ns.name,
+            'version': '1.0',
+            'dims': header[0:dims],
+            'measures': [header[i] for i in measures],
+            'notes': [{"date": "03/17/18", "author": "yarden", "text": "new format"}],
+            'pts': data2,
+            'mscs': list(mscs)
+        }
+        with open(new_msc, 'w') as f:
+            json.dump(temp, f, indent=2)
+
+    else:
+        with open(catalog_path, 'w') as f:
+            json.dump(catalog, f, indent=2)
 
     # msc.LoadData(ns.filename)
     # msc.Save(path / 'Hierarchy.csv', path / 'Base_Partition.json')

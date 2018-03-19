@@ -5,12 +5,11 @@ import numpy as np
 import os
 
 def getlatestexp(iii):
-    print("Get Latest Dataset")
+
     existingexp = os.listdir('data')
     expnum = [int(''.join(filter(str.isdigit, fname))) for fname in existingexp]
     sorteddir = [existingexp[ind] for ind in np.argsort(expnum)]
 
-    print(iii)
     while os.path.exists("data/V%s" %iii):
         iii = iii+1
     os.makedirs("data/V%s" %iii)
@@ -39,11 +38,13 @@ def create_new(old_reg, new_ver):
 def read_newdata(output,newparam):
     return output+'/'+newparam
 
-def combine_data(new_reg, new_pts):
+def combine_data(new_reg, new_pts,data_dir):
     ## Check unique here
-    #with open(d1, newline='') as csvfile:
-    #    reader = csv.reader(csvfile)
-    #    data1 = list(reader)
+
+    # suppose the new CSV file for post.py is new_pts.csv
+    data_dir = str(data_dir)
+
+
 
     with open(new_pts, newline='') as csvfile:
         #dialect = csv.Sniffer().sniff(csvfile.read(2048))
@@ -57,23 +58,30 @@ def combine_data(new_reg, new_pts):
         reg_data = json.load(json_data)
 
     old_pts = reg_data['pts']
-    new_pts = old_pts+data2[1:]
+    new_pts = old_pts+data2#[1:]
     reg_data['pts'] = new_pts
-
+    version = reg_data['version']
+    new_data_csv = data_dir + '/' + 'new_pts'+version+'.csv'
     with open(new_reg, 'w') as f:
         json.dump(reg_data, f)
 
-    return #new_reg
+    # store csv for post
+    with open(new_data_csv, 'a') as f:
+        report = csv.writer(f)
+        report.writerow(header)
+        report.writerows(new_pts)
 
-def mergedata(sim_dir, sim_out, new_reg, dims):
+    return new_data_csv
+
+def mergedata(sim_dir, sim_out, new_reg, dims,data_dir):
 
     # New json file already created as json with new_reg as filename
     #new_reg  = create_new(old_reg, new_ver)
 
     new_pts = read_newdata(sim_dir, sim_out)
 
-    combine_data(new_reg,new_pts)
+    csv_out = combine_data(new_reg,new_pts,data_dir)
 
-    return
+    return csv_out
 
 
