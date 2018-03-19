@@ -1,7 +1,6 @@
 import json
 import os
 import csv
-
 def create_new(name, old_ver, new_ver):
     #name, old_ver, new_ver
 
@@ -60,5 +59,5 @@ def load(received):
 def save_list(sample_inputs):
     with open('resample_params.csv', 'a') as f:
         report = csv.writer(f)
-        report.writerow(sample_inputs)
+        report.writerows(sample_inputs)
     return 'resample_params.csv'
