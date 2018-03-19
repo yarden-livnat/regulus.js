@@ -10,6 +10,7 @@ def sample_in_thread(reg_file):
     sim_out = 'new_sample_outputs.csv'
     sim_in = 'new_sample_inputs.csv'
 
+
     reg_file.save_sample_inputs(sim_in)
     sample_input = reg_file.report_sample_input()
 
