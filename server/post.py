@@ -18,7 +18,6 @@ class Merge(object):
         self.src = src
         self.dest = dest
 
-
 class Partition(object):
     _id_generator = -1
 
@@ -309,6 +308,22 @@ class Post(object):
         with open(path / filename, 'w') as f:
             json.dump(tree, f)
 
+    def save_in_class(self, path, name, k,mscs):
+        partitions = []
+        self.collect(self.root, partitions)
+        tree = {
+            'name': name,
+            'params': '-k '+ str(k),
+            'partitions': partitions,
+            'pts_idx': self.pts
+        }
+        #filename = name + ".json"
+        #with open(path / filename, 'w') as f:
+        #    json.dump(tree, f)
+        #self.mscs.append(tree)
+        mscs.append(tree)
+
+
     def collect(self, node, array):
         array.append({
             'id': node.id,
@@ -491,6 +506,7 @@ def post(args=None):
             print(error)
 
     catalog['msc'] = sorted(list(available))
+
 
     if not ns.multiple:
         regulus['mscs'] = list(mscs.values())

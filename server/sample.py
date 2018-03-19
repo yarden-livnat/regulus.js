@@ -11,6 +11,7 @@ def sample_in_thread(reg_file):
     sim_in = 'new_sample_inputs.csv'
 
 
+
     reg_file.save_sample_inputs(sim_in)
     sample_input = reg_file.report_sample_input()
 
@@ -37,6 +38,7 @@ def sample_in_thread(reg_file):
 
     print("New Results are available")
 
+
     return
 
 	
@@ -49,6 +51,7 @@ def createsample(received, data_dir):
 
         thread = threading.Thread(target=sample_in_thread, args=[reg_file])
         thread.start()
+
 
 
     return

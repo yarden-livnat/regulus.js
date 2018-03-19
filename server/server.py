@@ -33,6 +33,7 @@ def catalog():
 @app.route('/catalog')
 def catalog():
 
+
     files = [str(f.stem) for f in sorted(data_dir.glob('*.json'))]
     print(files)
     return json.dumps(files);
@@ -52,10 +53,6 @@ def resample():
     spec = request.json
     print('resample request received', spec)
     createsample(spec,data_dir)
-    #print('resample', spec)
-    print('resample post received', spec)
-
-    sample.createsample(spec)
 
 
 
