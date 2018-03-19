@@ -1,7 +1,10 @@
 
 body {
   font: 10pt Arial;
-  /*user-select: none;*/
+
+}
+body text {
+  user-select: none;
 }
 
 .page {
@@ -30,6 +33,10 @@ body {
   flex: 1 1 auto;
 }
 
+.shrink {
+  flex: 0 1 auto;
+}
+
 .row {
   flex-direction: row;
 }
@@ -47,6 +54,11 @@ body {
   flex: 0 1 auto;
 }
 
-#sample_view {
+#controls_view {
   flex: 0 1 auto;
+}
+
+#resample_view {
+  flex: 1 0 0;
+  max-width: 250px;
 }

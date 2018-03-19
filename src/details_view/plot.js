@@ -1,9 +1,10 @@
 import * as d3 from 'd3'
+import config from './config';
 
 export default function Plot() {
   let margin = {top: 1, right: 1, bottom: 1, left: 1},
-    width = 102 - margin.left - margin.right,
-    height = 102 - margin.top - margin.bottom;
+    width = config.plot_width,
+    height = config.plot_height;
 
   let x = null;
   let y = null;
@@ -23,7 +24,7 @@ export default function Plot() {
       .data(visible_pts, pt => pt.id);
 
     pts.enter().append('circle')
-      .attr('r', 1)
+      .attr('r', config.pt_radius)
       .attr('cx', d => tx(d))
       .attr('cy', d => ty(d))
       .merge(pts)
@@ -33,12 +34,32 @@ export default function Plot() {
     pts.exit().remove();
   }
 
+  function svg_render_extra_pts(pts ,i) {
+    let tx = x.get(this);
+    let ty = y.get(this);
+
+    let extra = d3.select(this).select('.pts').selectAll('.extra')
+      .data(pts); //, pt => pt.id);
+
+    extra.enter().append('circle')
+      .attr('class', 'extra')
+      .attr('r', config.extra_pt_radius)
+      .style("fill", 'black')
+      .attr('z-index', 2)
+      .merge(extra)
+      .attr('cx', d => tx(d))
+      .attr('cy', d => ty(d));
+
+    extra.exit().remove();
+  }
+
   function canvas_render_pts(d, i) {
     let bg_ctx = d3.select(this).select('.canvas-bg').node().getContext('2d');
     let fg_ctx = d3.select(this).select('.canvas-fg').node().getContext('2d');
 
     bg_ctx.save();
-    bg_ctx.clearRect(0, 0, width, height);
+    bg_ctx.fillStyle = 'white';
+    bg_ctx.fillRect(0, 0, width, height);
 
     fg_ctx.save();
     fg_ctx.clearRect(0, 0, width, height);
@@ -46,15 +67,14 @@ export default function Plot() {
     let tx = x.get(this);
     let ty = y.get(this);
 
-    // let visible_pts = show_filtered ? d.pts : d.pts.filter( pt => !pt.filtered);
     bg_ctx.fillStyle = '#eee';
     for (let pt of d.pts) {
       if (!pt.filtered) {
         fg_ctx.fillStyle = color(pt);
-        fg_ctx.fillRect(tx(pt), ty(pt), 1, 1);
+        fg_ctx.fillRect(tx(pt), ty(pt), config.pt_radius, config.pt_radius);
       }
       else if (show_filtered) {
-        bg_ctx.fillRect(tx(pt), ty(pt), 1, 1);
+        bg_ctx.fillRect(tx(pt), ty(pt), config.pt_radius, config.pt_radius);
       }
     }
 
@@ -68,13 +88,17 @@ export default function Plot() {
       let root = d3.select(this);
 
       if (!use_canvas)
-        svg_render_pts.call(this, d, i);
+        svg_render_pts.call(this, d.pts, i);
+
+      svg_render_extra_pts.call(this, d.extra || [], i);
 
       root.select('.line')
         .attr('d', line.get(this)(d.line));
 
       root.select('.area')
         .attr('d', area.get(this)(d.area));
+
+
     });
 
     if (use_canvas)
@@ -91,13 +115,13 @@ export default function Plot() {
 
     selection.append('canvas')
       .attr('class', 'canvas-bg')
-        .attr('width', width-2)
-        .attr('height', height-2);
+        .attr('width', width)
+        .attr('height', height);
 
     selection.append('canvas')
         .attr('class', 'canvas-fg')
-        .attr('width', width-2)
-        .attr('height', height-2);
+        .attr('width', width)
+        .attr('height', height);
 
     let svg = selection.append('svg')
         .attr('width', width + margin.left + margin.right)

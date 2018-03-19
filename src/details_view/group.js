@@ -1,22 +1,18 @@
 import * as d3 from "d3";
+import config from './config';
 import Plot from "./plot";
 import YAxis from './y_axis';
+
 import template from './group.html';
 
-let GROUP_OFFSET = 0;
-let GROUP_SIZE = 120;
-let PLOT_HEIGHT = 100;
-let PLOT_WIDTH = 100;
-
-let DURATION = 1000;
 
 export default function Group() {
   let dims = [];
   let measure = null;
   let y_axis = YAxis();
-  let sy = d3.scaleLinear().range([100, 0]);
+  let sy = d3.scaleLinear().range([config.plot_width, 0]);
 
-  let yScale = d3.scaleLinear().range([PLOT_HEIGHT, 0]);
+  let yScale = d3.scaleLinear().range([config.plot_height, 0]);
 
   let x = d3.local();
   let area = d3.local();
@@ -24,12 +20,12 @@ export default function Group() {
   let plot = Plot().x(x).line(line).area(area);
 
   function loc(i) {
-    return `${GROUP_OFFSET + i * GROUP_SIZE}px`;
+    return `${config.group_offset + i * config.group_size}px`;
   }
 
   function group(selection, all) {
     selection
-      .transition().duration(DURATION)
+      .transition().duration(config.duration)
       .style('top', (d, i) => loc(i))
       .style('opacity', 1)
     ;
@@ -38,9 +34,9 @@ export default function Group() {
     selection
       .each(function(d, i) {
         let g = d3.select(this);
-        g.select('.header .id').text(d => `id: ${d.id}`);
-        g.select('.header .name').text(d => d.name);
-        g.select('.header .size').text(d => `${d.pts.length} pts`);
+        g.select('.group-header .id').text(d => `id: ${d.id}`);
+        g.select('.group-header .name').text(d => d.name);
+        g.select('.group-header .size').text(d => `${d.pts.length} pts`);
 
         g.select('.measure .name').text(measure.name);
         g.select('.measure .y_axis').call(y_axis);
@@ -54,7 +50,7 @@ export default function Group() {
           // .merge(plots)
         list
           .each(function (dim, i) {
-            let sx = d3.scaleLinear().range([0, PLOT_WIDTH]).domain(dim.extent);
+            let sx = d3.scaleLinear().range([0, config.plot_width]).domain(dim.extent);
             x.set(this, pt => sx(pt[dim.name]));
 
 
@@ -92,7 +88,7 @@ export default function Group() {
 
   group.remove = function(selection) {
     selection
-      .transition().duration(DURATION)
+      .transition().duration(config.duration)
       .style('opacity', 0)
       .remove();
   };
@@ -112,6 +108,7 @@ export default function Group() {
     plot.color(_);
     return this;
   };
+
 
   group.y = function(_) {
     plot.y(_);

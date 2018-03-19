@@ -1,34 +1,30 @@
 import * as service from "./service";
+import {MultiMSC} from '../model/multi_msc';
+import {publish, subscribe} from '../utils/pubsub';
+
 import Panel from '../panel/panel';
 
-import * as info from '../info';
-import * as details_view from '../details';
+import * as dataset_view from '../dataset_view';
+import * as details_view from '../details_view';
 import * as tree_view from '../tree';
-import * as partition_view from '../partition';
-import * as controls_view from '../controls';
-import * as resample_view from '../resample';
+import * as partition_view from '../partition_view';
+import * as controls_view from '../filtering_view';
+import * as resample_view from '../resample_view';
 
 import './style.css';
-
-
-let dataset_panel = Panel('Dataset');
 
 setup();
 init();
 
 function setup() {
-  info.setup(dataset_panel('#dataset_view').content());
+  dataset_view.setup( Panel('Dataset')('#dataset_view').content());
   details_view.setup( Panel('Details')('#details_view').content());
-  tree_view.setup(Panel('Tree')('#tree_view').content());
+  tree_view.setup(Panel('Topology')('#tree_view').content());
   partition_view.setup(Panel('Partition')('#partition_view').content());
-  controls_view.setup(Panel('Controls')('#controls_view').content());
+  controls_view.setup(Panel('Filtering')('#controls_view').content());
   resample_view.setup(Panel('Resample')('#resample_view').content());
 }
 
 function init() {
-  service.load_catalog()
-    .then(info.set_catalog)
-    .then(catalog => dataset_panel.title(`Dataset: ${catalog.name}`));
+  dataset_view.init();
 }
-
-

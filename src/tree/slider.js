@@ -5,7 +5,7 @@ export default function Slider() {
   let width = 250 - margin.left - margin.right;
   let height = 35 - margin.top - margin.bottom;
 
-  let scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0, width]);
+  let scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0, width]).clamp(true);
   let axis =  d3.axisBottom(scale).ticks(3, '.1e');
 
   let range = [0, width];
@@ -54,6 +54,12 @@ export default function Slider() {
 
   slider.range = function(_) {
     range = [scale(_[0]), scale(_[1])];
+    return this;
+  };
+
+  slider.move = function(selection, _) {
+    if (_[0] !== range[0] || _[1] !== range[1])
+      selection.select('.brush').call(brush.move, [scale(_[0]), scale(_[1])]);
     return this;
   };
 

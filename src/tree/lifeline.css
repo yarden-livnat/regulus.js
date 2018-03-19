@@ -18,6 +18,11 @@
   stroke: gray;
 }
 
+.lifeline .node.details {
+  stroke-width: 2px;
+  fill: lightgreen;
+}
+
 .lifeline .node.filtered {
   color: #f0f0f0;
 }
@@ -26,4 +31,15 @@
   stroke: none;
   /*stroke: #f0f0f0;*/
   stroke-width: 0.5px
+}
+
+.lifeline {
+  user-select: none;
+}
+
+.lifeline .name {
+  /*color: red;*/
+  text-anchor: middle;
+  alignment-baseline: middle;
+  pointer-events: none;
 }

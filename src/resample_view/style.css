@@ -1,0 +1,40 @@
+.resample {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  max-width: 250px;
+  width: 200px;
+}
+
+.resample .samples {
+  width: 4em;
+}
+
+.resample .sigma {
+  width: 4em;
+}
+
+.resample .submit {
+  float: right;
+}
+
+.resample .separator {
+  width: 80%;
+  height: 1px;
+  margin: 5px;
+  background-color: #666666;
+}
+
+.resample .border {
+  width: 100%;
+  height: 1px;
+  background-color: #999999;
+  margin: 5px;
+}
+
+
+.section {
+  padding-bottom: 10px;
+}
+
+.section-header {
+  font-weight: bold;
+}

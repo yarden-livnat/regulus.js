@@ -8,9 +8,11 @@ export default class Partition {
   constructor(data, msc) {
     this.id = data.id;
     this.lvl = data.lvl;
+
     this.minmax_idx = data.minmax_idx;
     this.minmax = [msc.pts[data.minmax_idx[0]][msc.name], msc.pts[data.minmax_idx[1]][msc.name]];
-    this.pts_idx = data.pts_idx;
+    this.pts_idx = data.span;
+    this._pts = data.pts;
 
     this.parent = data.parent;
     this.children = data.children;
@@ -21,7 +23,7 @@ export default class Partition {
     this.notes = null;
 
     this.size = this.pts_idx[1]-this.pts_idx[0];
-    this._pts = null;
+
     this._reg_curve = null;
     this._stat = null;
   }
@@ -34,12 +36,13 @@ export default class Partition {
     return this.msc.measures;
   }
 
-  get measure() {
+  get measure_name() {
     return this.msc.name;
   }
 
   get pts() {
     if (!this._pts) {
+      let t0 = performance.now();
       let pts = [];
       let msc_pts = this.msc.pts;
       let msc_idx = this.msc.pts_idx;
@@ -50,6 +53,8 @@ export default class Partition {
 
       // consider adding the min and max pts
       this._pts = pts;
+      let t1 = performance.now();
+      console.log(`compute pts in ${d3.format('d')(t1-t0)} msec`);
     }
     return this._pts;
   }
@@ -66,7 +71,7 @@ export default class Partition {
         this._stat.set(attr.name, {
           name: attr.name,
           type: attr.type,
-          measure: attr.name === this.measure,
+          measure: attr.name === this.measure_name,
           n: values.length,
           quantile: [
             d3.quantile(values, 0.25),
@@ -83,13 +88,15 @@ export default class Partition {
 
   get regression_curve() {
     if (!this._reg_curve) {
-      let current_measure = this.msc.measure_by_name(this.msc.name);
+      let t0 = performance.now();
+      let current_measure = this.msc.measure; //
 
       // todo: consider adding the min/max points
       //       maybe only if they are not too dissimilar from the rest of the points
       let dims = this.pts.map( pt => this.msc.dims.map( d => pt[d.name] ));
       let measure = this.pts.map( pt => pt[current_measure.name]);
 
+      let t1 = performance.now();
       let extent = current_measure.extent;
       let bandwidth = default_bandwidth * (extent[1] - extent[0]);
 
@@ -104,9 +111,11 @@ export default class Partition {
       for (let i=0; i<py.length; i++) {
         curve.push(px[i].concat([py[i]]));
       }
-      curve.columns = dims.map(d => d.name).concat(current_measure.name);
+      let columns = this.dims.map(d => d.name).concat(current_measure.name);
 
-      this._reg_curve = {curve, std};
+      this._reg_curve = {curve, std, columns};
+      let t2 = performance.now();
+      console.log(`compute regression curve in ${d3.format('d')(t2-t0)} msec  [get pts in ${d3.format('d')(t1-t0)} msec]`);
     }
     return this._reg_curve;
   }
