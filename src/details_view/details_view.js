@@ -3,7 +3,7 @@ import * as chromatic from 'd3-scale-chromatic';
 
 import {cmaps} from '../utils/colors';
 import {publish, subscribe} from "../utils";
-import {and, or, not, AttrFilter} from '../model';
+import {and, or, not, AttrFilter, XYFilter} from '../model';
 import {ensure_single} from "../utils/events";
 
 import config from './config';
@@ -40,9 +40,12 @@ let y = d3.local();
 let group = Group()
     .y(y)
     .color(pt => colorScale(pt[color_by.name]))
-    .on('filter', update_filter);
+    .on_y('filter', update_filter)
+    .on_plot('start', start_pts_filter)
+    .on_plot('brush', update_pts_filter);
 
 let pts_filters = and();
+let plot_filter = null;
 
 // TODO: simplify or break up code
 
@@ -171,7 +174,7 @@ function select_color(name) {
 }
 
 function on_show_filtered() {
-  group.show_filtered(this.checked);
+  group.show_filtered(this.checked && 'all');
   update(partitions, true);
 }
 
@@ -219,12 +222,27 @@ function remove(partition){
   update(partitions);
 }
 
-function update_filter(attr) {
+function update_filter() {
   for (let pt of msc.pts) {
     pt.filtered = !pts_filters(pt);
   }
   update(partitions, true);
   publish('data.updated');
+}
+
+function start_pts_filter(pts, name, xr, yr) {
+  if (plot_filter) {
+    pts_filters.delete(plot_filter);
+    root.selectAll('.plot').select('.brush').call(group.plot().brush().move, null);
+  }
+  plot_filter = XYFilter(pts, name, measure.name).xr(xr).yr(yr);
+  pts_filters.add(plot_filter);
+  update_filter();
+}
+
+function update_pts_filter(xr, yr) {
+  plot_filter.xr(xr).yr(yr);
+  update_filter();
 }
 
 function update(list, all=false) {

@@ -5,7 +5,7 @@ let config = {
   group_size: 120,
   group_offset: 0,
 
-  pt_radius: 1.5,
+  pt_radius: 2,
   extra_pt_radius: 2,
 
   duration: 1000

@@ -15,6 +15,8 @@ def sample_in_thread(new_reg,dims,sample_input,data_dir):
     # CSV file as input for cyclus
     param = load_spec.save_list(sample_input)
 
+    ###Simulation###
+
     #subprocess.run(['python', '-m', 'scenario', '-t', 'Transition_scenario.xml', '-o', sim_dir, '-p',param, '-r', sim_out], check=True)
 
     #run_sim.runwithparam(['python', '-m', 'scenario', '-t', 'Transition_scenario.xml', '-o', sim_dir, '-p', sample_input, '-r', sim_out])
@@ -25,6 +27,8 @@ def sample_in_thread(new_reg,dims,sample_input,data_dir):
     new_data = testfun.generateres(new_input)
 
     testfun.savefile(new_data, sim_dir, sim_out)
+
+    ###Simulation###
 
     print("Simulation Finished")
 
