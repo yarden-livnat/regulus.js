@@ -10,15 +10,15 @@ def create_new(name, old_ver, new_ver,data_dir):
         with open(data_dir+'/'+name + '.json') as json_data:
             reg_data = json.load(json_data)
 
-    elif os.path.isfile(data_dir+'/'+name + old_ver + '.json'):
+    elif os.path.isfile(data_dir+'/'+name + '.' + old_ver + '.json'):
 
-        with open(data_dir+'/'+name + old_ver + '.json') as json_data:
+        with open(data_dir+'/'+name + '.' + old_ver + '.json') as json_data:
             reg_data = json.load(json_data)
 
     else:
         print("Can't find data")
 
-    new_reg = data_dir+'/'+ name + new_ver + '.json'
+    new_reg = data_dir+'/'+ name +'.'+new_ver + '.json'
 
     del reg_data['mscs']
 

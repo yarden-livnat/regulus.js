@@ -494,7 +494,6 @@ def post(args=None):
         with open(ns.temp) as f:
             temp = json.load(f)
         temp['mscs'] = mscs
-        print(temp)
         with open(ns.temp, 'w') as f:
             json.dump(temp, f, indent=2)
 

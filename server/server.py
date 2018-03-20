@@ -40,6 +40,7 @@ def data(path):
 def resample():
     #print('data_dir', data_dir)
     spec = request.json
+    print(spec['version'])
     print('resample request received')#, spec)
 
     sample.createsample(spec,data_dir)
