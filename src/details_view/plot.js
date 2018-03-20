@@ -6,21 +6,44 @@ export default function Plot() {
     width = config.plot_width,
     height = config.plot_height;
 
-  let x = null;
+  let ctx = null;
   let y = null;
   let color = null;
-  let line = null;
-  let area = null;
-  let show_filtered = true;
+
+  let show_filtered = 'all';
   let show_regression = true;
   let use_canvas = true;
-  let canvas_draw_circles = true;
+  let canvas_draw_circles = false;
+
+  let brush = d3.brush().extent([[0, 0], [width, height]])
+    .on('start', start)
+    .on('brush', brushed);
+  let dispatch = d3.dispatch('start', 'brush');
+
+  function brushed() {
+    let cctx = ctx.get(this);
+
+    let s = d3.event.selection;
+    let rx = [s[0][0], s[1][0]].map(cctx.sx.invert);
+    let ry = [s[0][1], s[1][1]].map(cctx.sy.invert);
+
+    dispatch.call('brush', this, rx, [ry[1], ry[0]]);
+  }
+
+  function start(partition) {
+    let cctx = ctx.get(this);
+    let s = d3.event.selection;
+    let rx = [s[0][0], s[1][0]].map(cctx.sx.invert);
+    let ry = [s[0][1], s[1][1]].map(cctx.sy.invert);
+    dispatch.call('start', this, partition.pts, cctx.name, rx, [ry[1], ry[0]]);
+  }
 
   function svg_render_pts(d ,i) {
-    let tx = x.get(this);
+    let cctx = ctx.get(this);
+    let tx = pt => cctx.sx(pt[cctx.name]);
     let ty = y.get(this);
 
-    let visible_pts = show_filtered ? d : d.filter( pt => !pt.filtered);
+    let visible_pts = (show_filtered === 'all' || show_filtered === cctx.name) ? d : d.filter( pt => !pt.filtered);
 
     let pts = d3.select(this).select('.pts').selectAll('circle')
       .data(visible_pts, pt => pt.id);
@@ -37,7 +60,8 @@ export default function Plot() {
   }
 
   function svg_render_extra_pts(pts ,i) {
-    let tx = x.get(this);
+    let cctx = ctx.get(this);
+    let tx = pt => cctx.sx(pt[cctx.name]);
     let ty = y.get(this);
 
     let extra = d3.select(this).select('.pts').selectAll('.extra')
@@ -75,7 +99,8 @@ export default function Plot() {
     fg_ctx.save();
     fg_ctx.clearRect(0, 0, width, height);
 
-    let tx = x.get(this);
+    let cctx = ctx.get(this);
+    let tx = pt => cctx.sx(pt[cctx.name]);
     let ty = y.get(this);
 
     bg_ctx.fillStyle = '#eee';
@@ -83,7 +108,7 @@ export default function Plot() {
       if (!pt.filtered) {
         fg_ctx.fillStyle = color(pt);
         draw_shape(fg_ctx, tx(pt), ty(pt), config.pt_radius);
-      } else if (show_filtered) {
+      } else if (show_filtered === 'all' || show_filtered == cctx.name) {
         draw_shape(bg_ctx, tx(pt), ty(pt), config.pt_radius);
       }
     }
@@ -93,9 +118,9 @@ export default function Plot() {
   }
 
   function plot(selection) {
-    let t0 = performance.now();
     selection.select('svg').each(function (d, i)  {
       let root = d3.select(this);
+      let cctx = ctx.get(this);
 
       if (!use_canvas)
         svg_render_pts.call(this, d.pts, i);
@@ -104,10 +129,12 @@ export default function Plot() {
 
       if (show_regression) {
         root.select('.line')
-          .attr('d', line.get(this)(d.line));
+          .attr('d', cctx.line(d.line));
 
         root.select('.area')
-          .attr('d', area.get(this)(d.area));
+          .attr('d', cctx.area(d.area));
+
+        root.select('.brush').call(brush);
       }
       root.select('.line').style('display', show_regression && 'inline' || 'none');
       root.select('.area').style('display', show_regression && 'inline' || 'none');
@@ -116,9 +143,6 @@ export default function Plot() {
 
     if (use_canvas)
       selection.each( function(d, i) { canvas_render_pts.call(this, d, i)});
-
-    let t1 = performance.now();
-    // console.log(`details plot render: ${t1-t0} msec`);
   }
 
   plot.create = function(selection) {
@@ -143,6 +167,7 @@ export default function Plot() {
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
     svg.append('rect')
+      .attr('class', 'frame')
       .attr('x', -1)
       .attr('y', -1)
       .attr('width', width+2)
@@ -151,6 +176,9 @@ export default function Plot() {
     svg.append('path').attr('class', 'area');
     svg.append('g').attr('class', 'pts');
     svg.append('path').attr('class', 'line');
+    svg.append('g')
+      .attr('class', 'brush')
+      .call(brush);
 
     let t1 = performance.now();
     // console.log(`details plot create: ${t1-t0} msec`);
@@ -162,23 +190,13 @@ export default function Plot() {
     return this;
   };
 
-  plot.x = function(_) {
-    x = _;
+  plot.ctx = function(_) {
+    ctx = _;
     return this;
   };
 
   plot.y = function(_) {
     y = _;
-    return this;
-  };
-
-  plot.line = function(_) {
-    line = _;
-    return this;
-  };
-
-  plot.area = function(_) {
-    area = _;
     return this;
   };
 
@@ -199,6 +217,11 @@ export default function Plot() {
 
   plot.use_canvas = function(_) {
     use_canvas = _;
+    return this;
+  };
+
+  plot.on = function(event, cb) {
+    dispatch.on(event, cb);
     return this;
   };
 

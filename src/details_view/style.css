@@ -120,7 +120,7 @@
   left: 0;
 }
 
-.details .plot rect {
+.details .plot .frame  {
   fill: none;
   stroke: black;
   stroke-width: 0.5px;
@@ -155,4 +155,15 @@
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
+}
+
+.details .plot .brush .overlay {
+  fill: none;
+}
+
+.details .plot .brush .selection {
+  fill: lightgray;
+  fill-opacity: 0.1;
+  stroke: black;
+  stroke-width: 1px;
 }

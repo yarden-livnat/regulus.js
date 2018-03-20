@@ -14,10 +14,8 @@ export default function Group() {
 
   let yScale = d3.scaleLinear().range([config.plot_height, 0]);
 
-  let x = d3.local();
-  let area = d3.local();
-  let line = d3.local();
-  let plot = Plot().x(x).line(line).area(area);
+  let ctx = d3.local();
+  let plot = Plot().ctx(ctx);//.x(x).line(line).area(area)
 
   function loc(i) {
     return `${config.group_offset + i * config.group_size}px`;
@@ -45,35 +43,36 @@ export default function Group() {
         let list = plots.enter()
           .append('div')
           .call(plot.create);
+
         if (all)
           list = list.merge(plots);
-          // .merge(plots)
+
         list
           .each(function (dim, i) {
             let sx = d3.scaleLinear().range([0, config.plot_width]).domain(dim.extent);
-            x.set(this, pt => sx(pt[dim.name]));
-
-
             let mi = dims.length;
-            line.set(this, d3.line()
-              .x(pt => sx(pt[i]))
-              .y(pt => sy(pt[mi])));
 
-            area.set(this, d3.area()
-              .y0((p) => sy(p.pt[mi]))
-              .y1((p) => sy(p.pt[mi]))
-              .x0((p) => sx(p.pt[i] - p.std[i]/2))
-              .x1((p) => sx(p.pt[i] + p.std[i]/2)));
+            ctx.set(this, {
+              name: dim.name,
+              sx, sy,
+              line: d3.line()
+                .x(pt => sx(pt[i]))
+                .y(pt => sy(pt[mi])),
+              area: d3.area()
+                .y0((p) => sy(p.pt[mi]))
+                .y1((p) => sy(p.pt[mi]))
+                .x0((p) => sx(p.pt[i] - p.std[i]/2))
+                .x1((p) => sx(p.pt[i] + p.std[i]/2))
+            });
           })
           .datum(d)
           .call(plot);
       });
-    let t1 = performance.now();
+    // let t1 = performance.now();
     // console.log(`details group render: ${t1-t0} msec`);
   }
 
   group.create = function(selection) {
-    let t0 = performance.now();
     selection
       .attr('class', 'group')
       .style('top', (d, i)=> loc(i))
@@ -82,8 +81,6 @@ export default function Group() {
     selection.html(template);
 
     selection.select('.measure').selectAll('.y_axis').call(y_axis.create);
-    let t1 = performance.now();
-    // console.log(`details group create: ${t1-t0} msec`);
   };
 
   group.remove = function(selection) {
@@ -108,7 +105,6 @@ export default function Group() {
     plot.color(_);
     return this;
   };
-
 
   group.y = function(_) {
     plot.y(_);
@@ -135,8 +131,13 @@ export default function Group() {
     return this;
   };
 
-  group.on = function(event, cb) {
+  group.on_y = function(event, cb) {
     y_axis.on(event, cb);
+    return this;
+  };
+
+  group.on_plot = function(event, cb) {
+    plot.on(event, cb);
     return this;
   };
 

@@ -26,8 +26,8 @@ export function and() {
     return filter;
   };
 
-  filter.remove = function(f) {
-    filters.remove(f);
+  filter.delete = function(f) {
+    filters.delete(f);
     return filter;
   };
 
@@ -49,8 +49,8 @@ export function or() {
     return filter;
   };
 
-  filter.remove = function(f) {
-    filters.remove(f);
+  filter.delete = function(f) {
+    filters.delete(f);
     return filter;
   };
 

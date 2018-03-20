@@ -103,11 +103,10 @@ export default class Partition {
       let bandwidth = default_bandwidth * (extent[1] - extent[0]);
 
       let py = subLinearSpace(this.minmax, extent, 100);
-      let hat = inverseMultipleRegression(dims, measure, kernel.gaussian, bandwidth);
-      let px = hat(py);
-
-      let hat2 = averageStd(dims, measure, kernel.gaussian, bandwidth);
-      let std = hat2(py, px);
+      this.inversse_regression_curve = inverseMultipleRegression(dims, measure, kernel.gaussian, bandwidth);
+      this.std_dev = averageStd(dims, measure, kernel.gaussian, bandwidth);
+      let px = this.inversse_regression_curve(py);
+      let std = this.std_dev(py, px);
 
       let curve = [];
       for (let i=0; i<py.length; i++) {
