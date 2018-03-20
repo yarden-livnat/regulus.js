@@ -15,7 +15,7 @@ export default function Group() {
   let yScale = d3.scaleLinear().range([config.plot_height, 0]);
 
   let ctx = d3.local();
-  let plot = Plot().ctx(ctx);//.x(x).line(line).area(area)
+  let plot = Plot().ctx(ctx);
 
   function loc(i) {
     return `${config.group_offset + i * config.group_size}px`;
@@ -129,6 +129,10 @@ export default function Group() {
   group.use_canvas = function(_) {
     plot.use_canvas(_);
     return this;
+  };
+
+  group.plot = function() {
+    return plot;
   };
 
   group.on_y = function(event, cb) {

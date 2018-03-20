@@ -231,7 +231,10 @@ function update_filter() {
 }
 
 function start_pts_filter(pts, name, xr, yr) {
-  if (plot_filter) pts_filters.delete(plot_filter);
+  if (plot_filter) {
+    pts_filters.delete(plot_filter);
+    root.selectAll('.plot').select('.brush').call(group.plot().brush().move, null);
+  }
   plot_filter = XYFilter(pts, name, measure.name).xr(xr).yr(yr);
   pts_filters.add(plot_filter);
   update_filter();

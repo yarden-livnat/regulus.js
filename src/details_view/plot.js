@@ -21,6 +21,7 @@ export default function Plot() {
   let dispatch = d3.dispatch('start', 'brush');
 
   function brushed() {
+    if (!d3.event.sourceEvent || !d3.event.selection) return; // Only transition after input.
     let cctx = ctx.get(this);
 
     let s = d3.event.selection;
@@ -31,6 +32,7 @@ export default function Plot() {
   }
 
   function start(partition) {
+    if (!d3.event.sourceEvent || !d3.event.selection) return; // Only transition after input.
     let cctx = ctx.get(this);
     let s = d3.event.selection;
     let rx = [s[0][0], s[1][0]].map(cctx.sx.invert);
@@ -150,6 +152,7 @@ export default function Plot() {
     selection
         .attr('class', 'plot');
 
+
     selection.append('canvas')
       .attr('class', 'canvas-bg')
         .attr('width', width)
@@ -218,6 +221,10 @@ export default function Plot() {
   plot.use_canvas = function(_) {
     use_canvas = _;
     return this;
+  };
+
+  plot.brush = function() {
+    return brush;
   };
 
   plot.on = function(event, cb) {
