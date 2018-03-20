@@ -20,6 +20,7 @@ app = Bottle()
 def static(filename='index.html'):
     return static_file(filename, root='../dist')
 
+
 @app.route('/catalog')
 def catalog():
     files = [str(f.stem) for f in sorted(data_dir.glob('*.json'))]
@@ -27,11 +28,13 @@ def catalog():
     return json.dumps(files);
     #return json.dumps(['deployment']);
 
+
 @app.route('/data/<path:path>')
 def data(path):
     filename = path+'.json'
     print('dataset', filename)
     return static_file(filename, root=str(data_dir))
+
 
 @app.post('/resample')
 def resample():
