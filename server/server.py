@@ -29,11 +29,13 @@ def catalog():
     return json.dumps(files);
 
 
+
 @app.route('/data/<path:path>')
 def data(path):
     filename = path+'.json'
     print('dataset', filename)
     return static_file(filename, root=str(data_dir))
+
 
 @app.post('/resample')
 def resample():

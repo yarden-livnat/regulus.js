@@ -1,5 +1,10 @@
 import * as d3 from 'd3';
 
+function functor(v) {
+  return typeof v === "function" ? v : function() {
+    return v;
+  };
+}
 
 export default function BoxPlot() {
   let margin = {top: 0, right: 0, bottom: 10, left: 50};
@@ -250,15 +255,15 @@ export default function BoxPlot() {
   }
 
 
-  box.width = function(x) {
+  box.width = function(_) {
     if (!arguments.length) return width;
-    width = x;
+    width = _;
     return box;
   };
 
-  box.height = function(x) {
+  box.height = function(_) {
     if (!arguments.length) return height;
-    height = x;
+    height = _;
     return box;
   };
 
@@ -276,7 +281,7 @@ export default function BoxPlot() {
 
   box.domain = function(x) {
     if (!arguments.length) return domain;
-    domain = x == null ? x : d3.functor(x);
+    domain = x === null ? x : functor(x);
     return box;
   };
 
