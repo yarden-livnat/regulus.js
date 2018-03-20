@@ -19,14 +19,13 @@
 }
 
 .details .dims .dim {
-  width: 120px;
   padding: 0;
-  /*margin-left: 10px;*/
   text-align: center;
 }
 
 .details .dims .dim label {
   /*background-color: beige;*/
+  display: block;
 }
 
 .details .groups {

@@ -12,13 +12,15 @@ export default function Plot() {
   let line = null;
   let area = null;
   let show_filtered = true;
+  let show_regression = true;
   let use_canvas = true;
+  let canvas_draw_circles = true;
 
   function svg_render_pts(d ,i) {
     let tx = x.get(this);
     let ty = y.get(this);
 
-    let visible_pts = show_filtered ? d.pts : d.pts.filter( pt => !pt.filtered);
+    let visible_pts = show_filtered ? d : d.filter( pt => !pt.filtered);
 
     let pts = d3.select(this).select('.pts').selectAll('circle')
       .data(visible_pts, pt => pt.id);
@@ -39,7 +41,7 @@ export default function Plot() {
     let ty = y.get(this);
 
     let extra = d3.select(this).select('.pts').selectAll('.extra')
-      .data(pts); //, pt => pt.id);
+      .data(pts);
 
     extra.enter().append('circle')
       .attr('class', 'extra')
@@ -53,6 +55,15 @@ export default function Plot() {
     extra.exit().remove();
   }
 
+  function draw_shape(ctx, x, y, r) {
+    if (canvas_draw_circles) {
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, 2 * Math.PI);
+      ctx.fill();
+    } else {
+      ctx.fillRect(x, y, r, r);
+    }
+  }
   function canvas_render_pts(d, i) {
     let bg_ctx = d3.select(this).select('.canvas-bg').node().getContext('2d');
     let fg_ctx = d3.select(this).select('.canvas-fg').node().getContext('2d');
@@ -71,10 +82,9 @@ export default function Plot() {
     for (let pt of d.pts) {
       if (!pt.filtered) {
         fg_ctx.fillStyle = color(pt);
-        fg_ctx.fillRect(tx(pt), ty(pt), config.pt_radius, config.pt_radius);
-      }
-      else if (show_filtered) {
-        bg_ctx.fillRect(tx(pt), ty(pt), config.pt_radius, config.pt_radius);
+        draw_shape(fg_ctx, tx(pt), ty(pt), config.pt_radius);
+      } else if (show_filtered) {
+        draw_shape(bg_ctx, tx(pt), ty(pt), config.pt_radius);
       }
     }
 
@@ -92,12 +102,15 @@ export default function Plot() {
 
       svg_render_extra_pts.call(this, d.extra || [], i);
 
-      root.select('.line')
-        .attr('d', line.get(this)(d.line));
+      if (show_regression) {
+        root.select('.line')
+          .attr('d', line.get(this)(d.line));
 
-      root.select('.area')
-        .attr('d', area.get(this)(d.area));
-
+        root.select('.area')
+          .attr('d', area.get(this)(d.area));
+      }
+      root.select('.line').style('display', show_regression && 'inline' || 'none');
+      root.select('.area').style('display', show_regression && 'inline' || 'none');
 
     });
 
@@ -176,6 +189,11 @@ export default function Plot() {
 
   plot.show_filtered = function(_) {
     show_filtered = _;
+    return this;
+  };
+
+  plot.show_regression= function(_) {
+    show_regression = _;
     return this;
   };
 

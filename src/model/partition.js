@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {inverseMultipleRegression, averageStd, linspace, fun as kernel, subLinearSpace} from '../regression/regression';
+import {inverseMultipleRegression, averageStd, linspace, fun as kernel, subLinearSpace} from '../statistics/regression';
 
 let default_bandwidth = 0.1;
 
@@ -51,7 +51,9 @@ export default class Partition {
         pts.push(msc_pts[msc_idx[i]]);
       }
 
-      // consider adding the min and max pts
+      pts.push(msc_pts[msc_idx[this.minmax_idx[0]]]);
+      pts.push(msc_pts[msc_idx[this.minmax_idx[1]]]);
+
       this._pts = pts;
       let t1 = performance.now();
       console.log(`compute pts in ${d3.format('d')(t1-t0)} msec`);

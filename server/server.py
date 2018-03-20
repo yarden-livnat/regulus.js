@@ -24,7 +24,11 @@ def static(filename='index.html'):
 
 @app.route('/catalog')
 def catalog():
-    return json.dumps(['test'])
+
+    files = [str(f.stem) for f in sorted(data_dir.glob('*.json'))]
+    print(files)
+    return json.dumps(files);
+
 
 @app.route('/data/<path:path>')
 def data(path):

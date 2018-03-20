@@ -15,6 +15,8 @@ export function setup(el) {
 
   root.select('select')
     .on('change', function() {load_data(this.value);});
+
+  root.select('#reload').on('click', init);
 }
 
 export function init() {
@@ -28,9 +30,11 @@ function set_catalog(_) {
 
   opts.enter()
     .append('option')
-    .merge(opts)
+  .merge(opts)
     .attr('value', d => d)
     .text(d => d);
+
+  opts.exit().remove();
 
   if (_.length === 1) {
     load_data(_[0]);
