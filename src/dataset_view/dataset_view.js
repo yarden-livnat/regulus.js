@@ -54,5 +54,6 @@ function remove_placeholder() {
     root.select('select').selectAll('option')
       .filter( d => d === 'select dataset')
       .remove();
+    _init = false;
   }
 }

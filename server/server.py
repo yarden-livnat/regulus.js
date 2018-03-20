@@ -32,15 +32,15 @@ def catalog():
 
 @app.route('/data/<path:path>')
 def data(path):
-    filename = Path(path).with_suffix('.json')
+    filename = path+'.json'
     print('dataset', filename)
-    return static_file(str(filename), root=str(data_dir))
+    return static_file(filename, root=str(data_dir))
 
 @app.post('/resample')
 def resample():
     #print('data_dir', data_dir)
     spec = request.json
-    print(spec['version'])
+
     print('resample request received')#, spec)
 
     sample.createsample(spec,data_dir)
