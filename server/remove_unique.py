@@ -8,6 +8,7 @@ def remove_duplicates(input):
         header = next(reader)
         data = [[float(x) for x in row] for row in reader]
 
+
     arr = np.asarray(data)
     x = arr[:, 0:-1]
     [a, b] = np.unique(x, axis=0, return_index=1)

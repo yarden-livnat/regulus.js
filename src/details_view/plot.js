@@ -153,6 +153,7 @@ export default function Plot() {
         .attr('class', 'plot')
 
 
+
     selection.append('canvas')
       .attr('class', 'canvas-bg')
         .attr('width', width)
