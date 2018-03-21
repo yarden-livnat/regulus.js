@@ -25,7 +25,7 @@ def static(filename='index.html'):
 def catalog():
     files = [str(f.stem) for f in sorted(data_dir.glob('*.json'))]
     print(files)
-    return json.dumps(files);
+    return json.dumps(files)
     #return json.dumps(['deployment']);
 
 
