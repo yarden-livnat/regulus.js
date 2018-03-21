@@ -1,6 +1,7 @@
 
 body {
   font: 10pt Arial;
+  padding: 10px;
 
 }
 body text {
@@ -47,18 +48,38 @@ body text {
 
 
 #dataset_view {
-  flex: 0 1 auto;
+  /*flex: 0 1 auto;*/
 }
 
 #partition_view {
-  flex: 0 1 auto;
+  /*flex: 0 1 auto;*/
 }
 
 #controls_view {
-  flex: 0 1 auto;
+  /*flex: 0 1 auto;*/
 }
 
 #resample_view {
-  flex: 1 0 0;
+  /*flex: 1 0 0;*/
   max-width: 250px;
+}
+
+.partition_view {
+  width: 100%;
+}
+
+.tree_view {
+  width: 100%;
+}
+
+.controls {
+  width: 100;
+}
+
+.details {
+  width: 100%;
+}
+
+.resample {
+  width: 100%;
 }

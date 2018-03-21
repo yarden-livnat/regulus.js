@@ -19,7 +19,7 @@ let prevent = false;
 let saved = [0, 0];
 
 export function setup(el) {
-  root = typeof el === 'string' && d3.select(el) || el;
+  root = d3.select(el); //typeof el === 'string' && d3.select(el) || el;
   root.classed('tree_view', true);
   root.html(template);
 
