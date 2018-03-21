@@ -15,8 +15,7 @@ let sy = d3.scaleLinear();
 
 
 export function setup(el) {
-  root = d3.select(el); // typeof el === 'string' && d3.select(el) || el;
-  root.classed('controls_view', true);
+  root = d3.select(el);
   root.html(template);
 
   chart.on('range', range => {

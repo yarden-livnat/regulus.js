@@ -83,24 +83,22 @@ export default function Lifeline() {
 
     let enter = d3nodes.enter()
       .append('rect')
-      .attr('class', 'node')
-      .on('mouseenter', d => hover(d, true))
-      .on('mouseleave', d => hover(d, false))
-      .on('click', ensure_single(details))
-      .on('dblclick', select)
+        .attr('class', 'node')
+        .on('mouseenter', d => hover(d, true))
+        .on('mouseleave', d => hover(d, false))
+        .on('click', ensure_single(details))
+        .on('dblclick', select)
       .merge(d3nodes)
-      .attr('x', d => sx(d.pos.x))
-      .attr('y', d => sy(d.pos.yp))
-      .attr('width', d => sx(d.pos.x + d.pos.w) - sx(d.pos.x))
-      .attr('height', d => sy(d.pos.y) - sy(d.pos.yp))
-      .classed('highlight', d => d.highlight)
-      .classed('selected', d => d.selected)
-      .classed('details', d => d.details);
+        .attr('x', d => sx(d.pos.x))
+        .attr('y', d => sy(d.pos.yp))
+        .attr('width', d => sx(d.pos.x + d.pos.w) - sx(d.pos.x))
+        .attr('height', d => sy(d.pos.y) - sy(d.pos.yp))
+        .classed('highlight', d => d.highlight)
+        .classed('selected', d => d.selected)
+        .classed('details', d => d.details);
 
     d3nodes.exit().remove();
 
-    // show id and names of partitioned that are also in detailed
-    // if there's enought space
     render_names(items.filter(d => d.details || d.highlight || d.selected ));
   }
 
@@ -126,6 +124,7 @@ export default function Lifeline() {
   }
 
   function lifeline(selection) {
+    console.log('lifeline', width, height);
     svg = selection
       .append('svg')
         .attr('class', 'lifeline')
@@ -133,20 +132,15 @@ export default function Lifeline() {
         .attr('height', height + margin.top + margin.bottom)
       .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
-
     svg.append('g')
       .attr('class', 'nodes');
 
     svg.append('g')
       .attr('class', 'names');
 
-    // svg.append('g')
-    //   .attr('class', 'edges');
-
     svg.append('g')
       .attr('class', 'x axis')
       .attr('transform', `translate(0,${height})`);
-      // .call(d3.axisBottom(pt_scale));
 
     svg.append('text')
       .attr('transform', `translate(${width/2},${height + margin.top + 20})`)
@@ -182,17 +176,12 @@ export default function Lifeline() {
   };
 
   lifeline.highlight = function(node, on) {
-    // svg.selectAll('.node').data([node], d => d.id)
-    //   .classed('highlight', on);
     node.highlight = on;
     if (on) render_names();
     return this;
   };
 
   lifeline.details = function(node, on) {
-    // svg.selectAll('.node').data([node], d => d.id)
-    //   .classed('details', on);
-    // console.log('tree.details:', node, on, node.details);
     node.details = on;
     render();
     return this;
@@ -201,9 +190,6 @@ export default function Lifeline() {
   lifeline.selected = function(node, on) {
     if (selected) selected.selected = false;
     selected = on && node;
-    // svg.selectAll('.node').data([node], d => d.id)
-    //   .classed('details', on);
-    // console.log('tree.details:', node, on, node.details);
     node.selected = on;
     render();
     return this;
@@ -239,6 +225,35 @@ export default function Lifeline() {
     range = _;
     sy.domain(range);
     render();
+    return this;
+  };
+
+  lifeline.set_size = function(w, h) {
+    width = w - margin.left - margin.right;
+    height = h - margin.top - margin.bottom;
+    console.log('lifeline set_size', width, height, w, h);
+
+    pt_scale.range([0, width]);
+    sx.range([0, width]);
+    sy.range([height, 0]);
+
+    if (svg) {
+      d3.select(svg.node().parentNode)
+        .attr('width', w)
+        .attr('height', h);
+
+      svg.select('.x')
+        .attr('transform', `translate(0,${height})`);
+
+      svg.select('.x text')
+        .attr('transform', `translate(${width / 2},${height + margin.top + 20})`);
+
+      svg.select('.y text')
+        .attr('y', 0 - margin.left)
+        .attr('x', 0 - (height / 2));
+
+      render();
+    }
     return this;
   };
 

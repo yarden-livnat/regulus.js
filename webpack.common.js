@@ -5,7 +5,7 @@ const CleanCSSPlugin = require("less-plugin-clean-css");
 
 module.exports = {
   entry: {
-    app: './src/app/app2.js'
+    app: './src/app/app.js'
   },
   optimization: {
     splitChunks: {

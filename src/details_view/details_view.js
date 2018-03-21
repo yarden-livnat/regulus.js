@@ -51,7 +51,7 @@ let plot_filter = null;
 
 export function setup(el) {
   root = d3.select(el); //typeof el === 'string' && d3.select(el) || el;
-  root.classed('details', true);
+  // root.classed('details, component', true);
   root.html(template);
 
   root.select('.config').select('#color-by')

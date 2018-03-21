@@ -1,5 +1,5 @@
 // Color variables (appears count calculates by raw css)
-@color0: white; //#e1e1e1; // Appears 3 times
+@color0: #fafafa; //#e1e1e1; // Appears 3 times
 @color1: #000000; // Appears 4 times  *** tab fg color
 @color2: #cccccc; // Appears 3 times *** frame around container
 @color3: black; //#777777; // Appears 2 times
@@ -9,10 +9,10 @@
 @color6: #452500; // Appears 1 time
 @color7: #fafafa; // Appears 1 time
 @color8: #999999; // Appears 1 time
-@color9: lightblue;//#bbbbbb; // Appears 1 time
+@color9: #bbbbbb; // Appears 1 time
 @color10: #888888; // Appears 1 time
 
-@tab_bg: lightblue;
+@tab_bg: white;
 @tab_bg_nonactive: softlight(lightblue, #000);
 
 // ".lm_dragging" is applied to BODY tag during Drag and is also directly applied to the root of the object being dragged
@@ -25,7 +25,7 @@
 
 // Single Pane content (area in which final dragged content is contained)
 .lm_content {
-  background: @color0;
+  //background: @color0;
   border: 1px solid @color2;
 }
 
@@ -68,6 +68,7 @@
 .lm_header {
   height: 20px;
   //user-select:none;       // Present in DARK Theme
+  background-color: lightblue;
 
   &.lm_selectable {
     cursor: pointer;
