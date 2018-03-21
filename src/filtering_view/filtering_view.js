@@ -15,7 +15,7 @@ let sy = d3.scaleLinear();
 
 
 export function setup(el) {
-  root = typeof el === 'string' && d3.select(el) || el;
+  root = d3.select(el); // typeof el === 'string' && d3.select(el) || el;
   root.classed('controls_view', true);
   root.html(template);
 

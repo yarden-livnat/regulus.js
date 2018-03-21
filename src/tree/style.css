@@ -1,11 +1,11 @@
-.tree_view {
-  display: block;
-}
+/*.tree_view {*/
+  /*display: block;*/
+/*}*/
 
-.tree_view .header {
-  background: lightblue;
-  width: 100%
-}
+/*.tree_view .header {*/
+  /*background: lightblue;*/
+  /*width: 100%*/
+/*}*/
 
 .tree_view .tree {
   max-height: 510px;

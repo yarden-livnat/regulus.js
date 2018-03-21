@@ -13,6 +13,7 @@ import * as resample_view from '../resample_view';
 
 import './style.css';
 
+
 // let socket = new WebSocket('find the current url');
 
 setup();

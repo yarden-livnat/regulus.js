@@ -1,11 +1,11 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-
+const CleanCSSPlugin = require("less-plugin-clean-css");
 
 module.exports = {
   entry: {
-    app: './src/app/app.js'
+    app: './src/app/app2.js'
   },
   optimization: {
     splitChunks: {
@@ -26,6 +26,9 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader']
+      },
       {
         test: /\.css$/,  use: [ 'style-loader', 'css-loader' ]
       },

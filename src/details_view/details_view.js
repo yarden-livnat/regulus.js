@@ -50,7 +50,7 @@ let plot_filter = null;
 // TODO: simplify or break up code
 
 export function setup(el) {
-  root = typeof el === 'string' && d3.select(el) || el;
+  root = d3.select(el); //typeof el === 'string' && d3.select(el) || el;
   root.classed('details', true);
   root.html(template);
 

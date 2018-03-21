@@ -3,7 +3,7 @@ from bottle import Bottle, run, static_file, post, request
 from pathlib import Path
 import json
 import argparse
-
+from sample import createsample
 
 p = argparse.ArgumentParser(description='Regulus server')
 p.add_argument('-d', '--data', default=None, help='data directory')
@@ -23,10 +23,10 @@ def static(filename='index.html'):
 
 @app.route('/catalog')
 def catalog():
+
     files = [str(f.stem) for f in sorted(data_dir.glob('*.json'))]
     print(files)
-    return json.dumps(files)
-    #return json.dumps(['deployment']);
+    return json.dumps(files);
 
 
 @app.route('/data/<path:path>')
@@ -35,11 +35,13 @@ def data(path):
     print('dataset', filename)
     return static_file(filename, root=str(data_dir))
 
-
 @app.post('/resample')
 def resample():
+    #print('data_dir', data_dir)
     spec = request.json
-    print('resample', spec)
+    print('resample request received', spec)
+    createsample(spec,data_dir)
+    #print('resample', spec)
     return
 
 
