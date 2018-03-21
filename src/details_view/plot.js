@@ -150,7 +150,7 @@ export default function Plot() {
   plot.create = function(selection) {
     let t0 = performance.now();
     selection
-        .attr('class', 'plot');
+        .attr('class', 'plot')
 
 
     selection.append('canvas')

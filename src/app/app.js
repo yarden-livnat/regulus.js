@@ -13,6 +13,8 @@ import * as resample_view from '../resample_view';
 
 import './style.css';
 
+// let socket = new WebSocket('find the current url');
+
 setup();
 init();
 
@@ -27,4 +29,8 @@ function setup() {
 
 function init() {
   dataset_view.init();
+
+  // socket.onmessage = function(event) {
+  //   console.log('received socket message');
+  // }
 }

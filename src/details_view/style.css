@@ -163,7 +163,7 @@
 
 .details .plot .brush .selection {
   fill: lightgray;
-  fill-opacity: 0.1;
+  fill-opacity: 0;
   stroke: black;
   stroke-width: 1px;
 }
