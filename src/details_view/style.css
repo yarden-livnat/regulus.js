@@ -1,3 +1,7 @@
+.details {
+  padding: 5px;
+}
+
 .details .config {
   border-bottom: 1px solid gray;
   padding: 2px 0 5px 0;

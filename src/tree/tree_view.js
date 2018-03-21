@@ -17,22 +17,27 @@ let y_range = [1e-5, 1];
 let slider = Slider();
 let prevent = false;
 let saved = [0, 0];
+// let tw = 0;
+// let th = 0;
 
 export function setup(el) {
-  root = d3.select(el); //typeof el === 'string' && d3.select(el) || el;
-  root.classed('tree_view', true);
+  root = d3.select(el);
   root.html(template);
 
   root.select('#tree-y-type')
     .on('change', select_y_type)
     .property('value', y_type);
 
-  tree(root.select('.tree'))
+  resize();
+  // console.log('\tsetup', tw, th);
+
+  root.select('.tree').call(tree
+    // .set_size(tw, th)
     .on('highlight', (node, on) => publish('partition.highlight', node, on))
     .on('select', (node, on) => publish('partition.selected', node, on))
     .on('details', (node, on) => publish('partition.details', node, on))
     .y_type(y_type)
-    .y_min(y_min);
+    .y_min(y_min));
 
 
   slider
@@ -50,6 +55,34 @@ export function setup(el) {
   subscribe('data.updated', () => tree.update());
 }
 
+export function set_size(w, h) {
+  // console.log('tree set_size', w, h, !!root);
+
+  if (root) {
+    resize();
+    // let rw = parseInt(root.style('width'));
+    // let rh = parseInt(root.style('height'));
+    // let cw = parseInt(root.select('.config').style('width'));
+    // let ch = parseInt(root.select('.config').style('height'));
+    // tw = rw;
+    // th = rh - ch;
+    // console.log('tw/th', tw, th);
+    // root.select('.tree svg')
+    //   .attr('width', tw)
+    //   .attr('height', th);
+    // tree.set_size(tw, th);
+  }
+
+}
+
+function resize() {
+  let rw = parseInt(root.style('width'));
+  let rh = parseInt(root.style('height'));
+  // let cw = parseInt(root.select('.config').style('width'));
+  let ch = parseInt(root.select('.config').style('height'));
+
+  tree.set_size(rw, rh - ch);
+}
 
 function reset(data) {
   msc = data;

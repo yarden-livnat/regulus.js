@@ -1,8 +1,8 @@
 
 let config = {
-  plot_width: 150,
-  plot_height: 100,
-  group_size: 120,
+  plot_width: 80,
+  plot_height: 280,
+  group_size: 300,
   group_offset: 0,
 
   pt_radius: 2,

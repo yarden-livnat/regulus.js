@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import {inverseMultipleRegression, averageStd, linspace, fun as kernel, subLinearSpace} from '../statistics/regression';
 
-let default_bandwidth = 0.1;
+let bandwidth_factor = 0.1;
 
 
 export default class Partition {
@@ -50,7 +50,6 @@ export default class Partition {
       for (let i = this.pts_idx[0]; i < to; i++) {
         pts.push(msc_pts[msc_idx[i]]);
       }
-
       pts.push(msc_pts[msc_idx[this.minmax_idx[0]]]);
       pts.push(msc_pts[msc_idx[this.minmax_idx[1]]]);
 
@@ -74,7 +73,7 @@ export default class Partition {
           name: attr.name,
           type: attr.type,
           measure: attr.name === this.measure_name,
-          n: values.length,
+          n: values.length+2,
           quantile: [
             d3.quantile(values, 0.25),
             d3.quantile(values, 0.5),
@@ -93,14 +92,12 @@ export default class Partition {
       let t0 = performance.now();
       let current_measure = this.msc.measure; //
 
-      // todo: consider adding the min/max points
-      //       maybe only if they are not too dissimilar from the rest of the points
       let dims = this.pts.map( pt => this.msc.dims.map( d => pt[d.name] ));
       let measure = this.pts.map( pt => pt[current_measure.name]);
 
       let t1 = performance.now();
       let extent = current_measure.extent;
-      let bandwidth = default_bandwidth * (extent[1] - extent[0]);
+      let bandwidth = bandwidth_factor * (extent[1] - extent[0]);
 
       let py = subLinearSpace(this.minmax, extent, 100);
       this.inversse_regression_curve = inverseMultipleRegression(dims, measure, kernel.gaussian, bandwidth);

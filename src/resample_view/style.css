@@ -1,7 +1,8 @@
 .resample {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  max-width: 250px;
-  width: 200px;
+  /*max-width: 250px;*/
+  /*width: 200px;*/
+  padding: 5px
 }
 
 .resample .params label {

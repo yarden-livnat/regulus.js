@@ -16,12 +16,10 @@ let n_samples = 0;
 
 let queue= [];
 
-
 let format = d3.format('.2g');
 
 export function setup(el) {
-  root = d3.select(el); //typeof el === 'string' && d3.select(el) || el;
-  root.classed('resample', true);
+  root = d3.select(el);
   root.html(template);
 
 

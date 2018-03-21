@@ -1,19 +1,14 @@
 /*.tree_view {*/
-  /*display: block;*/
+  /*display: table;*/
+  /*width: 100%;*/
+  /*height: 100%;*/
 /*}*/
 
-/*.tree_view .header {*/
-  /*background: lightblue;*/
-  /*width: 100%*/
+/*.tree_view .config {*/
+  /*display: table-row;*/
 /*}*/
 
-.tree_view .tree {
-  max-height: 510px;
-  overflow: auto;
-}
-
-#persistence-slider {
-  /*width: 200px;*/
-  /*height: 50px;*/
-}
-
+/*.tree_view .tree {*/
+  /*display: table-row;*/
+  /*height: 100%;*/
+/*}*/

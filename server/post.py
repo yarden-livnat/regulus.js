@@ -94,7 +94,7 @@ class Post(object):
                 self.check_partition(p)
             self.add(p)
 
-        self.find_unique()
+        # self.find_unique()
         self.remove_non_unique()
 
         self.merges.sort(key=lambda m: (m.level, m.src))
@@ -146,8 +146,9 @@ class Post(object):
             raise RuntimeError('Error: found {} roots'.format(len(self.active)))
 
         self.root = self.active.pop()
-        self.root.extrema.extend([self.root.min_idx, self.root.max_idx])
+        # self.root.extrema.extend([self.root.min_idx, self.root.max_idx])
         self.visit(self.root, 0)
+        self.pts.extend([self.root.min_idx, self.root.max_idx])
         self.rename(self.root, 0)
         return self
 
@@ -367,7 +368,10 @@ class Post(object):
                     print('*** duplicate extrema')
                 else:
                     pts.add(p)
-                    del self.all[p]
+                    if p in self.all:
+                        del self.all[p]
+                    else:
+                        print('{} not in app'.format(p))
             if len(node.children) > 0:
                 for child in node.children:
                     self.sanity_check(child, pts)
@@ -458,7 +462,7 @@ def post(args=None):
 
     available = set(catalog['msc'])
     if ns.single is not None:
-        mscs = [];
+        mscs = []
 
     for measure in measures:
         try:
@@ -467,6 +471,7 @@ def post(args=None):
             y = data[:, measure]
             msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm)
             msc.build(X=x, Y=y, names=header[:dims]+[name])
+            msc.save('hierarchy.csv', 'partition.json')
 
             if ns.single is not None:
                 Post(ns.debug)\

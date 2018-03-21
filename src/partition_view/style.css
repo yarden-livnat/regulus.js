@@ -1,7 +1,6 @@
-
-/*.partition_view div + div {*/
-  /*margin-top: 0.5em;*/
-/*}*/
+.partition_view {
+  padding: 5px;
+}
 
 .partition_view .partition_id.highlight {
   background-color: lightgray;

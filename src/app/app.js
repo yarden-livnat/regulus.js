@@ -1,8 +1,6 @@
-import * as service from "./service";
-import {MultiMSC} from '../model/multi_msc';
-import {publish, subscribe} from '../utils/pubsub';
 
-import Panel from '../panel/panel';
+import * as layout from './layout';
+import Component from '../components/component'
 
 import * as dataset_view from '../dataset_view';
 import * as details_view from '../details_view';
@@ -11,27 +9,39 @@ import * as partition_view from '../partition_view';
 import * as controls_view from '../filtering_view';
 import * as resample_view from '../resample_view';
 
+import '../style/fontawesome-all.min';
 import './style.css';
 
 
-// let socket = new WebSocket('find the current url');
+
 
 setup();
 init();
 
 function setup() {
-  dataset_view.setup( Panel('Dataset')('#dataset_view').content());
-  details_view.setup( Panel('Details')('#details_view').content());
-  tree_view.setup(Panel('Topology')('#tree_view').content());
-  partition_view.setup(Panel('Partition')('#partition_view').content());
-  controls_view.setup(Panel('Filtering')('#controls_view').content());
-  resample_view.setup(Panel('Resample')('#resample_view').content());
+  dataset_view.setup('#dataset_view');
+
+  layout.register('partition', Component(partition_view));
+  layout.register('topology', Component(tree_view));
+  layout.register('filtering', Component(controls_view));
+  layout.register('details', Component(details_view));
+  layout.register('resample', Component(resample_view));
+
+  layout.init();
+
+  // let addMenuItem = function( text ) {
+  //   let element = $( '<li>' + text + '</li>' );
+  //   $( '#menuContainer' ).append( element );
+  //
+  //   //insertion code will go here
+  // };
+
+  // addMenuItem( 'User added component A' );
+  // addMenuItem( 'User added component B' );
 }
 
 function init() {
   dataset_view.init();
-
-  // socket.onmessage = function(event) {
-  //   console.log('received socket message');
-  // }
 }
+
+
