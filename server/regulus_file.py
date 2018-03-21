@@ -3,7 +3,9 @@ import csv
 from pathlib import Path
 
 
-class regulus_file(object):
+
+class RegulusFile(object):
+
     def __init__(self, name = '', version = '1.0', dims = [], measures = [], pts = [], mscs = [], notes = ''):
         self.name = name
         self.dims = dims

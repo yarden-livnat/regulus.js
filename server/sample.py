@@ -1,7 +1,8 @@
 import subprocess
 import threading
 import testfun
-from regulus_file import regulus_file
+
+from regulus_file import RegulusFile
 
 def sample_in_thread(reg_file):
 
@@ -42,7 +43,7 @@ def sample_in_thread(reg_file):
 def createsample(received, data_dir):
     if received is not None:
 
-        reg_file = regulus_file()
+        reg_file = RegulusFile()
         reg_file.load_reg_json(spec= received, dir = data_dir)
         reg_file.update(spec = received)
 
