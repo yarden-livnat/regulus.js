@@ -95,7 +95,7 @@ def sim(args=None):
             os.system('rm ' + db)
             print('\tcreate...', end="")
             t = time.time()
-            ##scenario, params = generator.author()
+
             scenario, params = generator.buthor(data[j])
 
             save(xml_filename, scenario)
@@ -117,7 +117,7 @@ def sim(args=None):
             values = measures.compute(db)
             print("{:.1f}".format(time.time() - t))
 
-            with open(path / ns.report, 'a') as f:
+            with open(path / ns.report, 'w') as f:
                 report = csv.writer(f)
                 report.writerow(params + values)
 

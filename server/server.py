@@ -3,8 +3,7 @@ from bottle import Bottle, run, static_file, post, request
 from pathlib import Path
 import json
 import argparse
-import sample
-# import rerunsim func as module
+from sample import createsample
 
 p = argparse.ArgumentParser(description='Regulus server')
 p.add_argument('-d', '--data', default=None, help='data directory')
@@ -40,10 +39,8 @@ def data(path):
 def resample():
     #print('data_dir', data_dir)
     spec = request.json
-
-    print('resample request received')#, spec)
-
-    sample.createsample(spec,data_dir)
+    print('resample request received', spec)
+    createsample(spec,data_dir)
     #print('resample', spec)
     return
 

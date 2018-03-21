@@ -1,10 +1,13 @@
 import numpy as np
 import csv
-def load(input):
+from sys import argv
+
+def remove_duplicates(input):
     with open(input) as f:
         reader = csv.reader(f)
         header = next(reader)
         data = [[float(x) for x in row] for row in reader]
+
     arr = np.asarray(data)
     x = arr[:, 0:-1]
     [a, b] = np.unique(x, axis=0, return_index=1)
@@ -18,3 +21,6 @@ def load(input):
         report.writerows(unique_data)
 
     return fname
+
+if __name__ == '__main__':
+    remove_duplicates(argv[1])

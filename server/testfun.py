@@ -38,5 +38,5 @@ def savefile(out,sim_dir, sim_out):
     np.savetxt(sim_dir +'/'+ sim_out, out, header='X1,X2,X3,X4,Y', delimiter=",", comments='')
 
 def load_input(input):
-    my_data = np.asarray(input)#np.genfromtxt(input, skip_header=1 ,delimiter=',')
+    my_data = np.asarray(input)
     return my_data
