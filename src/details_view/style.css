@@ -20,6 +20,8 @@
   margin-left: 110px;
   display: flex;
   flex-direction: row;
+  /*width: 100%;*/
+  box-sizing: border-box;
 }
 
 .details_view .dims .dim {

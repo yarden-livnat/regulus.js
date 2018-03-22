@@ -60,7 +60,7 @@ let config = {
 
 
 let state = null; //localStorage.getItem('layout.state');
-let layout = new GoldenLayout( state && JSON.parse(state) || config);//, $('#layoutContainer'));
+let layout = new GoldenLayout( state && JSON.parse(state) || config, $('#layoutContainer'));
 
 layout.on('stateChanged', save);
 

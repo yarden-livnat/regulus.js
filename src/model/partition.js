@@ -50,8 +50,8 @@ export default class Partition {
       for (let i = this.pts_idx[0]; i < to; i++) {
         pts.push(msc_pts[msc_idx[i]]);
       }
-      pts.push(msc_pts[msc_idx[this.minmax_idx[0]]]);
-      pts.push(msc_pts[msc_idx[this.minmax_idx[1]]]);
+      pts.push(msc_pts[this.minmax_idx[0]]);
+      pts.push(msc_pts[this.minmax_idx[1]]);
 
       this._pts = pts;
       let t1 = performance.now();

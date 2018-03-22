@@ -28,16 +28,6 @@ function setup() {
   layout.register('resample', Component(resample_view));
 
   layout.init();
-
-  // let addMenuItem = function( text ) {
-  //   let element = $( '<li>' + text + '</li>' );
-  //   $( '#menuContainer' ).append( element );
-  //
-  //   //insertion code will go here
-  // };
-
-  // addMenuItem( 'User added component A' );
-  // addMenuItem( 'User added component B' );
 }
 
 function init() {
