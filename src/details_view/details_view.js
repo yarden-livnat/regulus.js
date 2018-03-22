@@ -22,6 +22,7 @@ let measure = null;
 let selected = null;
 let highlight = null;
 
+let width = 0, height = 0;
 
 let initial_cmap = 'RdYlBu';
 let color_by = null;
@@ -95,29 +96,36 @@ function resize() {
   let cw = parseInt(root.select('.config').style('width'));
   let ch = parseInt(root.select('.config').style('height'));
 
-  console.log('details resize', rw, rh-ch);
-  if (partitions.length >0) {
-    let g = root.select('.group');
-    let gw = parseInt(g.style('width'));
-    let gh = parseInt(g.style('height'));
+  let dw = parseInt(root.select('.dims').style('width'));
+  let dh = parseInt(root.select('.dims').style('height'));
 
-    let dh = parseInt(root.select('.dims').style('height'));
+  // console.log('bbox: ',d3.select('.dims').node().getBoundingClientRect());
+  console.log('details resize', width, height, rw, rh - ch-dh, dw, dh, 'set to:', dw,Math.max(partitions.length * config.group_size, height) );
+  // console.log('set to:',Math.max(dims.length * (config.plot_width+10) + 100, gw));
+  // if (partitions.length >0) {
+  //   let g = root.select('.group');
+  //   gw = parseInt(g.style('width'));
+  //   // let gh = parseInt(g.style('height'));
+  //   //
+  //   // let dh = parseInt(root.select('.dims').style('height'));
+  // }
 
     // root.select('.details')
     //   .attr('width', gw)
     //   .attr('height', partitions.length * config.group_size + dh)
     //   .attr('max-width', rw).attr('max-height', rh-ch);
 
-    console.log(config.group_size);
     root.select('.groups')
-      .style('width', `${gw}px`)
-      .style('height', `${partitions.length * config.group_size}px`);
-  }
+      .style('width', `${Math.max(dims.length * (config.plot_width+10) + 100, dw)}px`)
+      .style('height', `${rh-ch-dh-35}px`);
+  // }
 
 }
 
 export function set_size(w, h) {
   console.log('details set_size', w, h);
+  width = w;
+  height = h;
   if (root)
     resize();
 }
@@ -160,6 +168,8 @@ function reset(data) {
   colors.exit().remove();
 
   select_color(color_by_opt);
+
+  resize();
 }
 
 function on_highlight(partition, on) {
