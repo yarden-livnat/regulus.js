@@ -4,7 +4,12 @@ dist
 lib
 data
 sim
-old_datas
+hdviz_data
+deploy_data
+new_data
+test
+temp
+new_sample_inputs.csv
 
 node_modules
 .cache
