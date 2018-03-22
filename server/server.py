@@ -53,7 +53,5 @@ def resample():
     print('resample request received', spec)
     createsample(spec,data_dir)
 
-
-
 run(app, host='localhost', port=8081, debug=True, reloader=True)
 
