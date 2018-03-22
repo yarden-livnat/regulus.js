@@ -4,6 +4,8 @@ import csv
 import argparse
 from pathlib import Path
 from collections import defaultdict
+from datetime import date
+from getpass import getuser
 
 from topopy.MorseSmaleComplex import MorseSmaleComplex as MSC
 
@@ -14,6 +16,7 @@ class Merge(object):
         self.is_max = is_max
         self.src = src
         self.dest = dest
+
 
 class Partition(object):
     _id_generator = -1
@@ -27,17 +30,18 @@ class Partition(object):
     def reset():
         Partition._id_generator = -1
 
-    def __init__(self, persistence, base_pts=None, min_idx=None, max_idx=None, child=None):
+    def __init__(self, persistence, base_pts=None, min_idx=None, max_idx=None, child=None, is_max=None):
         self.id = Partition.gen_id()
         self.persistence = persistence
         self.span = []
         self.parent = None
         self.children = []
 
-        self.extrema = []
+        self.extrema = None
         self.base_pts = base_pts if base_pts is not None else []
         self.min_idx = min_idx
         self.max_idx = max_idx
+        self.is_max_merge = is_max
 
         if child is not None:
             self.min_idx = child.min_idx
@@ -48,6 +52,9 @@ class Partition(object):
     def add_child(self, child):
         child.parent = self
         self.children.append(child)
+        if child.min_idx != self.min_idx and child.max_idx != self.max_idx:
+            print("ERROR: child {} [{} {}] merged into parent {} [{} {}] without a matching extrema".format(child.id,
+                    child.min_idx, child.max_id, self.id, self.min_idx, self.max_idx))
 
 
 class Post(object):
@@ -65,6 +72,7 @@ class Post(object):
         self.unique = set()
         self.all = dict()
         self.data_pts = []
+        self.single = 0
 
     def load(self, path):
         with open(path / 'Base_Partition.json') as f:
@@ -119,14 +127,11 @@ class Post(object):
     def build(self):
         self.prepare()
         for merge in self.merges:
-            # print(merge.level, merge.is_max, merge.src, merge.dest)
+            print(merge.level, merge.is_max, merge.src, merge.dest)
             if merge.src == merge.dest:
                 continue
-            # if merge.src in [1399] or merge.dest in [1399]:
-            #     print('related merge')
-            # merge.dest may have been merged already (same persistence level: degenerate)
-            # if merge.src == 832 and merge.dest == 37:
-            #     print('check')
+
+            # merge.dest may have been merged already (same persistence level: degenerate case)
             dest = merge.dest
             while dest in self.mapping:
                 dest = self.mapping[dest]
@@ -146,8 +151,11 @@ class Post(object):
             raise RuntimeError('Error: found {} roots'.format(len(self.active)))
 
         self.root = self.active.pop()
-        # self.root.extrema.extend([self.root.min_idx, self.root.max_idx])
+
+        self.single = 0
         self.visit(self.root, 0)
+        print('found {} singles'.format(self.single))
+
         self.pts.extend([self.root.min_idx, self.root.max_idx])
         self.rename(self.root, 0)
         return self
@@ -178,8 +186,6 @@ class Post(object):
         add = []
         remove = set()
 
-        # if merge.src in [8410] or merge.dest in [8410]:
-        #     print('related merge')
         for d in idx_map[merge.dest]:
             n = None
             remove_src = set()
@@ -189,16 +195,13 @@ class Post(object):
                         # s is an intermediate and should be absorbed
                         if len(s.children) == 0:
                             # s is a base partition
-                            for p in s.base_pts:
-                                if p in d.base_pts:
-                                    print('*** adding duplicated base pts')
                             d.base_pts.extend(s.base_pts)
                         else:
                             for child in s.children:
                                 d.add_child(child)
                     else:
                         if n is None:
-                            n = Partition(merge.level, child=d)
+                            n = Partition(merge.level, child=d, is_max=merge.is_max)
                             remove.add(d)  # can't be removed during the iterations
                             add.append(n)
                         n.add_child(s)
@@ -223,7 +226,9 @@ class Post(object):
                 target = add[0]
             else:
                 target = next(iter(idx_map[merge.dest]))
-            target.extrema.append(merge.src)
+            if target.extrema is not None:
+                print("*** target ({}) extrema is not empty: {}".format(target.id, target.extrema))
+            target.extrema = merge.src
 
         for n in add:
             self.add(n)
@@ -250,8 +255,13 @@ class Post(object):
                 self.pts.extend(add)
                 idx += len(add)
         else:
-            self.pts.extend(partition.extrema)
-            idx += len(partition.extrema)
+            if len(partition.children) == 1:
+                self.single += 1
+
+            if partition.extrema is not None:
+                self.pts.append(partition.extrema)
+                idx += 1
+
             for child in partition.children:
                 idx = self.visit(child, idx)
 
@@ -270,41 +280,28 @@ class Post(object):
     # save
     #
 
-    def save(self, path, name, k):
+    def get_tree(self, name, params=''):
         partitions = []
         self.collect(self.root, partitions)
         tree = {
             'name': name,
-            'params': '-k '+ str(k),
+            'params': params,
             'partitions': partitions,
             'pts_idx': self.pts
         }
+        return tree
+
+    def save(self, path, name, params):
+        tree = self.get_tree(name, params)
         filename = name + ".json"
         with open(path / filename, 'w') as f:
             json.dump(tree, f)
-
-    def save_in_class(self, path, name, k,mscs):
-        partitions = []
-        self.collect(self.root, partitions)
-        tree = {
-            'name': name,
-            'params': '-k '+ str(k),
-            'partitions': partitions,
-            'pts_idx': self.pts
-        }
-        #filename = name + ".json"
-        #with open(path / filename, 'w') as f:
-        #    json.dump(tree, f)
-        #self.mscs.append(tree)
-        mscs.append(tree)
-
 
     def collect(self, node, array):
         array.append({
             'id': node.id,
             'lvl': node.persistence,
             'span': [node.span[0], node.span[1]],
-            # 'extrema': node.extrema,
             'minmax_idx': [node.min_idx, node.max_idx],
             'parent': node.parent.id if node.parent is not None else None,
             'children': [child.id for child in node.children] if node.persistence > 0 else []
@@ -325,7 +322,6 @@ class Post(object):
     def verify(self):
         if self.debug:
             self.statistics()
-            self.sanity_check()
         return self
 
     def statistics(self):
@@ -348,182 +344,145 @@ class Post(object):
             for child in node.children:
                 self.stat(child, levels)
 
-    def count(self, partition):
-        if partition.persistence == 0:
-            return 0, 1
-        n = 1
-        b = 0
-        for child in partition.children:
-            n1, b1 = self.count(child)
-            n += n1
-            b += b1
-        return n, b
 
-    def sanity_check(self, node=None, pts=None):
-        if node is not None:
-            for p in node.extrema:
-                if p in self.unique:
-                    print('*** extrema in unique {} i node:{}'.format(p, node.id))
-                if p in pts:
-                    print('*** duplicate extrema')
-                else:
-                    pts.add(p)
-                    if p in self.all:
-                        del self.all[p]
-                    else:
-                        print('{} not in app'.format(p))
-            if len(node.children) > 0:
-                for child in node.children:
-                    self.sanity_check(child, pts)
-            elif node.base_pts is not None:
-                # pts.extend(node.base_pts)
-                for p in node.base_pts:
-                    if p in pts:
-                        print('*** duplicate base {} in partition id:{} lvl:{}, min:{} max:{}, extrema:{}'.format(p,
-                                node.id, node.persistence, node.min_idx, node.max_idx, node.extrema))
-                    else:
-                        pts.add(p)
-                        if p in self.all:
-                            del self.all[p]
-        else:
-            pts = set()
-            n = len(self.all)
-            self.sanity_check(self.root, pts)
-            print('**** sanity check. pts:{}  #base min/max: {} {}'.format(len(pts), n, len(self.all)))
-            for k, v in self.all.items():
-                print('*** [all] {}: {}'.format(k,v))
-            for p in self.all:
-                if p in pts:
-                    print('*** minmax {} is in pts', p)
-            # print('root min/max: {}  {}'.format(self.root.min_idx, self.root.max_idx))
+def create_from_csv(filename, name, ndims):
+    with open(filename) as f:
+        reader = csv.reader(f)
+        header = next(reader)
+        data = [[float(x) for x in row] for row in reader]
+
+        if ndims is None:
+            ndims = len(header) - 1
+
+        regulus = {
+            'name': name,
+            'version': '1',
+            'dims': header[0:ndims],
+            'measures': header[ndims:],
+            'notes': [{"date": str(date.today()), "author": getuser()}],
+            'pts': data,
+            'mscs': []
+        }
+        return regulus
+
+
+def load_regulus(filename):
+    with open(filename) as f:
+        regulus = json.load(f)
+        return regulus
+
+
+def save_regulus(filename, regulus):
+    with open(filename, 'w') as f:
+        json.dump(regulus, f, indent=2)
 
 
 def post(args=None):
     p = argparse.ArgumentParser(prog='analyze', description='Extract input dimension and a single measure')
-    p.add_argument('filename', help='input data file [.csv format]')
+    p.add_argument('filename', help='input file [.csv data file or a regulus .json file]')
     p.add_argument('-k', '--knn', type=int, default=100, help='knn')
     p.add_argument('-b', '--beta', type=float, default=1.0, help='beta')
     p.add_argument('-n', '--norm', default='feature', help='norm')
     p.add_argument('-g', '--gradient', default='steepest', help='gradient')
     p.add_argument('-G', '--graph', default='relaxed beta skeleton', help='graph')
 
-    p.add_argument('-j', '--single', type=int, default=None, help='Whether to save to multiple jsons')
-    p.add_argument('-t', '--temp', type=str, default=None, help='Whether a template from the previous version is used')
+    p.add_argument('--multiple', action='store_true', help='save to multiple jsons')
 
     p.add_argument('-d', '--dims', type=int, default=None, help='number of input dimensions')
     p.add_argument('-m', '--measure', default=None, help='measure name')
-    p.add_argument('-c', '--col', type=int, default=-1, help='measure column index starting at 0')
-    p.add_argument('-a', '--all', action='store_true', help='process all measures')
+    p.add_argument('-c', '--col', type=int, default=None, help='measure column index starting at 0')
 
     p.add_argument('--name', default=None, help='dataset name')
-
 
     p.add_argument('--debug', action='store_true', help='process all measures')
 
     ns = p.parse_args(args)
-    path = Path(ns.filename).parent
+    filename = Path(ns.filename)
+    path = filename.parent
 
-    with open(ns.filename) as f:
-        reader = csv.reader(f)
-        header = next(reader)
-        data = [[float(x) for x in row] for row in reader]
-
-    dims = ns.dims if ns.dims is not None else len(header) - 1
-    data2 = data[:]
-    data = np.array(data)
-    x = data[:, 0:dims]
-
+    catalog = {}
+    regulus = None
     measures = []
-    if ns.all:
-        measures = range(dims, len(header))
-    elif ns.measure:
-        if ns.measure in header:
-            measures = [header.index(ns.measure)]
-        else:
-            print('unknown measure:', ns.measure)
-            exit(255)
-    else:
-        measures = [ns.col]
 
-    catalog_path = path / 'catalog.json'
-    if catalog_path.exists():
-        with open(catalog_path) as f:
-            catalog = json.load(f)
+    if filename.suffix == '.csv':
+        regulus = create_from_csv(filename, ns.name or path.name or filename.stem, ns.dims)
+    elif filename.suffix == '.json':
+        regulus = load_regulus(filename)
+    else:
+        print('Unknown input file type')
+        exit(255)
+
+    ndims = len(regulus['dims'])
+
+    if ns.col is not None:
+        measures = regulus['measures'][ns.col:ns.col]
+    elif ns.measure is not None:
+        measures = [regulus['measures'].index(ns.measure)]
+    else:
+        measures = regulus['measures']
+
+    data = regulus['pts']
+    np_data = np.array(data)
+    x = np_data[:, 0:ndims]
+
+    if ns.multiple:
+        catalog_path = path / 'catalog.json'
+        if catalog_path.exists():
+            with open(catalog_path) as f:
+                catalog = json.load(f)
     else:
         catalog = {
-            'name': Path(ns.filename).parent,
-            'data': Path(ns.filename).name,
-            'dims': dims,
+            'name': filename.parent,
+            'data': filename.name,
+            'dims': ndims,
             'msc': []
         }
-
     if ns.name is not None:
         catalog['name'] = ns.name
 
     available = set(catalog['msc'])
-    if ns.single is not None:
-        mscs = []
+    mscs = dict()
+    for msc in regulus['mscs']:
+        mscs[msc['name']] = msc
 
-    for measure in measures:
+    params = '-k {} -b {} -n {} -G "{}" -g {}'.format(ns.knn, ns.beta, ns.norm, ns.graph, ns.gradient)
+
+    for i, measure in enumerate(measures):
         try:
-            name = header[measure]
-            print('\npost ', name)
-            y = data[:, measure]
+            print('\npost ', measure)
+            y = np_data[:, ndims+i]
             msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm)
-            msc.build(X=x, Y=y, names=header[:dims]+[name])
-            msc.save('hierarchy.csv', 'partition.json')
+            msc.build(X=x, Y=y, names=regulus['dims']+[measure])
+            if ns.debug:
+                msc.save(path/ (measure + '_hierarchy.csv'), path / (measure + '_partition.json'))
 
-            if ns.single is not None:
+            if ns.multiple:
                 Post(ns.debug)\
                     .data(y)\
                     .msc(msc.base_partitions, msc.hierarchy)\
                     .build()\
                     .verify()\
-                    .save_in_class(path, name, ns.knn, mscs)
-
+                    .save(path, measure, params)
             else:
-                Post(ns.debug)\
-                    .data(y)\
-                    .msc(msc.base_partitions, msc.hierarchy)\
-                    .build()\
-                    .verify()\
-                    .save(path, name, ns.knn)
-
-            available.add(name)
+                tree = Post(ns.debug) \
+                    .data(y) \
+                    .msc(msc.base_partitions, msc.hierarchy) \
+                    .build() \
+                    .verify() \
+                    .get_tree(measure, params)
+                mscs[measure] = tree
+            available.add(measure)
         except RuntimeError as error:
             print(error)
 
     catalog['msc'] = sorted(list(available))
 
-    if ns.temp is not None:
-        with open(ns.temp) as f:
-            temp = json.load(f)
-        temp['mscs'] = mscs
-        with open(ns.temp, 'w') as f:
-            json.dump(temp, f, indent=2)
-
-    elif ns.single is not None:
-        new_msc = path / (ns.name+'.json')
-
-        temp = {
-            'name': ns.name,
-            'version': '1.0',
-            'dims': header[0:dims],
-            'measures': [header[i] for i in measures],
-            'notes': [{"date": "03/17/18", "author": "yarden", "text": "new format"}],
-            'pts': data2,
-            'mscs': list(mscs)
-        }
-        with open(new_msc, 'w') as f:
-            json.dump(temp, f, indent=2)
-
+    if not ns.multiple:
+        regulus['mscs'] = list(mscs.values())
+        save_regulus(filename.with_suffix('.json'), regulus)
     else:
-        with open(catalog_path, 'w') as f:
+        with open(path / 'catalog.json', 'w') as f:
             json.dump(catalog, f, indent=2)
-
-    # msc.LoadData(ns.filename)
-    # msc.Save(path / 'Hierarchy.csv', path / 'Base_Partition.json')
-    # Post().load(path).build().rearrange().save(path / 'msc.json')
 
 
 if __name__ == '__main__':
