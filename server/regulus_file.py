@@ -7,9 +7,11 @@ from pathlib import Path
 class RegulusFile(object):
 
     def __init__(self, name = '', version = '1.0', dims = [], measures = [], pts = [], mscs = [], notes = ''):
+
         self.name = name
-        self.dims = dims
         self.version = version
+
+        self.dims = dims
         self.measures = measures
         self.pts = pts
         self.mscs = mscs
