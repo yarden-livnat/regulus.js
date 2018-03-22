@@ -1,57 +1,61 @@
-.details {
+.details_view {
   padding: 5px;
 }
 
-.details .config {
+.details_view .config {
   border-bottom: 1px solid gray;
   padding: 2px 0 5px 0;
   margin-bottom: 10px;
 }
 
-.details .brush .overlay {
+.details_view .brush .overlay {
   fill: aliceblue;
 }
-.details .brush .selection {
+.details_view .brush .selection {
   fill: limegreen;
   fill-opacity: 1;
 }
 
-.details .dims {
+.details_view .dims {
   margin-left: 110px;
   display: flex;
   flex-direction: row;
 }
 
-.details .dims .dim {
+.details_view .dims .dim {
   padding: 0;
   text-align: center;
 }
 
-.details .dims .dim label {
+.details_view .dims .dim label {
   /*background-color: beige;*/
   display: block;
 }
 
-.details .groups {
-  position: relative;
-}
-
-.details .group {
-  position: absolute;
-  display: flex;
-  flex-direction: row;
+.details_view .details {
   overflow: auto;
 }
 
-.details .group.highlight {
+.details_view .groups {
+  position: relative;
+}
+
+.details_view .group {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  /*overflow: auto;*/
+}
+
+.details_view .group.highlight {
   /*background-color: #f0f0f0;*/
 }
 
-.details .group.selected .plots {
+.details_view .group.selected .plots {
   background-color: lightblue;
 }
 
-.details .group .group-header {
+.details_view .group .group-header {
   display: flex;
   flex-direction: column;
   width: 3em;
@@ -63,74 +67,74 @@
   background-color: lightgreen;
 }
 
-.details .group.highlight .group-header {
+.details_view .group.highlight .group-header {
   background-color: lightgray;
 }
 
-.details .group.selected .group-header {
+.details_view .group.selected .group-header {
   stroke-width: 3px;
   stroke: lightgreen;
 }
 
-.details .group.edit .group-header {
+.details_view .group.edit .group-header {
   background-color: lightsalmon;
 }
 
-.details .group .header .size {
+.details_view .group .header .size {
   font-size: 8pt;
   font-style: italic;
 }
 
-.details .measure .name {
+.details_view .measure .name {
   transform: rotate(-90deg);
   transform-origin: 45px 45px;
   position: absolute;
   /*background-color: beige;*/
 }
 
-.details .measure .y_axis label {
+.details_view .measure .y_axis label {
   fill: black;
   font-size: 10pt;
 }
 
-.details .group .plots {
+.details_view .group .plots {
   display: flex;
   flex-direction: row;
 }
 
 
-.details .plot {
+.details_view .plot {
   position: relative;
   margin:  10px 10px 0 10px;
   /*background-color: #fdfdfd;*/
 }
 
-.details .plot .canvas-bg {
+.details_view .plot .canvas-bg {
   /*position: absolute;*/
   top: 1px;
   left: 1px;
 }
 
-.details .plot .canvas-fg {
+.details_view .plot .canvas-fg {
   position: absolute;
   top: 1px;
   left: 1px;
 }
 
 
-.details .plot svg {
+.details_view .plot svg {
   position: absolute;
   top: 0;
   left: 0;
 }
 
-.details .plot .frame  {
+.details_view .plot .frame  {
   fill: none;
   stroke: black;
   stroke-width: 0.5px;
 }
 
-.details .plot .line {
+.details_view .plot .line {
   fill: none;
   stroke: #666;
   stroke-linejoin: round;
@@ -139,7 +143,7 @@
   stroke-width: 1px;
 }
 
-.details .plot .area {
+.details_view .plot .area {
   fill: #f0f0f0;
   fill-opacity: 0.4;
   stroke: gray;
@@ -150,22 +154,22 @@
   z-index: 0;
 }
 
-.details .plot circle {
+.details_view .plot circle {
   /*fill: steelblue;*/
 }
 
-.details .axis path,
-.details .axis line {
+.details_view .axis path,
+.details_view .axis line {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
 }
 
-.details .plot .brush .overlay {
+.details_view .plot .brush .overlay {
   fill: none;
 }
 
-.details .plot .brush .selection {
+.details_view .plot .brush .selection {
   fill: lightgray;
   fill-opacity: 0;
   stroke: black;
