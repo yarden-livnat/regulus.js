@@ -14,6 +14,7 @@
 
 @tab_bg: white;
 @tab_bg_nonactive: softlight(lightblue, #000);
+@content: white;
 
 // ".lm_dragging" is applied to BODY tag during Drag and is also directly applied to the root of the object being dragged
 
@@ -25,7 +26,7 @@
 
 // Single Pane content (area in which final dragged content is contained)
 .lm_content {
-  //background: @color0;
+  background: @content; //@color0;
   border: 1px solid @color2;
 }
 

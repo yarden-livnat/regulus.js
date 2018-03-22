@@ -50,10 +50,10 @@ let plot_filter = null;
 // TODO: simplify or break up code
 
 export function setup(el) {
-  root = d3.select(el); //typeof el === 'string' && d3.select(el) || el;
-  // root.classed('details, component', true);
+  root = d3.select(el);
   root.html(template);
 
+  resize();
   root.select('.config').select('#color-by')
     .on('change', function(d) {select_color(this.value);});
 
@@ -87,6 +87,41 @@ export function setup(el) {
   subscribe('partition.selected', (topic, partition, on) => on_selected(partition, on));
   subscribe('resample.pts', (topic, pts) => on_resample_pts(pts));
 }
+
+function resize() {
+  let rw = parseInt(root.style('width'));
+  let rh = parseInt(root.style('height'));
+
+  let cw = parseInt(root.select('.config').style('width'));
+  let ch = parseInt(root.select('.config').style('height'));
+
+  console.log('details resize', rw, rh-ch);
+  if (partitions.length >0) {
+    let g = root.select('.group');
+    let gw = parseInt(g.style('width'));
+    let gh = parseInt(g.style('height'));
+
+    let dh = parseInt(root.select('.dims').style('height'));
+
+    // root.select('.details')
+    //   .attr('width', gw)
+    //   .attr('height', partitions.length * config.group_size + dh)
+    //   .attr('max-width', rw).attr('max-height', rh-ch);
+
+    console.log(config.group_size);
+    root.select('.groups')
+      .style('width', `${gw}px`)
+      .style('height', `${partitions.length * config.group_size}px`);
+  }
+
+}
+
+export function set_size(w, h) {
+  console.log('details set_size', w, h);
+  if (root)
+    resize();
+}
+
 
 function reset(data) {
   partitions = [];
