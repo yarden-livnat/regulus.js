@@ -15,7 +15,9 @@ class ForwardLinearRegression:
             @ In, w, an optional  vector of weights corresponding to the
                 input samples
         """
-        self.training_data = np.hstack(X, y)
+        self.training_data = np.hstack((X, y.reshape(-1, 1)))
+        if w is None:
+            w = np.ones(len(y))
         self.weights = w
 
         Xw = np.ones((X.shape[0], X.shape[1]+1))
