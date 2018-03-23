@@ -5,7 +5,7 @@ lib
 data
 sim
 hdviz_data
-deploy_data
+server/deploy_data
 new_data
 server/test
 temp
