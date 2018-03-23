@@ -7,7 +7,7 @@ sim
 hdviz_data
 deploy_data
 new_data
-test
+server/test
 temp
 new_sample_inputs.csv
 
