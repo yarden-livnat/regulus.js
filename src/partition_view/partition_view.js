@@ -13,6 +13,8 @@ let timer = null;
 let shared_msc = null;
 let measure = null;
 
+let width = 0, height=0;
+
 let format = d3.format('.2g');
 
 let box_plot = BoxPlot()
@@ -42,6 +44,19 @@ export function setup(el) {
   subscribe('partition.selected', (topic, partition, show) => select_partition(partition, show));
 }
 
+export function set_size(w, h) {
+  width = w;
+  height = h;
+  if (root)
+    resize();
+}
+
+function resize() {
+  let w = parseInt(root.select('table').style('width'));
+  let h = parseInt(root.select('table').style('height'));
+
+  // root.select('.scroll').style('max')
+}
 
 function alias_changed() {
   current.alias = this.value;

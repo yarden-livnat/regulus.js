@@ -33,11 +33,22 @@ let config = {
           title: 'Partition'
         },
         {
-          type: 'component',
-          componentName: 'topology',
-          componentState: {},
-          title: 'Topology',
-          isClosable: false,
+          type: 'stack',
+          content: [{
+              type: 'component',
+              componentName: 'topology',
+              componentState: {},
+              title: 'Topology',
+              isClosable: false,
+            },
+            {
+              type: 'component',
+              componentName: 'crosscut',
+              componentState: {},
+              title: 'Crosscut',
+              isClosable: false,
+            },
+          ]
         },
         {
           type: 'column',

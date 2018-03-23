@@ -25,7 +25,7 @@ export function setup(el) {
       publish('persistence.range', range);
       prevent = false;
     }
-    else console.log('ctrl move prevent');
+    // else console.log('ctrl move prevent');
   }
 );
 
@@ -43,7 +43,7 @@ function move_range(range) {
   if (prevent) console.log('ctrl move prevent');
   if (!prevent) {
     prevent = true;
-    if (saved[0] !== range[0] || saved[1] != range[1]) {
+    if (saved[0] !== range[0] || saved[1] !== range[1]) {
       // console.log('ctrl: range', range, 'mapped', sx(range[0]), sx(range[1]));
       root.select('.persistence_chart').selectAll('svg').call(chart.move, [sx(range[0]), sx(range[1])]);
     }
