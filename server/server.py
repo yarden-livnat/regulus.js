@@ -16,6 +16,7 @@ print('*** Using data dir:',data_dir)
 app = Bottle()
 
 jobs = dict()
+next_jobs_id = 0
 jobs_lock = threading.Lock()
 
 
@@ -48,15 +49,17 @@ def resample():
 
     job = new_job()
     job['status'] = 'scheduled'
+    job['code'] = 0
     thread = threading.Thread(target=resample_job, args=[job, spec])
     thread.start()
 
-    return job['id']
+    return json.dumps(job['id'])
 
 
 @app.route('/status/<job_id>')
 def status(job_id):
     print('status', job_id)
+    job_id = int(job_id)
     with jobs_lock:
         if job_id in jobs:
             job = jobs[job_id]
@@ -68,18 +71,20 @@ def status(job_id):
 
 
 def new_job():
+    global next_jobs_id
     with jobs_lock:
-        job = {'id': len(jobs)}
+        next_jobs_id += 1
+        job = {'id': next_jobs_id}
         jobs[job['id']] = job
     return job
 
 
 def resample_job(job, spec):
-    job['status'] = 'started'
+    job['status'] = 'running'
     code = sample(spec, data_dir)
     print('job {} done with code:{}'.format(job['id'], code))
     with jobs_lock:
-        job['status'] = 'done' if status == 0 else 'error'
+        job['status'] = 'done' if code == 0 else 'error'
         job['code'] = code
 
 

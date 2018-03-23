@@ -62,7 +62,7 @@ export default class Partition {
 
       this._pts = pts;
       let t1 = performance.now();
-      console.log(`compute pts in ${d3.format('d')(t1-t0)} msec`);
+      // console.log(`compute pts in ${d3.format('d')(t1-t0)} msec`);
     }
     return this._pts;
   }
