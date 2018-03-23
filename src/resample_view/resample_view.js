@@ -80,7 +80,7 @@ function update_sigma(v) {
 }
 
 function prepare(partition, scale) {
-  let reg = partition.regression_curve;
+  let reg = partition.inverse_regression_curve;
 
   let m = reg.columns.length-1;
   let measure = [];
@@ -117,7 +117,7 @@ function review() {
 
   let proposed = resample(current.spec, n_samples);
 
-  let reg = current.partition.regression_curve;
+  let reg = current.partition.inverse_regression_curve;
 
   let pts = [];
   let y = reg.columns.length-1;

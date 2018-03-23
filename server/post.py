@@ -37,7 +37,7 @@ class Partition(object):
         self.parent = None
         self.children = []
 
-        self.extrema = None
+        self.extrema = []
         self.base_pts = base_pts if base_pts is not None else []
         self.min_idx = min_idx
         self.max_idx = max_idx
@@ -54,7 +54,7 @@ class Partition(object):
         self.children.append(child)
         if child.min_idx != self.min_idx and child.max_idx != self.max_idx:
             print("ERROR: child {} [{} {}] merged into parent {} [{} {}] without a matching extrema".format(child.id,
-                    child.min_idx, child.max_id, self.id, self.min_idx, self.max_idx))
+                    child.min_idx, child.max_idx, self.id, self.min_idx, self.max_idx))
 
 
 class Post(object):
@@ -127,7 +127,7 @@ class Post(object):
     def build(self):
         self.prepare()
         for merge in self.merges:
-            print(merge.level, merge.is_max, merge.src, merge.dest)
+            # print(merge.level, merge.is_max, merge.src, merge.dest)
             if merge.src == merge.dest:
                 continue
 
@@ -226,9 +226,7 @@ class Post(object):
                 target = add[0]
             else:
                 target = next(iter(idx_map[merge.dest]))
-            if target.extrema is not None:
-                print("*** target ({}) extrema is not empty: {}".format(target.id, target.extrema))
-            target.extrema = merge.src
+            target.extrema.append(merge.src)
 
         for n in add:
             self.add(n)
@@ -258,9 +256,9 @@ class Post(object):
             if len(partition.children) == 1:
                 self.single += 1
 
-            if partition.extrema is not None:
-                self.pts.append(partition.extrema)
-                idx += 1
+            if len(partition.extrema) > 0:
+                self.pts.extend(partition.extrema)
+                idx += len(partition.extrema)
 
             for child in partition.children:
                 idx = self.visit(child, idx)
@@ -451,7 +449,7 @@ def post(args=None):
         try:
             print('\npost ', measure)
             y = np_data[:, ndims+i]
-            msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm)
+            msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm, connect=True)
             msc.build(X=x, Y=y, names=regulus['dims']+[measure])
             if ns.debug:
                 msc.save(path/ (measure + '_hierarchy.csv'), path / (measure + '_partition.json'))

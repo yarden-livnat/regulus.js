@@ -5,6 +5,21 @@ import * as $ from 'jquery';
 import GoldenLayout from 'golden-layout/dist/goldenlayout';
 
 let config = {
+  settings: {
+    hasHeaders: true,
+    constrainDragToContainer: true,
+    reorderEnabled: true,
+    selectionEnabled: false,
+    popoutWholeStack: false,
+    blockedPopoutsThrowError: true,
+    closePopoutsOnUnload: true,
+    showPopoutIcon: false,
+    showMaximiseIcon: true,
+    showCloseIcon: false
+  },
+  dimensions:{
+
+  },
   content: [{
     type: 'column',
     content: [{

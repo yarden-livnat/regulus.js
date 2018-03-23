@@ -10,7 +10,6 @@ export default function Lifeline() {
   let svg = null;
   let root = null;
   let nodes = [];
-  let edges = [];
   let selected = null;
 
   let pt_scale = d3.scaleLinear().domain([0,1]).range([0,width]);
@@ -28,16 +27,8 @@ export default function Lifeline() {
 
   function preprocess() {
     selected = null;
+    if (!root) return;
     pt_scale.domain([0, root.size]);
-    edges = [];
-    // visit(root);
-
-    function visit(node) {
-      for (let child of node.children) {
-        edges.push( {parent: node, child: child});
-        visit(child);
-      }
-    }
   }
 
   function hover(d, on) {
@@ -57,6 +48,7 @@ export default function Lifeline() {
   }
 
   function layout() {
+    if (!root) return;
     visit(root, [0, 1]);
 
     function visit(node, range) {
@@ -161,11 +153,8 @@ export default function Lifeline() {
     return lifeline;
   }
 
-  let flag = false;
   lifeline.data = function(_nodes, _root) {
     render([]);
-
-    if (flag) return;
 
     root = _root;
     nodes = _nodes;
