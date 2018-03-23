@@ -3,12 +3,12 @@ build
 dist
 lib
 data
-sim
-hdviz_data
-server/deploy_data
-new_data
-server/test
-temp
+sim/
+hdviz_data/
+server/deploy_data/
+new_data/
+server/test/
+temp/
 new_sample_inputs.csv
 
 node_modules
