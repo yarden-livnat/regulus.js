@@ -89,7 +89,7 @@ export default function Chart() {
   };
 
   chart.move = function(selection, _) {
-    console.log('ctrl brush move', _);
+    // console.log('ctrl brush move', _);
     selection.select('.brush')
       .call(brush.move, _);
     return this;

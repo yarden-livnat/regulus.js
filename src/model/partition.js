@@ -30,6 +30,9 @@ export default class Partition {
     this._inv_reg_curve = null;
     this._stat = null;
     this.extent = [0, 0];
+    this.dims_vec = null;
+    this.measure_vec = null;
+    this.bandwidth = 0;
   }
 
   get dims() {
@@ -93,21 +96,12 @@ export default class Partition {
 
   get inverse_regression_curve() {
     if (!this._inv_reg_curve) {
-      this._compute_curves();
+      this._get_vecs();
 
-      // let t0 = performance.now();
-      // let current_measure = this.msc.measure;
-      //
-      // let dims = this.pts.map( pt => this.msc.dims.map( d => pt[d.name] ));
-      // let measure = this.pts.map( pt => pt[current_measure.name]);
-      //
-      // let t1 = performance.now();
-      // let extent = current_measure.extent;
-      // let bandwidth = bandwidth_factor * (extent[1] - extent[0]);
+      this._inverse_regression_curve = inverseMultipleRegression(this.dims_vec, this.measure_vec, kernel.gaussian,this.bandwidth);
+      this._std_dev = averageStd(this.dims_vec, this.measure_vec, kernel.gaussian, this.bandwidth);
 
       let py = subLinearSpace(this.minmax, this.extent, 100);
-      // this.inverse_regression_curve = inverseMultipleRegression(dims, measure, kernel.gaussian, bandwidth);
-      // this.std_dev = averageStd(dims, measure, kernel.gaussian, bandwidth);
       let px = this._inverse_regression_curve(py);
       let std = this._std_dev(py, px);
 
@@ -123,25 +117,25 @@ export default class Partition {
   }
 
   get regression_curve() {
-    if (!this._reg_curve) {
-      this._compute_curves();
+    if (!this._regression_curve) {
+      let t0 = performance.now();
+      this. _get_vecs();
+      let t1 = performance.now();
+      this._get_vecs();
+      this._regression_curve = multipleRegression(this.dims_vec, this.measure_vec, kernel.gaussian, this.bandwidth);
+      let t2 = performance.now();
+      // console.log(`compute regression curves in ${d3.format('d')(t2-t0)} msec  (vec:${d3.format('d')(t1-t0)})`);
     }
     return this._regression_curve;
   }
 
-  _compute_curves() {
-    let t0 = performance.now();
+  _get_vecs() {
+    if (this.dims_vec) return;
+
     let current_measure = this.msc.measure;
-
-    let dims = this.pts.map( pt => this.msc.dims.map( d => pt[d.name] ));
-    let measure = this.pts.map( pt => pt[current_measure.name]);
+    this.dims_vec = this.pts.map( pt => this.msc.dims.map( d => pt[d.name] ));
+    this.measure_vec = this.pts.map( pt => pt[current_measure.name]);
     this.extent = current_measure.extent;
-    let bandwidth = bandwidth_factor * (this.extent[1] - this.extent[0]);
-
-    this._inverse_regression_curve = inverseMultipleRegression(dims, measure, kernel.gaussian, bandwidth);
-    this._std_dev = averageStd(dims, measure, kernel.gaussian, bandwidth);
-    this._regression_curve = multipleRegression(dims, measure, kernel.gaussian, bandwidth);
-    let t2 = performance.now();
-    console.log(`compute regression curves in ${d3.format('d')(t2-t0)} msec`);
+    this.bandwidth = bandwidth_factor * (this.extent[1] - this.extent[0]);
   }
 }

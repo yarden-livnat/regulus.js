@@ -23,7 +23,7 @@ def static(filename='index.html'):
 
 @app.route('/catalog')
 def catalog():
-
+    print('req catalog')
     files = [str(f.stem) for f in sorted(data_dir.glob('*.json'))]
     print(files)
     return json.dumps(files);
@@ -31,13 +31,14 @@ def catalog():
 
 @app.route('/data/<path:path>')
 def data(path):
+    print('req data ', path)
     filename = path+'.json'
     print('dataset', filename)
     return static_file(filename, root=str(data_dir))
 
 @app.post('/resample')
 def resample():
-    #print('data_dir', data_dir)
+    print('data_dir', data_dir)
     spec = request.json
     print('resample request received', spec)
     createsample(spec,data_dir)
