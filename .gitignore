@@ -7,7 +7,7 @@ sim/
 hdviz_data/
 server/deploy_data/
 new_data/
-!server/test/
+server/test/
 temp/
 new_sample_inputs.csv
 
