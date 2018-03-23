@@ -87,6 +87,7 @@ let config = {
 
 let state = null; //localStorage.getItem('layout.state');
 let layout = new GoldenLayout( state && JSON.parse(state) || config, $('#layoutContainer'));
+layout._isFullPage = true;
 
 layout.on('stateChanged', save);
 

@@ -56,7 +56,7 @@ export function CrossCutView() {
     resize();
     d3.select('.crosscut').call(crosscut);
 
-    subscribe('data.new', (topic, data) => reset(data));
+    // subscribe('data.new', (topic, data) => reset(data));
   };
 
   view.set_size = function(w, h) {

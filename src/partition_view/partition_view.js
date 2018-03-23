@@ -54,8 +54,10 @@ export function set_size(w, h) {
 function resize() {
   let w = parseInt(root.select('table').style('width'));
   let h = parseInt(root.select('table').style('height'));
+  console.log('partition view resize', width, height, ' table:', w, h);
 
-  // root.select('.scroll').style('max')
+  root.select('.scroll').style('max-height', `${height - h}px`);
+  root.select('.scroll').style('max-width', `${width}px`);
 }
 
 function alias_changed() {
