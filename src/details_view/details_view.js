@@ -244,7 +244,7 @@ function on_resample_pts(pts) {
 }
 
 function add(partition) {
-  let reg_curve = partition.regression_curve;
+  let reg_curve = partition.inverse_regression_curve;
 
   partitions.push({
     id: partition.id,

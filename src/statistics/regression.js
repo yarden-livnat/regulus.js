@@ -2,7 +2,7 @@ import 'kernel-smooth';
 import isArray from 'validate.io-array';
 import isFunction from 'validate.io-function';
 
-export {fun} from 'kernel-smooth';
+export {fun, multipleRegression} from 'kernel-smooth';
 
 // from kernel-smooth (not exported)
 function weight( kernel, bandwidth, x_0, x_i ) {

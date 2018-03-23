@@ -44,6 +44,7 @@ export function setup(el) {
     .call(slider);
 
   subscribe('data.new', (topic, data) => reset(data));
+  subscribe('data.loaded', (topic, data) => reset(null));
   subscribe('partition.highlight', (topic, partition, on) => tree.highlight(partition, on));
   subscribe('partition.details', (topic, partition, on) => tree.details(partition, on));
   subscribe('partition.selected', (topic, partition, on) => tree.selected(partition, on));
@@ -59,7 +60,6 @@ export function set_size(w, h) {
 function resize() {
   let rw = parseInt(root.style('width'));
   let rh = parseInt(root.style('height'));
-  // let cw = parseInt(root.select('.config').style('width'));
   let ch = parseInt(root.select('.config').style('height'));
 
   tree.set_size(rw, rh - ch);
@@ -68,7 +68,10 @@ function resize() {
 function reset(data) {
   msc = data;
 
-  tree.data(msc.partitions, msc.tree);
+  if (!data)
+    tree.data([], null);
+  else
+    tree.data(msc.partitions, msc.tree);
 }
 
 function select_y_type() {
