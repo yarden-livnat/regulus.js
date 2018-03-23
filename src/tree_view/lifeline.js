@@ -95,7 +95,7 @@ export default function Lifeline() {
   }
 
   function render_names(items = null) {
-    items = items || nodes.filter(d => d.details || d.highlight || d.selected );
+    items = items || nodes.filter(d => d.details || d.highlight || d.selected || d.alias);
     let names = svg.select('.names').selectAll('.name')
      .data(items, d => d.id);
 
@@ -116,7 +116,7 @@ export default function Lifeline() {
   }
 
   function lifeline(selection) {
-    console.log('lifeline', width, height);
+    // console.log('lifeline', width, height);
     svg = selection
       .append('svg')
         .attr('class', 'lifeline')
@@ -132,23 +132,23 @@ export default function Lifeline() {
 
     svg.append('g')
       .attr('class', 'x axis')
-      .attr('transform', `translate(0,${height})`);
-
-    svg.append('text')
-      .attr('transform', `translate(${width/2},${height + margin.top + 20})`)
-      .style('text-anchor', 'middle')
-      .text('Points');
+      .attr('transform', `translate(0,${height})`)
+      .append('text')
+        .attr('class', 'axis-label')
+        .attr('transform', `translate(${width/2},${margin.top + 20})`)
+        .style('text-anchor', 'middle')
+        .text('Points');
 
     svg.append('g')
-      .attr('class', 'y axis');
-
-    svg.append('text')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', 0 - margin.left)
-      .attr('x',0 - (height / 2))
-      .attr('dy', '1em')
-      .style('text-anchor', 'middle')
-      .text('Persistence');
+      .attr('class', 'y axis')
+      .append('text')
+        .attr('class', 'axis-label')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 0 - margin.left)
+        .attr('x',0 - (height / 2))
+        .attr('dy', '1em')
+        .style('text-anchor', 'middle')
+        .text('Persistence');
 
     return lifeline;
   }
@@ -220,7 +220,7 @@ export default function Lifeline() {
   lifeline.set_size = function(w, h) {
     width = w - margin.left - margin.right;
     height = h - margin.top - margin.bottom;
-    console.log('lifeline set_size', width, height, w, h);
+    // console.log('lifeline set_size', width, height, w, h);
 
     pt_scale.range([0, width]);
     sx.range([0, width]);
@@ -234,10 +234,10 @@ export default function Lifeline() {
       svg.select('.x')
         .attr('transform', `translate(0,${height})`);
 
-      svg.select('.x text')
-        .attr('transform', `translate(${width / 2},${height + margin.top + 20})`);
+      svg.select('.x .axis-label')
+        .attr('transform', `translate(${width / 2}, ${/*height + */margin.top + 20})`);
 
-      svg.select('.y text')
+      svg.select('.y .axis-label')
         .attr('y', 0 - margin.left)
         .attr('x', 0 - (height / 2));
 

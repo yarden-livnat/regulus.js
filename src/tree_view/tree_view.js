@@ -26,15 +26,15 @@ export function setup(el) {
     .on('change', select_y_type)
     .property('value', y_type);
 
-  resize();
-
-  root.select('.tree').call(tree
+  tree
     .on('highlight', (node, on) => publish('partition.highlight', node, on))
     .on('select', (node, on) => publish('partition.selected', node, on))
     .on('details', (node, on) => publish('partition.details', node, on))
     .y_type(y_type)
-    .y_min(y_min));
+    .y_min(y_min);
 
+  root.select('.tree').call(tree);
+  resize();
 
   slider
     .range(y_range)
@@ -53,8 +53,7 @@ export function setup(el) {
 }
 
 export function set_size(w, h) {
-  if (root)
-    resize();
+  if (root) resize();
 }
 
 function resize() {

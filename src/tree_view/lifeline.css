@@ -43,3 +43,8 @@
   alignment-baseline: middle;
   pointer-events: none;
 }
+
+.lifeline .axis .axis-label {
+  fill: black;
+  font-size: 10pt;
+}

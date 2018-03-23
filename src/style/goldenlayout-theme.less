@@ -15,6 +15,7 @@
 @tab_bg: white;
 @tab_bg_nonactive: softlight(lightblue, #000);
 @content: white;
+@splitter_hover: #eee;
 
 // ".lm_dragging" is applied to BODY tag during Drag and is also directly applied to the root of the object being dragged
 
@@ -60,7 +61,7 @@
 
   &:hover, // When hovered by mouse...
   &.lm_dragging {
-    background: @color9;
+    background: @splitter_hover; //@color9;
     opacity: 1;
   }
 }

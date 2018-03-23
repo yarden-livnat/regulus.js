@@ -4,15 +4,14 @@ import Component from '../components/component'
 
 import * as dataset_view from '../dataset_view';
 import * as details_view from '../details_view';
-import * as tree_view from '../tree';
+import * as tree_view from '../tree_view';
 import * as partition_view from '../partition_view';
 import * as controls_view from '../filtering_view';
 import * as resample_view from '../resample_view';
 import {CrossCutView} from '../cutcross_view';
 
-import '../style/fontawesome-all.min';
+// import '../style/fontawesome-all.min';
 import './style.css';
-
 
 
 

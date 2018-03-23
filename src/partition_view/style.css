@@ -2,6 +2,9 @@
   padding: 5px;
 }
 
+.partition_view .scroll {
+  overflow: auto;
+}
 .partition_view .partition_id.highlight {
   background-color: lightgray;
 }
@@ -52,6 +55,7 @@
 
 .partition_view .stat {
   margin: 5px;
+  display: flex;
 }
 
 .partition_view .name {
