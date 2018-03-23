@@ -1,5 +1,8 @@
 import {publish } from "../utils/pubsub";
 
+let JOB_INQUIRY_DELAY = 5000;
+
+
 export function load_catalog() {
   return fetch('catalog')
     .then( response => response.json() )
@@ -23,7 +26,6 @@ export function submit_resample(spec) {
 }
 
 function monitor_job(id) {
-  console.log('job:', id);
   publish('status', `job id:${id}`);
   check(id);
 
@@ -32,17 +34,15 @@ function monitor_job(id) {
       fetch(`status/${id}`)
         .then(r => r.json())
         .then(reply => {
-          console.log(`job ${id} status:${reply}`);
-
-          if (reply.status === 'done') {
-            publish('status', `job ${id} done`);
+          if (reply.status === 'done' || reply.status === 'error') {
+            publish('status', `job ${id} ${reply.status}`);
           }
           else if (reply.status === 'running') {
             check(id);
           }
         })
     },
-    1000);
+      JOB_INQUIRY_DELAY);
   }
 }
 
