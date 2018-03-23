@@ -1,14 +1,19 @@
 
 
-export function resample(spec, n) {
+export function resample(spec, n, range) {
+
   let dims = spec.dims.map(d => d.name);
   let len = spec.measure.length;
+  let measures = spec.measure;
 
   let weights = Array(len).fill(0);
   for (let dim of spec.dims) {
     let total = dim.to.reduce((s,v) => s + v) - dim.from.reduce((s,v) => s+v);
     for (let i = 0; i < len; i++) {
-      weights[i] += (dim.to[i] - dim.from[i])/total;
+      if(range===null)
+        weights[i] += (dim.to[i] - dim.from[i])/total;
+      else
+        weights[i] += (measures[i]>=range[0] && measures[i]<=range[1])?(dim.to[i] - dim.from[i])/total:0;
     }
   }
 

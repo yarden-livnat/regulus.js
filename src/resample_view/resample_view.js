@@ -10,7 +10,7 @@ let root = null;
 let msc = null;
 let selected = null;
 let current = null;
-
+let sample_range = null;
 let sigma_scale = 1;
 let n_samples = 0;
 
@@ -40,6 +40,7 @@ export function setup(el) {
 
   subscribe('data.new', (topic, data) => reset(data));
   subscribe('partition.selected', (topic, partition, on) => select(partition, on));
+  subscribe('range.selected', (topic, range) => set_resample_range(range));
 }
 
 function reset(data) {
@@ -48,6 +49,10 @@ function reset(data) {
   current = null;
   queue = [];
   // root.select('.submit').attr('disabled', true);
+}
+
+function set_resample_range(range){
+  sample_range = range;
 }
 
 function select(partition, on) {
@@ -115,7 +120,7 @@ function prepare(partition, scale) {
 function review() {
   if (!current) return;
 
-  let proposed = resample(current.spec, n_samples);
+  let proposed = resample(current.spec, n_samples, sample_range);
 
   let reg = current.partition.regression_curve;
 

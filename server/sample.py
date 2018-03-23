@@ -31,10 +31,10 @@ def sample_in_thread(reg_file):
 
 
     if reg_file.name == 'test':
-        subprocess.run(['python', 'post.py', '-k', '50', '-d', '4', '--name', 'test', updated_json],check=True)
+        subprocess.run(['python', 'post.py', '-k', '100', '-d', '4', '--name', 'test', updated_json],check=True)
 
     if reg_file.name == 'deployment':
-        subprocess.run(['python', 'post.py', '-k', '500', '-d', '6', '--name', 'deployment', '--all',  updated_dataset,'-j', '1', '-t',updated_json],check=True)
+        subprocess.run(['python', 'post.py', '-k', '500', '-d', '6', '--name', 'deployment', updated_json],check=True)
 
     print("New Results are available")
 
