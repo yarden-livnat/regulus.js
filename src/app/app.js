@@ -1,6 +1,7 @@
-
+import * as d3 from 'd3';
 import * as layout from './layout';
 import Component from '../components/component'
+import {subscribe} from "../utils/pubsub";
 
 import * as dataset_view from '../dataset_view';
 import * as details_view from '../details_view';
@@ -19,6 +20,7 @@ setup();
 init();
 
 function setup() {
+  subscribe('status', report_status);
   dataset_view.setup('#dataset_view');
 
   layout.register('partition', Component(partition_view));
@@ -35,4 +37,6 @@ function init() {
   dataset_view.init();
 }
 
-
+function report_status(topic, msg) {
+  d3.select('#status').text(msg);
+}

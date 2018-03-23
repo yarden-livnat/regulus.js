@@ -87,7 +87,6 @@ class RegulusFile(object):
         if new_sample is not None:
             self.new_sample_input = new_sample
 
-
     def extract_input(self, data):
         self.new_sample_input = [[ptdict[inputdim] for inputdim in self.dims] for ptdict in data]
 

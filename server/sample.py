@@ -1,5 +1,4 @@
 import subprocess
-import threading
 import testfun
 from regulus_file import RegulusFile
 
@@ -27,14 +26,14 @@ def sample(spec, data_dir):
     updated_dataset = reg_file.save_all_pts()
     updated_json = reg_file.save_json()
 
+    status = {}
     if reg_file.name == 'test':
-        subprocess.run(['python', 'post.py', '-k', '50', '-d', '4', '--name', 'test', '--all', updated_dataset,'-j', '1', '-t',updated_json],check=True)
+        status = subprocess.run(['python', 'post.py', '-k', '50', '-d', '4', '--name', 'test', updated_dataset])
     elif reg_file.name == 'deployment':
-        subprocess.run(['python', 'post.py', '-k', '500', '-d', '6', '--name', 'deployment', '--all',  updated_dataset,'-j', '1', '-t',updated_json],check=True)
+        status = subprocess.run(['python', 'post.py', '-k', '500', '-d', '6', '--name', 'deployment', updated_dataset])
 
     print("New Results are available")
-
-    return
+    return status.returncode
 
 
 # def createsample(received, data_dir):
@@ -48,3 +47,6 @@ def sample(spec, data_dir):
 #         thread.start()
 #
 #     return
+
+if __name__ == '__main__':
+    pass
