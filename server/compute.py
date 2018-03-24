@@ -1,7 +1,7 @@
 import subprocess
 import testfun
 from regulus_file import RegulusFile
-from linearfit import linearfit
+from linearfit import linear_fit
 
 def update_params(reg, spec):
 
@@ -27,6 +27,7 @@ def recompute(spec, data_dir):
     status = {}
 
     status = subprocess.run(['python', 'post.py', '-d', str(dims), '--name', name, '--p', updated_json])
+
     #if reg_file.name == 'test':
     #    status = subprocess.run(['python', 'post.py', '-d', dims, '--name', name, '-p', 1, updated_json])
     #elif reg_file.name == 'deployment':
@@ -35,7 +36,7 @@ def recompute(spec, data_dir):
     #    print("Can't resample for selected data")
     #    exit(255)
 
-    linearfit(updated_json)
+    linear_fit(updated_json)
 
     print("New Structure is available")
     return status.returncode
