@@ -15,9 +15,7 @@ import {CrossCutView} from '../cutcross_view';
 import './style.css';
 
 
-
 setup();
-init();
 
 function setup() {
   subscribe('status', report_status);
@@ -30,6 +28,7 @@ function setup() {
   layout.register('resample', Component(resample_view));
   layout.register('crosscut', Component(CrossCutView()));
 
+  layout.on('initialised', init);
   layout.init();
 }
 

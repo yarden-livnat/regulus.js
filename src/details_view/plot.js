@@ -51,7 +51,7 @@ export default function Plot() {
       .data(visible_pts, pt => pt.id);
 
     pts.enter().append('circle')
-      .attr('r', config.pt_radius)
+      .attr('r', config.pt_size)
       .attr('cx', d => tx(d))
       .attr('cy', d => ty(d))
       .merge(pts)
@@ -84,10 +84,10 @@ export default function Plot() {
   function draw_shape(ctx, x, y, r) {
     if (canvas_draw_circles) {
       ctx.beginPath();
-      ctx.arc(x, y, r, 0, 2 * Math.PI);
+      ctx.arc(x, y, config.pt_size, 0, 2 * Math.PI);
       ctx.fill();
     } else {
-      ctx.fillRect(x, y, r, r);
+      ctx.fillRect(x, y, config.pt_size, config.pt_size);
     }
   }
   function canvas_render_pts(d, i) {
@@ -96,10 +96,10 @@ export default function Plot() {
 
     bg_ctx.save();
     bg_ctx.fillStyle = 'white';
-    bg_ctx.fillRect(0, 0, width, height);
+    bg_ctx.fillRect(0, 0, width+config.pt_size, height+config.pt_size);
 
     fg_ctx.save();
-    fg_ctx.clearRect(0, 0, width, height);
+    fg_ctx.clearRect(0, 0, width+config.pt_size, height+config.pt_size);
 
     let cctx = ctx.get(this);
     let tx = pt => cctx.sx(pt[cctx.name]);
@@ -109,9 +109,9 @@ export default function Plot() {
     for (let pt of d.pts) {
       if (!pt.filtered) {
         fg_ctx.fillStyle = color(pt);
-        draw_shape(fg_ctx, tx(pt), ty(pt), config.pt_radius);
-      } else if (show_filtered === 'all' || show_filtered == cctx.name) {
-        draw_shape(bg_ctx, tx(pt), ty(pt), config.pt_radius);
+        draw_shape(fg_ctx, tx(pt), ty(pt), config.pt_size);
+      } else if (show_filtered === 'all' || show_filtered === cctx.name) {
+        draw_shape(bg_ctx, tx(pt), ty(pt), config.pt_size);
       }
     }
 
@@ -150,18 +150,17 @@ export default function Plot() {
   plot.create = function(selection) {
     let t0 = performance.now();
     selection
-        .attr('class', 'plot')
-
+        .attr('class', 'plot');
 
     selection.append('canvas')
       .attr('class', 'canvas-bg')
-        .attr('width', width)
-        .attr('height', height);
+        .attr('width', width+config.pt_size)
+        .attr('height', height+config.pt_size);
 
     selection.append('canvas')
         .attr('class', 'canvas-fg')
-        .attr('width', width)
-        .attr('height', height);
+        .attr('width', width+config.pt_size)
+        .attr('height', height+config.pt_size);
 
     let svg = selection.append('svg')
         .attr('width', width + margin.left + margin.right)
@@ -169,12 +168,12 @@ export default function Plot() {
       .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    svg.append('rect')
-      .attr('class', 'frame')
-      .attr('x', -1)
-      .attr('y', -1)
-      .attr('width', width+2)
-      .attr('height', height+2);
+    // svg.append('rect')
+    //   .attr('class', 'frame')
+    //   .attr('x', -2)
+    //   .attr('y', -2)
+    //   .attr('width', width+4)
+    //   .attr('height', height+4);
 
     svg.append('path').attr('class', 'area');
     svg.append('g').attr('class', 'pts');

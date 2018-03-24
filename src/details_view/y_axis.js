@@ -5,8 +5,8 @@ export default function YAxis() {
   let width = 60 - margin.left - margin.right;
   let height = 120 - margin.top - margin.bottom;
 
-  let scale = d3.scaleLinear().range([height, 0]);
-  let axis = d3.axisLeft(scale).ticks(2, 's');
+  let scale = d3.scaleLinear().range([height, 0]).nice();
+  let axis = d3.axisLeft(scale).ticks(3, 's');
   let extent = [0, 0];
 
   let brush_selection;
@@ -79,7 +79,7 @@ export default function YAxis() {
   y.domain = function(_) {
     name = _.name;
     extent = _.extent;
-    scale.domain(_.extent);
+    scale.domain(_.extent).nice();
     return this;
   };
 

@@ -100,6 +100,10 @@ export function init() {
   layout.init();
 }
 
+export function on(event, cb, ctx) {
+  layout.on(event, cb, ctx);
+}
+
 export function save() {
   // let t0= performance.now();
   // let state = JSON.stringify(layout.toConfig());
