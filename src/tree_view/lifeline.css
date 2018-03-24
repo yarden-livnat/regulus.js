@@ -5,8 +5,9 @@
 }
 
 .lifeline .node:hover {
-  fill: lightgray;
+  /*fill: lightgray;*/
   stroke-width: 2px;
+  z-index: 10;
 }
 
 .lifeline .node.selected {
@@ -16,11 +17,13 @@
 .lifeline .node.highlight {
   stroke-width: 2px;
   stroke: gray;
+  filter: url('#drop-shadow');
 }
 
 .lifeline .node.details {
-  stroke-width: 2px;
+  /*stroke-width: 2px;*/
   /*fill: lightgreen;*/
+  filter: url('#drop-shadow');
 }
 
 .lifeline .node.filtered {

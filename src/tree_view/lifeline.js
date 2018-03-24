@@ -115,13 +115,16 @@ export default function Lifeline() {
       .merge(d3nodes)
         .attr('x', d => sx(d.pos.x))
         .attr('y', d => sy(d.pos.yp))
-        .attr('width', d => sx(d.pos.x + d.pos.w) - sx(d.pos.x))
-        .attr('height', d => sy(d.pos.y) - sy(d.pos.yp))
+        .attr('width', d => sx(d.pos.x + d.pos.w) - sx(d.pos.x)-1)
+        .attr('height', d => sy(d.pos.y) - sy(d.pos.yp)-1)
         .classed('highlight', d => d.highlight)
         .classed('selected', d => d.selected)
         .classed('details', d => d.details);
 
     d3nodes.exit().remove();
+
+    svg.select('.nodes').selectAll('.details')
+      .each(function() { this.parentNode.appendChild(this);});
 
     render_names(items.filter(d => d.details || d.highlight || d.selected ));
   }
@@ -182,6 +185,36 @@ export default function Lifeline() {
         .style('text-anchor', 'middle')
         .text('Persistence');
 
+    let defs = svg.append('defs');
+
+    let filter = defs.append('filter')
+      .attr('id', 'drop-shadow')
+      .attr('height', '130%')
+      .attr('width', '130%');
+
+    filter.append("feGaussianBlur")
+      .attr("in", "SourceAlpha")
+      .attr("stdDeviation", 5)
+      .attr("result", "blur");
+
+    filter.append("feOffset")
+      .attr("in", "blur")
+      .attr("dx", 5)
+      .attr("dy", 5)
+      .attr("result", "shadow");
+
+    // filter.append('feBlend')
+    //   .attr('in', 'SourceGraphic')
+    //   .attr('in2', 'blurOut')
+    //   .attr('mode', 'normal');
+    let feMerge = filter.append("feMerge");
+
+    feMerge.append("feMergeNode")
+      .attr("in", "shadow");
+    feMerge.append("feMergeNode")
+      .attr("in", "SourceGraphic");
+
+
     return lifeline;
   }
 
@@ -199,12 +232,14 @@ export default function Lifeline() {
 
   lifeline.highlight = function(node, on) {
     node.highlight = on;
+    svg.selectAll('.node').data([node], d => d.id).classed('highlight', on);
     if (on) render_names();
     return this;
   };
 
   lifeline.details = function(node, on) {
     node.details = on;
+    node.highlight = on;
     render();
     return this;
   };

@@ -96,7 +96,9 @@ export default function Plot() {
 
     bg_ctx.save();
     bg_ctx.fillStyle = 'white';
+    bg_ctx.strokeStyle = 'black';
     bg_ctx.fillRect(0, 0, width+config.pt_size, height+config.pt_size);
+    bg_ctx.strokeRect(0, 0,  width+config.pt_size, height+config.pt_size);
 
     fg_ctx.save();
     fg_ctx.clearRect(0, 0, width+config.pt_size, height+config.pt_size);
@@ -165,15 +167,16 @@ export default function Plot() {
     let svg = selection.append('svg')
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
+
       .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
     // svg.append('rect')
     //   .attr('class', 'frame')
-    //   .attr('x', -2)
-    //   .attr('y', -2)
-    //   .attr('width', width+4)
-    //   .attr('height', height+4);
+    //   .attr('x', -1)
+    //   .attr('y', -1)
+    //   .attr('width', width+2)
+    //   .attr('height', height+2);
 
     svg.append('path').attr('class', 'area');
     svg.append('g').attr('class', 'pts');
