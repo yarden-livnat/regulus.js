@@ -41,13 +41,13 @@ let config = {
               title: 'Topology',
               isClosable: false,
             },
-            {
-              type: 'component',
-              componentName: 'crosscut',
-              componentState: {},
-              title: 'Crosscut',
-              isClosable: false,
-            },
+            // {
+            //   type: 'component',
+            //   componentName: 'crosscut',
+            //   componentState: {},
+            //   title: 'Crosscut',
+            //   isClosable: false,
+            // },
           ]
         },
         {

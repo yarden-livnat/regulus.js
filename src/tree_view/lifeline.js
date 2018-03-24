@@ -1,6 +1,7 @@
 import * as d3 from 'd3'
 import {ensure_single} from '../utils/events';
 import './lifeline.css';
+import * as chromatic from "d3-scale-chromatic";
 
 export default function Lifeline() {
   let margin = {top: 10, right: 10, bottom: 50, left:60},
@@ -21,6 +22,9 @@ export default function Lifeline() {
   let y_axis = d3.axisLeft(sy).ticks(4, '.1e');
   let x_axis = d3.axisBottom(pt_scale).ticks(8, 's');
   let value_scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0,1]).clamp(true);
+  let color = d3.scaleSequential(chromatic['interpolateRdYlBu']).domain([0,1]);
+
+  let active = [];
 
   let dispatch = d3.dispatch('highlight', 'select', 'details');
 
@@ -29,6 +33,34 @@ export default function Lifeline() {
     selected = null;
     if (!root) return;
     pt_scale.domain([0, root.size]);
+  }
+
+  function update_front(level) {
+    for (let node of active)
+      node.front = false;
+
+    active = [];
+    if (root.model)
+      visit(root);
+
+    let d3nodes = svg.select('.nodes').selectAll('.node')
+      .data(active, d => d.id);
+
+    d3nodes
+      .attr('fill', d => color(d.model && d.model.fitness || 0));
+
+    d3nodes.exit()
+      .attr('fill', 'white');
+
+    function visit(node) {
+      if (node.model.fitness > level) {
+        console.log(`fitness:  id:${node.id} lvl: ${node.lvl}  fitness:${node.model.fitness}  level: ${level}`);
+        node.front = true;
+        active.push(node);
+      }
+      // else
+        node.children.forEach(visit);
+    }
   }
 
   function hover(d, on) {
@@ -217,10 +249,14 @@ export default function Lifeline() {
     return this;
   };
 
+  lifeline.front = function(_) {
+    update_front(_);
+    return this;
+  };
+
   lifeline.set_size = function(w, h) {
     width = w - margin.left - margin.right;
     height = h - margin.top - margin.bottom;
-    // console.log('lifeline set_size', width, height, w, h);
 
     pt_scale.range([0, width]);
     sx.range([0, width]);

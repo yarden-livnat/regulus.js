@@ -43,6 +43,9 @@ export function setup(el) {
   root.select('#persistence-slider')
     .call(slider);
 
+  root.select('.fitness-slider')
+    .on('input', on_fitness);
+
   subscribe('data.new', (topic, data) => reset(data));
   subscribe('data.loaded', (topic, data) => reset(null));
   subscribe('partition.highlight', (topic, partition, on) => tree.highlight(partition, on));
@@ -80,7 +83,7 @@ function select_y_type() {
 function set_persistence_range(range) {
   if (!prevent) {
     prevent = true;
-    if (saved[0] != range[0] || saved[1] != range[1]) {
+    if (saved[0] !== range[0] || saved[1] !== range[1]) {
       root.select('#persistence-slider')
         .call(slider.move, range);
     }
@@ -100,4 +103,8 @@ function slider_range_update(range) {
   }
   else
   if (prevent) console.log('tree slider prevent');
+}
+
+function on_fitness() {
+  tree.front(+this.value);
 }

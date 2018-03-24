@@ -13,6 +13,7 @@ export default class Partition {
     this.minmax = [msc.pts[data.minmax_idx[0]][msc.name], msc.pts[data.minmax_idx[1]][msc.name]];
     this.pts_idx = data.span;
     this._pts = data.pts;
+    this.model = data.model;
 
     this.parent = data.parent;
     this.children = data.children;

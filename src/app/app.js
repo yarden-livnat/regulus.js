@@ -26,7 +26,7 @@ function setup() {
   layout.register('filtering', Component(controls_view));
   layout.register('details', Component(details_view));
   layout.register('resample', Component(resample_view));
-  layout.register('crosscut', Component(CrossCutView()));
+  // layout.register('crosscut', Component(CrossCutView()));
 
   layout.on('initialised', init);
   layout.init();

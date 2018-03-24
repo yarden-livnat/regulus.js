@@ -1,5 +1,5 @@
 .lifeline .node {
-  fill: white;
+  /*fill: white;*/
   stroke: steelblue;
   stroke-width: 0.5px;
 }
@@ -10,7 +10,7 @@
 }
 
 .lifeline .node.selected {
-  fill: lightblue;
+  /*fill: lightblue;*/
 }
 
 .lifeline .node.highlight {
@@ -20,17 +20,11 @@
 
 .lifeline .node.details {
   stroke-width: 2px;
-  fill: lightgreen;
+  /*fill: lightgreen;*/
 }
 
 .lifeline .node.filtered {
   color: #f0f0f0;
-}
-
-.lifeline .edge {
-  stroke: none;
-  /*stroke: #f0f0f0;*/
-  stroke-width: 0.5px
 }
 
 .lifeline {

@@ -15,23 +15,15 @@ export default function Crosscut() {
 
   let tree = null;
 
-
-  function preprocess(_) {
-    tree = _;
-    // visit(tree);
-
-    function visit(node) {
-    }
-  }
-
   function update() {
     active = [];
+    if (!tree) return;
     let x = 0;
     visit(tree);
 
     function visit(node) {
       // console.log(node.id, node.lvl, node.fitness);
-      if (node.fitness > level) {
+      if (node.model.fitness > level) {
         active.push({
           id: node.id,
           x0: x,
@@ -78,9 +70,9 @@ export default function Crosscut() {
     return crosscut;
   }
 
-  crosscut.data = function(tree, size) {
-    preprocess(tree);
-    sx.domain([0, size]);
+  crosscut.data = function(root) {
+    sx.domain([0, root && root.pts.length || 0]);
+    tree = root;
     update();
     render();
     return this;
@@ -95,11 +87,6 @@ export default function Crosscut() {
     level = _;
     update();
     render();
-    return this;
-  };
-
-  crosscut.measure = function(_) {
-    measure = _;
     return this;
   };
 

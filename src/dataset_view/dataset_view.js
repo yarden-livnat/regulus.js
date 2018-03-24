@@ -23,7 +23,6 @@ export function setup(el) {
 
 export function init() {
   service.load_catalog()
-    .then( r => { console.log('catalog:', r); return r;})
     .then(set_catalog);
 }
 

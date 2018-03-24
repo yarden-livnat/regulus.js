@@ -8,43 +8,30 @@ export function CrossCutView() {
   let root = null;
   let crosscut = Crosscut();
 
-  function fitness(d, y, yp) {
-    let mean = d3.mean(y, pt => pt[d]);
-
-    let s_reg = 0, s_stat = 0;
-    for (let i=0; i<y.length; i++) {
-      let diff = y[i][d] - yp[i];
-      s_reg += diff * diff;
-      diff = y[i][d] - mean;
-      s_stat += diff * diff;
-    }
-    return 1 - s_reg/s_stat;
-  }
-
   function process(partitions) {
-    if (partitions.length === 0 || partitions[0].fitness) return;
-
-    let t = performance.now();
-    let name =  partitions[0].measure_name;
     for (let partition of partitions) {
-      let yp = partition.regression_curve(partition.dims_vec);
-
-      partition.fitness = fitness(name, partition.pts, yp);
-      console.log('process:', partition.id, partition.lvl, partition.fitness);
+      partition.fitness = Math.random();
     }
-    console.log('crosscut process', Math.round(performance.now() - t));
   }
 
   function reset(data) {
-    process(data.partitions);
-    let v = data.partitions.map(p => p.fitness);
+    // process(data.partitions);
+
+    let v = data.partitions.map(p => p.model.fitness);
     let histogram = d3.histogram();
     let bins = histogram(v);
     console.log('histogram:', bins);
-    crosscut.data(data.tree, data.pts.length);
+
+    crosscut.data(data.tree);
   }
 
   function resize() {
+  }
+
+  function on_slider() {
+    let v = +this.value;
+    console.log('v = ',v);
+    crosscut.level(v);
   }
 
   let view = {};
@@ -54,9 +41,11 @@ export function CrossCutView() {
     root.html(template);
 
     resize();
-    d3.select('.crosscut').call(crosscut);
+    root.select('.crosscut').call(crosscut);
+    root.select('.crosscut-slider')
+      .on('input', on_slider);
 
-    // subscribe('data.new', (topic, data) => reset(data));
+    subscribe('data.new', (topic, data) => reset(data));
   };
 
   view.set_size = function(w, h) {

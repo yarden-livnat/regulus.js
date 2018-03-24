@@ -9,7 +9,7 @@ import {ensure_single} from "../utils/events";
 import config from './config';
 import Group from './group';
 import XAxis from './x_axis';
-import template from './details.html';
+import template from './details_view.html';
 import './style.css';
 
 
