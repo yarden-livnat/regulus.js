@@ -259,6 +259,7 @@ function update_filter() {
 
 function start_pts_filter(pts, name, xr, yr) {
   if (plot_filter) {
+    publish('range.selected', null);
     pts_filters.delete(plot_filter);
     root.selectAll('.plot').select('.brush').call(group.plot().brush().move, null);
   }
@@ -269,6 +270,7 @@ function start_pts_filter(pts, name, xr, yr) {
 
 function update_pts_filter(xr, yr) {
   plot_filter.xr(xr).yr(yr);
+  publish('range.selected', yr);
   update_filter();
 }
 
