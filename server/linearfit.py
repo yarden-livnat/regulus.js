@@ -32,6 +32,7 @@ def update_partition(partition, idx, pts, ndims, measure):
             "coeff": reg.coef_.tolist(),
             "intercept": reg.intercept_
             },
+
         'fitness': reg.score(x,y)
         }
 
@@ -66,3 +67,4 @@ if __name__ == '__main__':
         linear_fit(argv[1],argv[2])
     else:
         linear_fit(argv[1])
+

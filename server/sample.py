@@ -1,7 +1,7 @@
 import subprocess
 import testfun
 from regulus_file import RegulusFile
-from linearfit import linearfit
+from linearfit import linear_fit
 sim_dir = 'temp'
 sim_out = 'new_sample_outputs.csv'
 sim_in = 'new_sample_inputs.csv'
