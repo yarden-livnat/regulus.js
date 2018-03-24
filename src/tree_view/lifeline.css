@@ -42,3 +42,16 @@
   fill: black;
   font-size: 10pt;
 }
+
+#persistence-slider {
+  /*display: inline-block;*/
+}
+
+.lifeline .slider-wrapper {
+  display: inline-block;
+  width: 600px;
+}
+
+#fitness-value {
+  padding-left: 10px;
+}

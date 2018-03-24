@@ -106,5 +106,6 @@ function slider_range_update(range) {
 }
 
 function on_fitness() {
+  root.select('#fitness-value').text(+this.value);
   tree.front(+this.value);
 }

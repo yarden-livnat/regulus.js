@@ -22,7 +22,7 @@ export default function Lifeline() {
   let y_axis = d3.axisLeft(sy).ticks(4, '.1e');
   let x_axis = d3.axisBottom(pt_scale).ticks(8, 's');
   let value_scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0,1]).clamp(true);
-  let color = d3.scaleSequential(chromatic['interpolateRdYlBu']).domain([0,1]);
+  let color = d3.scaleSequential(chromatic['interpolateRdYlBu']).domain([1,0]);
 
   let active = [];
 
@@ -54,7 +54,7 @@ export default function Lifeline() {
 
     function visit(node) {
       if (node.model.fitness > level) {
-        console.log(`fitness:  id:${node.id} lvl: ${node.lvl}  fitness:${node.model.fitness}  level: ${level}`);
+        // console.log(`fitness:  id:${node.id} lvl: ${node.lvl}  fitness:${node.model.fitness}  level: ${level}`);
         node.front = true;
         active.push(node);
       }
