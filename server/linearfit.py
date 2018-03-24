@@ -67,4 +67,3 @@ if __name__ == '__main__':
         linear_fit(argv[1],argv[2])
     else:
         linear_fit(argv[1])
-
