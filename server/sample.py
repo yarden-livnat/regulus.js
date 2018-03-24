@@ -2,6 +2,10 @@ import subprocess
 import threading
 import testfun
 from regulus_file import RegulusFile
+from pathlib import Path
+from Predictor import Predictor
+import numpy as np
+import pandas as pd
 
 def sample_in_thread(reg_file):
 
@@ -22,6 +26,19 @@ def sample_in_thread(reg_file):
         new_data = testfun.generateres(new_input)
         testfun.savefile(new_data, sim_dir, sim_out)
 
+    # if 'PNNL' in reg_file.name:
+    if reg_file.name == 'PNNL_7D_mean':
+        df = pd.DataFrame(reg_file.pts)
+        data = df.as_matrix()
+        # print(df.columns)
+        # print(reg_file.pts[0])
+        print('poop')
+        X = data[:, :-1]
+        y = data[:, -1]
+        model = Predictor(X, y)
+        new_data = model.predict(sample_input)
+        np.savetxt(Path(sim_dir / sim_out), np.hstack((sample_input, new_data)),
+                   delimiter=',')
 
     reg_file.add_pts_from_csv(sim_dir+'/'+sim_out)
     updated_dataset = reg_file.save_all_pts()
@@ -34,11 +51,17 @@ def sample_in_thread(reg_file):
     if reg_file.name == 'deployment':
         subprocess.run(['python', 'post.py', '-k', '500', '-d', '6', '--name', 'deployment', '--all',  updated_dataset,'-j', '1', '-t',updated_json],check=True)
 
+    if 'PNNL' in reg_file.name:
+        subprocess.run(['python', 'post.py', '-k', '50', '-b', '1', '-G',
+                        'relaxed beta skeleton', '--name', reg_file.name,
+                        '--all', updated_dataset,'-j', '1', '-t',updated_json],
+                       check=True)
+
     print("New Results are available")
 
     return
 
-	
+
 def createsample(received, data_dir):
     if received is not None:
 
