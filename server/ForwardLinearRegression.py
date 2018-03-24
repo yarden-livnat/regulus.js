@@ -28,6 +28,7 @@ class ForwardLinearRegression:
         self.intercept = results[0]
         self.coefficients = results[1:]
         self.r_squared = None
+        #self.compute_R_squared()
 
     def apply(self, X):
         """ Applies the linear model to a set of incoming data
