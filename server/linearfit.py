@@ -1,59 +1,79 @@
-import numpy as np
-import json
 from sys import argv
-from ForwardLinearRegression import ForwardLinearRegression as flr
-from sklearn.metrics import r2_score as fit
+import json
+import csv
+import numpy as np
+from sklearn.metrics import r2_score as fitness
+from sklearn.metrics import explained_variance_score
+from sklearn import linear_model
+
+Y = []
+
+
 def load_file(file):
     with open(file) as json_data:
         data = json.load(json_data)
+        return data
 
-    return data
 
-def calc_regression(mscs, pts, dims):
+def update_partition(partition, idx, pts, ndims, measure):
+    span = partition["span"]
+    pts_idx = idx[span[0]:span[1]]
+    [min, max] = partition["minmax_idx"]
+    pts_idx.append(min)
+    pts_idx.append(max)
+
+    data = pts[pts_idx, :]
+    x = data[:, 0:ndims]
+    y = data[:, ndims + measure]
+    ##flr = ForwardLinearRegression(x, y)
+    reg = linear_model.LinearRegression()
+    reg.fit(x,y)
+    partition['model'] = {
+        "linear_reg": {
+            "coeff": reg.coef_.tolist(),#flr.coefficients.tolist(),
+            "intercept": reg.intercept_#flr.intercept
+            },
+        'fitness': reg.score(x,y)#fitness(y,flr.apply(x))
+        }
+    yp = reg.predict(x)
+    Y.append([list(y), list(yp)])
+    print('id: {} size: {} fitness: {}'.format(partition['id'], len(data), partition['model']['fitness']))
+
+
+def update_msc(msc, pts, ndims, measure):
+    print(msc['name'])
+    if 'pts_idx' not in msc:
+        print('ignored')
+    for partition in msc["partitions"]:
+        update_partition(partition, msc['pts_idx'], pts, ndims, measure)
+
+
+def calc_regression(mscs, pts, ndims):
     array_pts = np.array(pts)
-    dim_len = len(dims)
-    measure_col = 0
-    for msc in mscs:
+    for measure, msc in enumerate(mscs):
+        update_msc(msc, array_pts, ndims, measure)
 
-        for partition in msc["partitions"]:
-            span = partition["span"]
-            pts_idx = msc["pts_idx"][span[0]:span[1]]
-            [min, max] = partition["minmax_idx"]
-            if min not in pts_idx:
-                pts_idx.append(min)
-            if max not in pts_idx:
-                pts_idx.append(max)
-            cur_xy = array_pts[pts_idx,:]
-            cur_x = cur_xy[:,0:dim_len]
-            cur_y = cur_xy[:,dim_len+measure_col]
-            ref = flr(cur_x,cur_y)
 
-            model = {}
-            linear = {}
-            linear["coeff"] = ref.coefficients.tolist()
-            linear["intercept"] = ref.intercept
-            linear["fitness"] = fit(ref.apply(cur_x),cur_y)
+def linear_fit(filename, output=None):
+    regulus = load_file(filename)
+    calc_regression(regulus["mscs"], regulus["pts"], len(regulus["dims"]))
 
-            model["lieanr_reg"] = linear
+    if output is None:
+        output = filename
 
-            partition["model"] = model
+    with open(output, 'w') as outfile:
+        json.dump(regulus, outfile)
 
-        measure_col = measure_col + 1
-    return
-def linearfit(filename, rename = None):
-    data = load_file(filename)
-    calc_regression(data["mscs"], data["pts"], data["dims"])
+    with open('pts.csv', 'w') as f:
+        r = csv.writer(f,delimiter=',')
+        r.writerows(Y)
 
-    if rename is not None:
-        with open(rename, 'w') as outfile:
-            json.dump(data, outfile)
+    with open('pts.json', 'w') as f:
+        json.dump(Y, f)
 
-    else:
-        with open(filename, 'w') as outfile:
-            json.dump(data, outfile)
 
 if __name__ == '__main__':
     if len(argv)>2:
-        linearfit(argv[1],argv[2])
+        linear_fit(argv[1],argv[2])
     else:
-        linearfit(argv[1])
+        linear_fit(argv[1])
