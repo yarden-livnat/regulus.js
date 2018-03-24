@@ -2,21 +2,11 @@ from sys import argv
 import json
 import csv
 import numpy as np
-# from sklearn.metrics import r2_score as fitness
-# from sklearn.metrics import explained_variance_score as fitness
-# from sklearn.metrics import r2_score as fitness
+from sklearn.metrics import r2_score as fitness
+from sklearn.metrics import explained_variance_score
 from ForwardLinearRegression import ForwardLinearRegression
 
-
 Y = []
-
-
-def fitness(y, yp):
-    chi = 0
-    for i, yp_i in enumerate(yp):
-        delta = y[i]-yp_i
-        chi += delta*delta/yp_i
-    return chi
 
 
 def load_file(file):
@@ -46,8 +36,6 @@ def update_partition(partition, idx, pts, ndims, measure):
         }
     yp = flr.apply(x)
     Y.append([list(y), list(yp)])
-    # for i in range(2000):
-    #     print(y[i], y[[i], ])
     print('id: {} size: {} fitness: {}'.format(partition['id'], len(data), partition['model']['fitness']))
 
 
