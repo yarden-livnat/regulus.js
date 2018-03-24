@@ -435,11 +435,17 @@ def post(args=None):
 
     if ns.p:
         param_in_file = regulus['mscs'][0]["params"]
-        ns.knn = param_in_file["k"]
-        ns.beta = param_in_file["b"]
-        ns.norm = param_in_file["n"]
-        ns.graph = param_in_file["G"]
-        ns.gradient = param_in_file["g"]
+        if type(param_in_file) is dict:
+            if "k" in param_in_file:
+                ns.knn = param_in_file["k"]
+            if "b" in param_in_file:
+                ns.beta = param_in_file["b"]
+            if "n" in param_in_file:
+                ns.norm = param_in_file["n"]
+            if "G" in param_in_file:
+                ns.graph = param_in_file["G"]
+            if "g" in param_in_file:
+                ns.gradient = param_in_file["g"]
 
     if ns.multiple:
         catalog_path = path / 'catalog.json'
