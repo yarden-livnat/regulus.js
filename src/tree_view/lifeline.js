@@ -22,9 +22,10 @@ export default function Lifeline() {
   let y_axis = d3.axisLeft(sy).ticks(4, '.1e');
   let x_axis = d3.axisBottom(pt_scale).ticks(8, 's');
   let value_scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0,1]).clamp(true);
-  let color = d3.scaleSequential(chromatic['interpolateRdYlBu']).domain([1,0]);
+  let color = d3.scaleSequential(chromatic['interpolateRdYlBu']).domain([1,0.8]);
 
   let active = [];
+  let level = 0;
 
   let dispatch = d3.dispatch('highlight', 'select', 'details');
 
@@ -35,12 +36,12 @@ export default function Lifeline() {
     pt_scale.domain([0, root.size]);
   }
 
-  function update_front(level) {
+  function update_front() {
     for (let node of active)
       node.front = false;
 
     active = [];
-    if (root.model)
+    if (root && root.model)
       visit(root);
 
     let d3nodes = svg.select('.nodes').selectAll('.node')
@@ -193,6 +194,7 @@ export default function Lifeline() {
     preprocess();
     layout();
     render();
+    update_front();
     return this;
   };
 
@@ -250,7 +252,8 @@ export default function Lifeline() {
   };
 
   lifeline.front = function(_) {
-    update_front(_);
+    level = _;
+    update_front();
     return this;
   };
 

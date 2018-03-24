@@ -47,8 +47,8 @@
   /*display: inline-block;*/
 }
 
-.lifeline .slider-wrapper {
-  display: inline-block;
+.slider-wrapper {
+  display: inline-grid;
   width: 600px;
 }
 

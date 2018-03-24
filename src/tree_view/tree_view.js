@@ -46,6 +46,8 @@ export function setup(el) {
   root.select('.fitness-slider')
     .on('input', on_fitness);
 
+  root.select('#fitness-value').text(+root.select('.fitness-slider').attr('value'));
+
   subscribe('data.new', (topic, data) => reset(data));
   subscribe('data.loaded', (topic, data) => reset(null));
   subscribe('partition.highlight', (topic, partition, on) => tree.highlight(partition, on));
