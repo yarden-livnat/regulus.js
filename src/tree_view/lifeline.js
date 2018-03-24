@@ -55,7 +55,6 @@ export default function Lifeline() {
 
     function visit(node) {
       if (node.model.fitness > level) {
-        // console.log(`fitness:  id:${node.id} lvl: ${node.lvl}  fitness:${node.model.fitness}  level: ${level}`);
         node.front = true;
         active.push(node);
       }
