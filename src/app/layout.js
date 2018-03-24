@@ -5,6 +5,21 @@ import * as $ from 'jquery';
 import GoldenLayout from 'golden-layout/dist/goldenlayout';
 
 let config = {
+  settings: {
+    hasHeaders: true,
+    constrainDragToContainer: true,
+    reorderEnabled: true,
+    selectionEnabled: false,
+    popoutWholeStack: false,
+    blockedPopoutsThrowError: true,
+    closePopoutsOnUnload: true,
+    showPopoutIcon: false,
+    showMaximiseIcon: true,
+    showCloseIcon: false
+  },
+  dimensions:{
+
+  },
   content: [{
     type: 'column',
     content: [{
@@ -18,11 +33,22 @@ let config = {
           title: 'Partition'
         },
         {
-          type: 'component',
-          componentName: 'topology',
-          componentState: {},
-          title: 'Topology',
-          isClosable: false,
+          type: 'stack',
+          content: [{
+              type: 'component',
+              componentName: 'topology',
+              componentState: {},
+              title: 'Topology',
+              isClosable: false,
+            },
+            // {
+            //   type: 'component',
+            //   componentName: 'crosscut',
+            //   componentState: {},
+            //   title: 'Crosscut',
+            //   isClosable: false,
+            // },
+          ]
         },
         {
           type: 'column',
@@ -61,6 +87,7 @@ let config = {
 
 let state = null; //localStorage.getItem('layout.state');
 let layout = new GoldenLayout( state && JSON.parse(state) || config, $('#layoutContainer'));
+layout._isFullPage = true;
 
 layout.on('stateChanged', save);
 
@@ -71,6 +98,10 @@ export function register(name, component) {
 
 export function init() {
   layout.init();
+}
+
+export function on(event, cb, ctx) {
+  layout.on(event, cb, ctx);
 }
 
 export function save() {

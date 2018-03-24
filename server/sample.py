@@ -1,5 +1,4 @@
 import subprocess
-import threading
 import testfun
 from regulus_file import RegulusFile
 from pathlib import Path
@@ -7,21 +6,22 @@ from Predictor import Predictor
 import numpy as np
 import pandas as pd
 
-def sample_in_thread(reg_file):
+sim_dir = 'temp'
+sim_out = 'new_sample_outputs.csv'
+sim_in = 'new_sample_inputs.csv'
 
-    sim_dir = 'temp'
-    sim_out = 'new_sample_outputs.csv'
-    sim_in = 'new_sample_inputs.csv'
 
+def sample(spec, data_dir):
+    reg_file = RegulusFile()
+    reg_file.load_reg_json(spec=spec, dir=data_dir)
+    reg_file.update(spec=spec)
     reg_file.save_sample_inputs(sim_in)
+
     sample_input = reg_file.report_sample_input()
 
-
-    if reg_file.name =='deployment':
+    if reg_file.name == 'deployment':
         subprocess.run(['python', '-m', 'scenario', '-t', 'Transition_scenario.xml', '-o', sim_dir, '-p',sim_in, '-r', sim_out], check=True)
-
-
-    if reg_file.name == 'test':
+    elif reg_file.name == 'test':
         new_input = testfun.load_input(sample_input)
         new_data = testfun.generateres(new_input)
         testfun.savefile(new_data, sim_dir, sim_out)
@@ -40,16 +40,16 @@ def sample_in_thread(reg_file):
         np.savetxt(Path(sim_dir / sim_out), np.hstack((sample_input, new_data)),
                    delimiter=',')
 
+
     reg_file.add_pts_from_csv(sim_dir+'/'+sim_out)
     updated_dataset = reg_file.save_all_pts()
     updated_json = reg_file.save_json()
 
-
+    status = {}
     if reg_file.name == 'test':
-        subprocess.run(['python', 'post.py', '-k', '50', '-d', '4', '--name', 'test', '--all', updated_dataset,'-j', '1', '-t',updated_json],check=True)
-
-    if reg_file.name == 'deployment':
-        subprocess.run(['python', 'post.py', '-k', '500', '-d', '6', '--name', 'deployment', '--all',  updated_dataset,'-j', '1', '-t',updated_json],check=True)
+        status = subprocess.run(['python', 'post.py', '-k', '50', '-d', '4', '--name', 'test', updated_dataset])
+    elif reg_file.name == 'deployment':
+        status = subprocess.run(['python', 'post.py', '-k', '500', '-d', '6', '--name', 'deployment', updated_dataset])
 
     if 'PNNL' in reg_file.name:
         subprocess.run(['python', 'post.py', '-k', '50', '-b', '1', '-G',
@@ -59,17 +59,20 @@ def sample_in_thread(reg_file):
 
     print("New Results are available")
 
-    return
+    return status.returncode
 
 
-def createsample(received, data_dir):
-    if received is not None:
+# def createsample(received, data_dir):
+#     if received is not None:
+#
+#         reg_file = RegulusFile()
+#         reg_file.load_reg_json(spec= received, dir = data_dir)
+#         reg_file.update(spec = received)
+#
+#         thread = threading.Thread(target=sample_in_thread, args=[reg_file])
+#         thread.start()
+#
+#     return
 
-        reg_file = RegulusFile()
-        reg_file.load_reg_json(spec= received, dir = data_dir)
-        reg_file.update(spec = received)
-
-        thread = threading.Thread(target=sample_in_thread, args=[reg_file])
-        thread.start()
-
-    return
+if __name__ == '__main__':
+    pass

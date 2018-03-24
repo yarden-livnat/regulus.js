@@ -1,0 +1,25 @@
+<div class="config">
+  <label>Y axis</label>
+  <select id="tree-y-type">
+    <option value="log">log</option>
+    <option value="linear">linear</select>
+  </select>
+  <div id="persistence-slider"></div>
+
+  <label>Fitness </label>
+  <div class="slider-wrapper">
+    <input type="range" class="fitness-slider" min="0.0" max="1" step="0.0001" list="steplist">
+  </div>
+  <label id="fitness-value"></label>
+  <datalist id="steplist">
+    <option>0.7</option>
+    <option>0.75</option>
+    <option>0.8</option>
+    <option>0.85</option>
+    <option>0.9</option>
+    <option>0.95</option>
+    <option>1.0</option>
+  </datalist>
+</div>
+
+<div class="tree"></div>

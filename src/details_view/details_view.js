@@ -9,7 +9,7 @@ import {ensure_single} from "../utils/events";
 import config from './config';
 import Group from './group';
 import XAxis from './x_axis';
-import template from './details.html';
+import template from './details_view.html';
 import './style.css';
 
 
@@ -83,6 +83,7 @@ export function setup(el) {
 
 
   subscribe('data.new', (topic, data) => reset(data));
+  subscribe('data.loaded', (topic, data) => update([]));
   subscribe('partition.details', (topic, partition, on) => on ? add(partition) : remove(partition));
   subscribe('partition.highlight', (topic, partition, on) => on_highlight(partition, on));
   subscribe('partition.selected', (topic, partition, on) => on_selected(partition, on));
@@ -99,31 +100,12 @@ function resize() {
   let dw = parseInt(root.select('.dims').style('width'));
   let dh = parseInt(root.select('.dims').style('height'));
 
-  // console.log('bbox: ',d3.select('.dims').node().getBoundingClientRect());
-  console.log('details resize', width, height, rw, rh - ch-dh, dw, dh, 'set to:', dw,Math.max(partitions.length * config.group_size, height) );
-  // console.log('set to:',Math.max(dims.length * (config.plot_width+10) + 100, gw));
-  // if (partitions.length >0) {
-  //   let g = root.select('.group');
-  //   gw = parseInt(g.style('width'));
-  //   // let gh = parseInt(g.style('height'));
-  //   //
-  //   // let dh = parseInt(root.select('.dims').style('height'));
-  // }
-
-    // root.select('.details')
-    //   .attr('width', gw)
-    //   .attr('height', partitions.length * config.group_size + dh)
-    //   .attr('max-width', rw).attr('max-height', rh-ch);
-
-    root.select('.groups')
-      .style('width', `${Math.max(dims.length * (config.plot_width+10) + 100, dw)}px`)
-      .style('height', `${rh-ch-dh-35}px`);
-  // }
-
+  root.select('.groups')
+    .style('width', `${Math.max(dims.length * (config.plot_width+10) + 100, dw)}px`)
+    .style('height', `${rh-ch-dh-35}px`);
 }
 
 export function set_size(w, h) {
-  console.log('details set_size', w, h);
   width = w;
   height = h;
   if (root)
@@ -244,7 +226,7 @@ function on_resample_pts(pts) {
 }
 
 function add(partition) {
-  let reg_curve = partition.regression_curve;
+  let reg_curve = partition.inverse_regression_curve;
 
   partitions.push({
     id: partition.id,

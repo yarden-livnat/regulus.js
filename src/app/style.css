@@ -42,6 +42,13 @@ body text {
   /*padding:5px;*/
 }
 
+.separator {
+  width: 100%;
+  height: 1px;
+  margin: 5px;
+  background-color: #666666;
+}
+
 .expand {
   flex: 1 1 auto;
 }

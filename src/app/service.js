@@ -1,8 +1,11 @@
+import {publish } from "../utils/pubsub";
+
+let JOB_INQUIRY_DELAY = 5000;
+
 
 export function load_catalog() {
   return fetch('catalog')
-    .then( response =>
-      response.json() )
+    .then( response => response.json() )
 }
 
 export function load_dataset(name) {
@@ -17,6 +20,29 @@ export function submit_resample(spec) {
     headers: {
       'Content-Type': 'application/json'
     }
-  });
+  })
+    .then(r => r.json())
+    .then(monitor_job);
+}
+
+function monitor_job(id) {
+  publish('status', `job id:${id}`);
+  check(id);
+
+  function check(id) {
+    setTimeout( () => {
+      fetch(`status/${id}`)
+        .then(r => r.json())
+        .then(reply => {
+          if (reply.status === 'done' || reply.status === 'error') {
+            publish('status', `job ${id} ${reply.status}`);
+          }
+          else if (reply.status === 'running') {
+            check(id);
+          }
+        })
+    },
+      JOB_INQUIRY_DELAY);
+  }
 }
 

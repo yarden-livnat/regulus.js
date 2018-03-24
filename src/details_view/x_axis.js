@@ -5,8 +5,8 @@ export default function XAxis() {
   let width = 120 - margin.left - margin.right;
   let height = 30 - margin.top - margin.bottom;
 
-  let scale = d3.scaleLinear().range([0, width]);
-  let axis =  d3.axisBottom(scale).ticks(2, 's');
+  let scale = d3.scaleLinear().range([0, width]).nice();
+  let axis =  d3.axisBottom(scale).ticks(3, 's');
   let name = 'x axis';
   let brush = d3.brushX().extent([[0, -10], [width, 0]])
     .on('brush', brushed)
@@ -15,7 +15,7 @@ export default function XAxis() {
   let dispatch = d3.dispatch('filter');
 
   function brushed(dim) {
-    let range = d3.event.selection.map(scale.domain(dim.extent).invert);
+    let range = d3.event.selection.map(scale.domain(dim.extent).nice().invert);
     dim.filter.range(range);
     dispatch.call('filter', this, dim, range);
   }
@@ -24,7 +24,7 @@ export default function XAxis() {
     if (!d3.event.sourceEvent) return; // Only transition after input.
     if (!d3.event.selection) return; // Ignore empty selections.
     if (dim.filter) {
-      let range = d3.event.selection.map(scale.domain(dim.extent).invert);
+      let range = d3.event.selection.map(scale.domain(dim.extent).nice().invert);
       if ((range[1] - range[0]) / (dim.extent[1] - dim.extent[0]) < 0.01)
         dim.filter.range(null);
       else
@@ -42,7 +42,7 @@ export default function XAxis() {
 
   function x(selection) {
     selection.select('.x').each(function (d) {
-      scale.domain(d.extent);
+      scale.domain(d.extent).nice();
       d3.select(this).call(axis);
     });
 
@@ -79,7 +79,7 @@ export default function XAxis() {
 
   x.domain = function(_) {
     name = _.name;
-    scale.domain(_.extent);
+    scale.domain(_.extent).nice();
     return this;
   };
 

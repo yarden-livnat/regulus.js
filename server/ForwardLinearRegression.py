@@ -40,11 +40,9 @@ class ForwardLinearRegression:
         """ Returns the coefficient of determination for the data fit
             to this object and caches it locally to this object
         """
-        if self.r_squared is not None:
-            return self.r_squared
-
-        yHat = self.apply(self.training_data[:, :-1])
-        self.r_squared = sum(np.sqrt((yHat-self.training_data[:, -1])**2))
+        if self.r_squared is None:
+            yHat = self.apply(self.training_data[:, :-1])
+            self.r_squared = sum(np.sqrt((yHat-self.training_data[:, -1])**2))
 
         return self.r_squared
 

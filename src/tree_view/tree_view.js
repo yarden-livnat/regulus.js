@@ -26,15 +26,15 @@ export function setup(el) {
     .on('change', select_y_type)
     .property('value', y_type);
 
-  resize();
-
-  root.select('.tree').call(tree
+  tree
     .on('highlight', (node, on) => publish('partition.highlight', node, on))
     .on('select', (node, on) => publish('partition.selected', node, on))
     .on('details', (node, on) => publish('partition.details', node, on))
     .y_type(y_type)
-    .y_min(y_min));
+    .y_min(y_min);
 
+  root.select('.tree').call(tree);
+  resize();
 
   slider
     .range(y_range)
@@ -43,7 +43,11 @@ export function setup(el) {
   root.select('#persistence-slider')
     .call(slider);
 
+  root.select('.fitness-slider')
+    .on('input', on_fitness);
+
   subscribe('data.new', (topic, data) => reset(data));
+  subscribe('data.loaded', (topic, data) => reset(null));
   subscribe('partition.highlight', (topic, partition, on) => tree.highlight(partition, on));
   subscribe('partition.details', (topic, partition, on) => tree.details(partition, on));
   subscribe('partition.selected', (topic, partition, on) => tree.selected(partition, on));
@@ -52,14 +56,12 @@ export function setup(el) {
 }
 
 export function set_size(w, h) {
-  if (root)
-    resize();
+  if (root) resize();
 }
 
 function resize() {
   let rw = parseInt(root.style('width'));
   let rh = parseInt(root.style('height'));
-  // let cw = parseInt(root.select('.config').style('width'));
   let ch = parseInt(root.select('.config').style('height'));
 
   tree.set_size(rw, rh - ch);
@@ -68,7 +70,10 @@ function resize() {
 function reset(data) {
   msc = data;
 
-  tree.data(msc.partitions, msc.tree);
+  if (!data)
+    tree.data([], null);
+  else
+    tree.data(msc.partitions, msc.tree);
 }
 
 function select_y_type() {
@@ -78,7 +83,7 @@ function select_y_type() {
 function set_persistence_range(range) {
   if (!prevent) {
     prevent = true;
-    if (saved[0] != range[0] || saved[1] != range[1]) {
+    if (saved[0] !== range[0] || saved[1] !== range[1]) {
       root.select('#persistence-slider')
         .call(slider.move, range);
     }
@@ -98,4 +103,9 @@ function slider_range_update(range) {
   }
   else
   if (prevent) console.log('tree slider prevent');
+}
+
+function on_fitness() {
+  root.select('#fitness-value').text(+this.value);
+  tree.front(+this.value);
 }

@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {inverseMultipleRegression, averageStd, linspace, fun as kernel, subLinearSpace} from '../statistics/regression';
+import {inverseMultipleRegression, averageStd, multipleRegression, linspace, fun as kernel, subLinearSpace} from '../statistics/regression';
 
 let bandwidth_factor = 0.1;
 
@@ -13,6 +13,7 @@ export default class Partition {
     this.minmax = [msc.pts[data.minmax_idx[0]][msc.name], msc.pts[data.minmax_idx[1]][msc.name]];
     this.pts_idx = data.span;
     this._pts = data.pts;
+    this.model = data.model;
 
     this.parent = data.parent;
     this.children = data.children;
@@ -24,8 +25,15 @@ export default class Partition {
 
     this.size = this.pts_idx[1]-this.pts_idx[0];
 
-    this._reg_curve = null;
+    this._regression_curve = null;
+    this._inverse_regression_curve = null;
+    this._std_dev = null;
+    this._inv_reg_curve = null;
     this._stat = null;
+    this.extent = [0, 0];
+    this.dims_vec = null;
+    this.measure_vec = null;
+    this.bandwidth = 0;
   }
 
   get dims() {
@@ -55,7 +63,7 @@ export default class Partition {
 
       this._pts = pts;
       let t1 = performance.now();
-      console.log(`compute pts in ${d3.format('d')(t1-t0)} msec`);
+      // console.log(`compute pts in ${d3.format('d')(t1-t0)} msec`);
     }
     return this._pts;
   }
@@ -87,34 +95,48 @@ export default class Partition {
     return this._stat;
   }
 
-  get regression_curve() {
-    if (!this._reg_curve) {
-      let t0 = performance.now();
-      let current_measure = this.msc.measure; //
+  get inverse_regression_curve() {
+    if (!this._inv_reg_curve) {
+      this._get_vecs();
 
-      let dims = this.pts.map( pt => this.msc.dims.map( d => pt[d.name] ));
-      let measure = this.pts.map( pt => pt[current_measure.name]);
+      this._inverse_regression_curve = inverseMultipleRegression(this.dims_vec, this.measure_vec, kernel.gaussian,this.bandwidth);
+      this._std_dev = averageStd(this.dims_vec, this.measure_vec, kernel.gaussian, this.bandwidth);
 
-      let t1 = performance.now();
-      let extent = current_measure.extent;
-      let bandwidth = bandwidth_factor * (extent[1] - extent[0]);
-
-      let py = subLinearSpace(this.minmax, extent, 100);
-      this.inversse_regression_curve = inverseMultipleRegression(dims, measure, kernel.gaussian, bandwidth);
-      this.std_dev = averageStd(dims, measure, kernel.gaussian, bandwidth);
-      let px = this.inversse_regression_curve(py);
-      let std = this.std_dev(py, px);
+      let py = subLinearSpace(this.minmax, this.extent, 100);
+      let px = this._inverse_regression_curve(py);
+      let std = this._std_dev(py, px);
 
       let curve = [];
       for (let i=0; i<py.length; i++) {
         curve.push(px[i].concat([py[i]]));
       }
-      let columns = this.dims.map(d => d.name).concat(current_measure.name);
+      let columns = this.dims.map(d => d.name).concat(this.msc.measure.name);
 
-      this._reg_curve = {curve, std, columns};
-      let t2 = performance.now();
-      console.log(`compute regression curve in ${d3.format('d')(t2-t0)} msec  [get pts in ${d3.format('d')(t1-t0)} msec]`);
+      this._inv_reg_curve = {curve, std, columns};
     }
-    return this._reg_curve;
+    return this._inv_reg_curve;
+  }
+
+  get regression_curve() {
+    if (!this._regression_curve) {
+      let t0 = performance.now();
+      this. _get_vecs();
+      let t1 = performance.now();
+      this._get_vecs();
+      this._regression_curve = multipleRegression(this.dims_vec, this.measure_vec, kernel.gaussian, this.bandwidth);
+      let t2 = performance.now();
+      // console.log(`compute regression curves in ${d3.format('d')(t2-t0)} msec  (vec:${d3.format('d')(t1-t0)})`);
+    }
+    return this._regression_curve;
+  }
+
+  _get_vecs() {
+    if (this.dims_vec) return;
+
+    let current_measure = this.msc.measure;
+    this.dims_vec = this.pts.map( pt => this.msc.dims.map( d => pt[d.name] ));
+    this.measure_vec = this.pts.map( pt => pt[current_measure.name]);
+    this.extent = current_measure.extent;
+    this.bandwidth = bandwidth_factor * (this.extent[1] - this.extent[0]);
   }
 }

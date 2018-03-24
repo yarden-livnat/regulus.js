@@ -107,20 +107,20 @@
 
 .details_view .plot {
   position: relative;
-  margin:  10px 10px 0 10px;
+  margin:  10px 8px 0 10px;
   /*background-color: #fdfdfd;*/
 }
 
 .details_view .plot .canvas-bg {
-  /*position: absolute;*/
-  top: 1px;
-  left: 1px;
+  position: relative;
+  top: -2px;
+  left: -2px;
 }
 
 .details_view .plot .canvas-fg {
   position: absolute;
-  top: 1px;
-  left: 1px;
+  top: -2px;
+  left: -2px;
 }
 
 
