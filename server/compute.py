@@ -57,6 +57,7 @@ def compute(spec, data_dir):
 
     linear_fit(updated_json)
 
+
     print("New Structure is available")
     return status.returncode
 
