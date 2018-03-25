@@ -31,6 +31,8 @@ def sample(spec, data_dir):
         data = np.array(reg_file.pts)
         X = data[:, :-1]
         y = data[:, -1]
+        print(X)
+        print(y)
         model = Predictor(X, y)
         new_data = model.predict(sample_input)
         np.savetxt(sim_dir / sim_out,
