@@ -5,7 +5,6 @@ from regulus_file import RegulusFile
 from linearfit import linear_fit
 
 
-
 def decode(param_received):
     newparams = {}
     # k, G, g, b, n
@@ -21,19 +20,18 @@ def decode(param_received):
             else:
                 newparams[param] = int(strip_list[idx+1])
     return newparams
-def update_params(reg, spec):
 
+
+def update_params(reg, spec):
     newparams = decode(spec["params"])
 
-
     for key, value in newparams.items():
-        if value!= '':
+        if value != '':
             for msc in reg.mscs:
                 msc["params"][key] = value
 
     reg.name = spec["name"]
     reg.version = spec["new_version"]
-
 
 
 def compute(spec, data_dir):
@@ -50,14 +48,6 @@ def compute(spec, data_dir):
     status = {}
 
     status = subprocess.run(['python', 'post.py', '-d', str(dims), '--name', name, '--p', updated_json])
-
-    #if reg_file.name == 'test':
-    #    status = subprocess.run(['python', 'post.py', '-d', dims, '--name', name, '-p', 1, updated_json])
-    #elif reg_file.name == 'deployment':
-    #    status = subprocess.run(['python', 'post.py', '-d', dims, '--name', name, '-p', 1, updated_json])
-    #else:
-    #    print("Can't resample for selected data")
-    #    exit(255)
 
     linear_fit(updated_json)
 

@@ -1,6 +1,7 @@
 import numpy as np
 import json
 import csv
+import sys
 import argparse
 from pathlib import Path
 from collections import defaultdict
@@ -378,19 +379,48 @@ def save_regulus(filename, regulus):
         json.dump(regulus, f, indent=2)
 
 
+# def merge_params(msc, ns, p):
+#     params = msc['params']
+#     args = sys.argv[0:0]
+#     for key, value in params.items():
+#         args.extend(['-' + key, str(value)])
+#     ns = p.parse_args(args + sys.argv[1:])
+#     for param in ['knn', 'beta', 'norm', 'gradient', 'graph']:
+#         if hasattr(ns, param):
+#             params[param] = ns[param]
+#     return ns, params
+
+def merge_params(msc, ns, p):
+    params = msc['params']
+    args = sys.argv[0:0]
+    for key, value in params.items():
+        args.extend(['-' + key, str(value)])
+    ns = p.parse_args(args + sys.argv[1:])
+    for param in ['knn', 'beta', 'norm', 'gradient', 'graph']:
+        if hasattr(ns, param):
+            params[param] = ns[param]
+    return ns, params
+
+
+defaults = {
+    'knn': 100,
+    'beta': 1.0,
+    'norm': 'feature',
+    'gradient': 'steepest',
+    'graph': 'relaxed beta skeleton'
+}
+
+
 def post(args=None):
     p = argparse.ArgumentParser(prog='analyze', description='Extract input dimension and a single measure')
     p.add_argument('filename', help='input file [.csv data file or a regulus .json file]')
-    p.add_argument('-k', '--knn', type=int, default=100, help='knn')
-    p.add_argument('-b', '--beta', type=float, default=1.0, help='beta')
-    p.add_argument('-n', '--norm', default='feature', help='norm')
-    p.add_argument('-g', '--gradient', default='steepest', help='gradient')
-    p.add_argument('-G', '--graph', default='relaxed beta skeleton', help='graph')
+    p.add_argument('-k', '--knn', type=int, help='knn')
+    p.add_argument('-b', '--beta', type=float, help='beta')
+    p.add_argument('-n', '--norm', help='norm')
+    p.add_argument('-g', '--gradient', help='gradient')
+    p.add_argument('-G', '--graph', help='graph')
 
     p.add_argument('--p', action='store_true', help='use parameters in json')
-
-
-    p.add_argument('--multiple', action='store_true', help='save to multiple jsons')
 
     p.add_argument('-d', '--dims', type=int, default=None, help='number of input dimensions')
     p.add_argument('-m', '--measure', default=None, help='measure name')
@@ -398,19 +428,14 @@ def post(args=None):
 
     p.add_argument('--name', default=None, help='dataset name')
 
-    p.add_argument('--debug', action='store_true', help='process all measures')
+    p.add_argument('--debug', action='store_true')
 
     ns = p.parse_args(args)
-
-
-
 
     filename = Path(ns.filename)
     path = filename.parent
 
-    catalog = {}
     regulus = None
-    measures = []
 
     if filename.suffix == '.csv':
         regulus = create_from_csv(filename, ns.name or path.name or filename.stem, ns.dims)
@@ -433,86 +458,58 @@ def post(args=None):
     np_data = np.array(data)
     x = np_data[:, 0:ndims]
 
-    if ns.p:
-        param_in_file = regulus['mscs'][0]["params"]
-        if type(param_in_file) is dict:
-            if "k" in param_in_file:
-                ns.knn = param_in_file["k"]
-            if "b" in param_in_file:
-                ns.beta = param_in_file["b"]
-            if "n" in param_in_file:
-                ns.norm = param_in_file["n"]
-            if "G" in param_in_file:
-                ns.graph = param_in_file["G"]
-            if "g" in param_in_file:
-                ns.gradient = param_in_file["g"]
+    # if ns.p:
+    #     param_in_file = regulus['mscs'][0]["params"]
+    #     if type(param_in_file) is dict:
+    #         if "k" in param_in_file:
+    #             ns.knn = param_in_file["k"]
+    #         if "b" in param_in_file:
+    #             ns.beta = param_in_file["b"]
+    #         if "n" in param_in_file:
+    #             ns.norm = param_in_file["n"]
+    #         if "G" in param_in_file:
+    #             ns.graph = param_in_file["G"]
+    #         if "g" in param_in_file:
+    #             ns.gradient = param_in_file["g"]
 
-
-
-    if ns.multiple:
-        catalog_path = path / 'catalog.json'
-        if catalog_path.exists():
-            with open(catalog_path) as f:
-                catalog = json.load(f)
-    else:
-        catalog = {
-            'name': filename.parent,
-            'data': filename.name,
-            'dims': ndims,
-            'msc': []
-        }
-    if ns.name is not None:
-        catalog['name'] = ns.name
-
-    available = set(catalog['msc'])
     mscs = dict()
     for msc in regulus['mscs']:
         mscs[msc['name']] = msc
 
     #params = '-k {} -b {} -n {} -G "{}" -g {}'.format(ns.knn, ns.beta, ns.norm, ns.graph, ns.gradient)
-    params = {}
-    params['k'] = ns.knn
-    params['b'] = ns.beta
-    params['n'] = ns.norm
-    params['G'] = ns.graph
-    params['g'] = ns.gradient
+    # params = {}
+    # params['k'] = ns.knn
+    # params['b'] = ns.beta
+    # params['n'] = ns.norm
+    # params['G'] = ns.graph
+    # params['g'] = ns.gradient
 
     for i, measure in enumerate(measures):
         try:
             print('\npost ', measure)
+
+            params = {}
+            if measure in mscs:
+                ns, params = merge_params(mscs[measure], ns, p)
+
             y = np_data[:, ndims+i]
             msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm, connect=True)
             msc.build(X=x, Y=y, names=regulus['dims']+[measure])
             if ns.debug:
                 msc.save(path/ (measure + '_hierarchy.csv'), path / (measure + '_partition.json'))
 
-            if ns.multiple:
-                Post(ns.debug)\
-                    .data(y)\
-                    .msc(msc.base_partitions, msc.hierarchy)\
-                    .build()\
-                    .verify()\
-                    .save(path, measure, params)
-            else:
-                tree = Post(ns.debug) \
-                    .data(y) \
-                    .msc(msc.base_partitions, msc.hierarchy) \
-                    .build() \
-                    .verify() \
-                    .get_tree(measure, params)
-                mscs[measure] = tree
-            available.add(measure)
+            Post(ns.debug)\
+                .data(y)\
+                .msc(msc.base_partitions, msc.hierarchy)\
+                .build()\
+                .verify()\
+                .save(path, measure, params)
+
         except RuntimeError as error:
             print(error)
 
-    catalog['msc'] = sorted(list(available))
-
-    if not ns.multiple:
-        regulus['mscs'] = list(mscs.values())
-        save_regulus(filename.with_suffix('.json'), regulus)
-    else:
-        with open(path / 'catalog.json', 'w') as f:
-            json.dump(catalog, f, indent=2)
+    regulus['mscs'] = list(mscs.values())
+    save_regulus(filename.with_suffix('.json'), regulus)
 
 
 if __name__ == '__main__':
