@@ -40,8 +40,8 @@ export function setup(el) {
     .on('details', (node, on) => publish('partition.details', node, on))
     .y_type(y_type)
     .y_min(y_min)
-    .feature_name('fitness')
-    .feature_value(0.5);
+    .feature(current_feature)
+    .feature_value(current_feature.value);
 
   root.select('.tree').call(tree);
   resize();
@@ -181,7 +181,7 @@ function select_feature() {
     .attr('step', current_feature.step)
     .attr('value', current_feature.value);
 
-  tree.feature_name(current_feature.name)
+  tree.feature(current_feature)
     .feature_value(current_feature.value);
 }
 

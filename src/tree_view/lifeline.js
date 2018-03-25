@@ -27,6 +27,7 @@ export default function Lifeline() {
   let active = [];
   let level = 0;
   let feature = null;
+  let feature_name = null;
   let feature_value = 0;
 
   let dispatch = d3.dispatch('highlight', 'select', 'details');
@@ -51,13 +52,14 @@ export default function Lifeline() {
       .data(active, d => d.id);
 
     d3nodes
-      .attr('fill', d => color(d.model && d.model[feature] || 0));
+      // .attr('fill', d => color(d.model && d.model[feature_name] || 0));
+    .attr('fill', d => d3.rgb(color(d.model && d.model[feature_name] || 0)).brighter(2));
 
     d3nodes.exit()
       .attr('fill', 'white');
 
     function visit(node) {
-      if (node.model[feature] > feature_value) {
+      if (node.model[feature_name] > feature_value) {
         node.front = true;
         active.push(node);
       }
@@ -157,7 +159,7 @@ export default function Lifeline() {
   }
 
   function lifeline(selection) {
-    // console.log('lifeline', width, height);
+    console.log('lifeline', width, height);
     svg = selection
       .append('svg')
         .attr('class', 'lifeline')
@@ -209,10 +211,6 @@ export default function Lifeline() {
       .attr("dy", 5)
       .attr("result", "shadow");
 
-    // filter.append('feBlend')
-    //   .attr('in', 'SourceGraphic')
-    //   .attr('in2', 'blurOut')
-    //   .attr('mode', 'normal');
     let feMerge = filter.append("feMerge");
 
     feMerge.append("feMergeNode")
@@ -297,8 +295,10 @@ export default function Lifeline() {
     return this;
   };
 
-  lifeline.feature_name = function(_) {
+  lifeline.feature = function(_) {
     feature = _;
+    feature_name = feature.name;
+    color.domain([feature.range[1], feature.range[0]]);
     update_front();
     return this;
   };
@@ -306,6 +306,7 @@ export default function Lifeline() {
   lifeline.set_size = function(w, h) {
     width = w - margin.left - margin.right;
     height = h - margin.top - margin.bottom;
+    console.log('lifeline.setsize', width, height);
 
     pt_scale.range([0, width]);
     sx.range([0, width]);
@@ -320,7 +321,7 @@ export default function Lifeline() {
         .attr('transform', `translate(0,${height})`);
 
       svg.select('.x .axis-label')
-        .attr('transform', `translate(${width / 2}, ${/*height + */margin.top + 20})`);
+        .attr('transform', `translate(${width / 2}, ${margin.top + 20})`);
 
       svg.select('.y .axis-label')
         .attr('y', 0 - margin.left)
