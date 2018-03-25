@@ -1,6 +1,9 @@
 import * as d3 from 'd3';
 import PriorityQueue from 'js-priority-queue';
+
 import Chart from './chart';
+// import Similarity from './similarity';
+
 import {publish, subscribe} from "../utils";
 import template from './filtering_view.html';
 import './style.css';
@@ -12,6 +15,9 @@ let prevent = false;
 let saved = [0,1];
 let sx = d3.scaleLog().clamp(true);
 let sy = d3.scaleLinear();
+
+// let similarity = Similarity()
+//   .on('filter', report_filter);
 
 
 export function setup(el) {
@@ -26,17 +32,24 @@ export function setup(el) {
       prevent = false;
     }
     // else console.log('ctrl move prevent');
-  }
-);
+  });
+
+  // similarity(root);
 
   subscribe('persistence.range', (topic, range) => move_range(range));
   subscribe('data.new', (topic, data) => reset(data));
+}
+
+
+function report_filter(type, value) {
+  publish(type, value);
 }
 
 function reset(data) {
   msc = data;
 
   reset_persistence();
+  // similarity.data(msc.tree);
 }
 
 function move_range(range) {

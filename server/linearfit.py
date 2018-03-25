@@ -1,12 +1,11 @@
+#!/usr/bin/env python
+
 from sys import argv
 import json
-import csv
 import numpy as np
 from sklearn.metrics import r2_score as fitness
 from sklearn.metrics import explained_variance_score
-from ForwardLinearRegression import ForwardLinearRegression
-
-Y = []
+from sklearn import linear_model
 
 
 def load_file(file):
@@ -25,18 +24,16 @@ def update_partition(partition, idx, pts, ndims, measure):
     data = pts[pts_idx, :]
     x = data[:, 0:ndims]
     y = data[:, ndims + measure]
-    flr = ForwardLinearRegression(x, y)
+    reg = linear_model.LinearRegression()
+    reg.fit(x, y)
 
     partition['model'] = {
         "linear_reg": {
-            "coeff": flr.coefficients.tolist(),
-            "intercept": flr.intercept
+            "coeff": reg.coef_.tolist(),
+            "intercept": reg.intercept_
             },
-        'fitness': fitness(y, flr.apply(x))
+        'fitness': reg.score(x,y)
         }
-    yp = flr.apply(x)
-    Y.append([list(y), list(yp)])
-    print('id: {} size: {} fitness: {}'.format(partition['id'], len(data), partition['model']['fitness']))
 
 
 def update_msc(msc, pts, ndims, measure):
@@ -62,13 +59,6 @@ def linear_fit(filename, output=None):
 
     with open(output, 'w') as outfile:
         json.dump(regulus, outfile)
-
-    with open('pts.csv', 'w') as f:
-        r = csv.writer(f,delimiter=',')
-        r.writerows(Y)
-
-    with open('pts.json', 'w') as f:
-        json.dump(Y, f)
 
 
 if __name__ == '__main__':

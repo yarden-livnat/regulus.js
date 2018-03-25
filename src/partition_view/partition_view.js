@@ -69,7 +69,8 @@ function reset(_) {
   shared_msc = _;
   selected = null;
   highlight = null;
-  show_partition();
+  measure = null;
+  show_partition(true);
 }
 
 function select_partition(partition, show) {
@@ -93,7 +94,7 @@ function highlight_partition(partition, show) {
   }
 }
 
-function show_partition() {
+function show_partition(init=false) {
   current = highlight || selected || shared_msc.as_partition;
 
   root.select('.partition_id')
@@ -122,6 +123,9 @@ function show_partition() {
   let measures = stat.filter(s => s.type === 'measure')
     .sort( (a,b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
   show('.measures', measures, true);
+  if (init && measures.length === 1) {
+    select_measure(measures[0]);
+  }
 }
 
 function show(selector, data, listen=false) {

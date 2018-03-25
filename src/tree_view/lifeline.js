@@ -22,9 +22,12 @@ export default function Lifeline() {
   let y_axis = d3.axisLeft(sy).ticks(4, '.1e');
   let x_axis = d3.axisBottom(pt_scale).ticks(8, 's');
   let value_scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0,1]).clamp(true);
-  let color = d3.scaleSequential(chromatic['interpolateRdYlBu']).domain([1,0]);
+  let color = d3.scaleSequential(chromatic['interpolateRdYlBu']).domain([1,0.8]);
 
   let active = [];
+  let level = 0;
+  let feature = null;
+  let feature_value = 0;
 
   let dispatch = d3.dispatch('highlight', 'select', 'details');
 
@@ -35,26 +38,26 @@ export default function Lifeline() {
     pt_scale.domain([0, root.size]);
   }
 
-  function update_front(level) {
+  function update_front() {
+    if (!svg) return;
     for (let node of active)
       node.front = false;
 
     active = [];
-    if (root.model)
+    if (root && root.model && feature)
       visit(root);
 
     let d3nodes = svg.select('.nodes').selectAll('.node')
       .data(active, d => d.id);
 
     d3nodes
-      .attr('fill', d => color(d.model && d.model.fitness || 0));
+      .attr('fill', d => color(d.model && d.model[feature] || 0));
 
     d3nodes.exit()
       .attr('fill', 'white');
 
     function visit(node) {
-      if (node.model.fitness > level) {
-        // console.log(`fitness:  id:${node.id} lvl: ${node.lvl}  fitness:${node.model.fitness}  level: ${level}`);
+      if (node.model[feature] > feature_value) {
         node.front = true;
         active.push(node);
       }
@@ -115,13 +118,19 @@ export default function Lifeline() {
       .merge(d3nodes)
         .attr('x', d => sx(d.pos.x))
         .attr('y', d => sy(d.pos.yp))
-        .attr('width', d => sx(d.pos.x + d.pos.w) - sx(d.pos.x))
-        .attr('height', d => sy(d.pos.y) - sy(d.pos.yp))
+        .attr('width', d => {
+          // console.log(d.id, d.pos.x, d.pos.w, sx(d.pos.x + d.pos.w), sx(d.pos.x));
+          return Math.max(0, sx(d.pos.x + d.pos.w) - sx(d.pos.x)-1)
+        })
+        .attr('height', d => Math.max(0, sy(d.pos.y) - sy(d.pos.yp)-1))
         .classed('highlight', d => d.highlight)
         .classed('selected', d => d.selected)
         .classed('details', d => d.details);
 
     d3nodes.exit().remove();
+
+    svg.select('.nodes').selectAll('.details')
+      .each(function() { this.parentNode.appendChild(this);});
 
     render_names(items.filter(d => d.details || d.highlight || d.selected ));
   }
@@ -182,6 +191,36 @@ export default function Lifeline() {
         .style('text-anchor', 'middle')
         .text('Persistence');
 
+    let defs = svg.append('defs');
+
+    let filter = defs.append('filter')
+      .attr('id', 'drop-shadow')
+      .attr('height', '130%')
+      .attr('width', '130%');
+
+    filter.append("feGaussianBlur")
+      .attr("in", "SourceAlpha")
+      .attr("stdDeviation", 5)
+      .attr("result", "blur");
+
+    filter.append("feOffset")
+      .attr("in", "blur")
+      .attr("dx", 5)
+      .attr("dy", 5)
+      .attr("result", "shadow");
+
+    // filter.append('feBlend')
+    //   .attr('in', 'SourceGraphic')
+    //   .attr('in2', 'blurOut')
+    //   .attr('mode', 'normal');
+    let feMerge = filter.append("feMerge");
+
+    feMerge.append("feMergeNode")
+      .attr("in", "shadow");
+    feMerge.append("feMergeNode")
+      .attr("in", "SourceGraphic");
+
+
     return lifeline;
   }
 
@@ -193,17 +232,20 @@ export default function Lifeline() {
     preprocess();
     layout();
     render();
+    update_front();
     return this;
   };
 
   lifeline.highlight = function(node, on) {
     node.highlight = on;
+    svg.selectAll('.node').data([node], d => d.id).classed('highlight', on);
     if (on) render_names();
     return this;
   };
 
   lifeline.details = function(node, on) {
     node.details = on;
+    node.highlight = on;
     render();
     return this;
   };
@@ -249,8 +291,15 @@ export default function Lifeline() {
     return this;
   };
 
-  lifeline.front = function(_) {
-    update_front(_);
+  lifeline.feature_value = function(_) {
+    feature_value = _;
+    update_front();
+    return this;
+  };
+
+  lifeline.feature_name = function(_) {
+    feature = _;
+    update_front();
     return this;
   };
 

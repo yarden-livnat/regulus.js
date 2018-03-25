@@ -115,6 +115,8 @@
   position: relative;
   top: -2px;
   left: -2px;
+  stroke: black;
+  stroke-width: 2px;
 }
 
 .details_view .plot .canvas-fg {

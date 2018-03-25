@@ -1,28 +1,28 @@
-.resample {
+.resample_view {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   /*max-width: 250px;*/
   /*width: 200px;*/
   padding: 5px
 }
 
-.resample .params label {
+.resample_view .params label {
   padding-right: 5px;
 }
 
-.resample .samples {
+.resample_view .samples {
   width: 3em;
 }
 
-.resample .sigma {
+.resample_view .sigma {
   width: 3em;
 }
 
-.resample .submit {
+.resample_view .submit {
   float: right;
 }
 
 
-.resample .border {
+.resample_view .border {
   width: 100%;
   height: 1px;
   background-color: #999999;
