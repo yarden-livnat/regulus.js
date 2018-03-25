@@ -1,23 +1,23 @@
 import subprocess
+import numpy as np
+import pandas as pd
+from pathlib import Path
+
 import testfun
 from regulus_file import RegulusFile
 from linearfit import linear_fit
-
-from pathlib import Path
 from Predictor import Predictor
-import numpy as np
-import pandas as pd
 
 sim_dir = 'temp'
 sim_out = 'new_sample_outputs.csv'
 sim_in = 'new_sample_inputs.csv'
+
 
 def sample(spec, data_dir):
     reg_file = RegulusFile()
     reg_file.load_reg_json(spec=spec, dir=data_dir)
     reg_file.update(spec=spec)
     reg_file.save_sample_inputs(sim_in)
-
 
     sample_input = reg_file.report_sample_input()
 
@@ -33,7 +33,7 @@ def sample(spec, data_dir):
         y = data[:, -1]
         model = Predictor(X, y)
         new_data = model.predict(sample_input)
-        np.savetxt(sim_dir + '/' + sim_out,
+        np.savetxt(sim_dir / sim_out,
                    np.hstack((np.array(sample_input), np.atleast_2d(new_data).T)), delimiter=',')
     else:
         print("can't resample for " + reg_file.name)
