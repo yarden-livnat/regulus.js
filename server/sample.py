@@ -45,7 +45,7 @@ def sample(spec, data_dir):
     #else:
     #    print("can't resample for selected data")
     #    exit(255)
-    linearfit(updated_json)
+    linear_fit(updated_json)
 
     print("New Results are available")
     return status.returncode

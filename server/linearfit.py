@@ -62,6 +62,7 @@ def linear_fit(filename, output=None):
         json.dump(regulus, outfile)
 
 
+
 if __name__ == '__main__':
     if len(argv)>2:
         linear_fit(argv[1],argv[2])

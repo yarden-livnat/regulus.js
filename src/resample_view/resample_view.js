@@ -13,7 +13,6 @@ let current = null;
 let sample_range = null;
 let sigma_scale = 1;
 let n_samples = 0;
-
 let queue= [];
 
 let format = d3.format('.2g');
@@ -38,6 +37,11 @@ export function setup(el) {
       update_sigma(+this.value);
     });
 
+  root.select('.compute')
+    // .attr('disabled', true)
+    .on('click', d => submit_params(root.select('.parameters').property('value')));
+
+
   subscribe('data.new', (topic, data) => reset(data));
   subscribe('partition.selected', (topic, partition, on) => select(partition, on));
   subscribe('range.selected', (topic, range) => set_resample_range(range));
@@ -48,6 +52,9 @@ function reset(data) {
   selected = null;
   current = null;
   queue = [];
+  console.log(msc);
+  root.select('#msc-parameters')
+      .text(Object.entries(msc.parms));
   // root.select('.submit').attr('disabled', true);
 }
 
@@ -137,6 +144,7 @@ function review() {
   publish('resample.pts', pts);
 }
 
+
 function submit(n) {
   if (!current) return;
 
@@ -146,4 +154,16 @@ function submit(n) {
     new_version: msc.shared.version+'.1',
     pts: current.pts
   })
+}
+
+function submit_params(parameters) {
+
+    if (!parameters || msc === null) return;
+
+    service.submit_recompute({
+        name: msc.shared.name,
+        version: msc.shared.version,
+        new_version: msc.shared.version+'.1',
+        params: parameters
+    })
 }

@@ -25,6 +25,20 @@ export function submit_resample(spec) {
     .then(monitor_job);
 }
 
+export function submit_recompute(spec) {
+    return fetch('recompute', {
+        method: 'post',
+        body: JSON.stringify(spec),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(r => r.json())
+        .then(monitor_job);
+}
+
+
+
 function monitor_job(id) {
   publish('status', `job id:${id}`);
   check(id);

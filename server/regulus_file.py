@@ -66,11 +66,15 @@ class RegulusFile(object):
     # Right now used to load specification received and update class
     def update(self, spec = None, version = None, name = None, notes = None, new_version = None, new_input_object = None, new_sample = None):
         if spec is not None:
+            try:
+                self.name = spec['name']
+                self.old_version = self.version
+                self.version = spec['new_version']
 
-            self.name = spec['name']
-            self.old_version = self.version
-            self.version = spec['new_version']
-            self.extract_input(spec['pts'])
+                self.extract_input(spec['pts'])
+            except KeyError as error:
+                print(error)
+                exit()
 
         if version is not None:
             self.version = version
