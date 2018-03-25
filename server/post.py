@@ -387,6 +387,9 @@ def post(args=None):
     p.add_argument('-g', '--gradient', default='steepest', help='gradient')
     p.add_argument('-G', '--graph', default='relaxed beta skeleton', help='graph')
 
+    p.add_argument('--p', action='store_true', help='use parameters in json')
+
+
     p.add_argument('--multiple', action='store_true', help='save to multiple jsons')
 
     p.add_argument('-d', '--dims', type=int, default=None, help='number of input dimensions')
@@ -398,6 +401,10 @@ def post(args=None):
     p.add_argument('--debug', action='store_true', help='process all measures')
 
     ns = p.parse_args(args)
+
+
+
+
     filename = Path(ns.filename)
     path = filename.parent
 
@@ -426,6 +433,20 @@ def post(args=None):
     np_data = np.array(data)
     x = np_data[:, 0:ndims]
 
+    if ns.p:
+        param_in_file = regulus['mscs'][0]["params"]
+        if type(param_in_file) is dict:
+            if "k" in param_in_file:
+                ns.knn = param_in_file["k"]
+            if "b" in param_in_file:
+                ns.beta = param_in_file["b"]
+            if "n" in param_in_file:
+                ns.norm = param_in_file["n"]
+            if "G" in param_in_file:
+                ns.graph = param_in_file["G"]
+            if "g" in param_in_file:
+                ns.gradient = param_in_file["g"]
+
     if ns.multiple:
         catalog_path = path / 'catalog.json'
         if catalog_path.exists():
@@ -446,7 +467,13 @@ def post(args=None):
     for msc in regulus['mscs']:
         mscs[msc['name']] = msc
 
-    params = '-k {} -b {} -n {} -G "{}" -g {}'.format(ns.knn, ns.beta, ns.norm, ns.graph, ns.gradient)
+    #params = '-k {} -b {} -n {} -G "{}" -g {}'.format(ns.knn, ns.beta, ns.norm, ns.graph, ns.gradient)
+    params = {}
+    params['k'] = ns.knn
+    params['b'] = ns.beta
+    params['n'] = ns.norm
+    params['G'] = ns.graph
+    params['g'] = ns.gradient
 
     for i, measure in enumerate(measures):
         try:
