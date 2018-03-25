@@ -22,7 +22,7 @@ export default function Lifeline() {
   let y_axis = d3.axisLeft(sy).ticks(4, '.1e');
   let x_axis = d3.axisBottom(pt_scale).ticks(8, 's');
   let value_scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0,1]).clamp(true);
-  let color = d3.scaleSequential(chromatic['interpolateRdYlBu']).domain([1,0.8]);
+  let color = d3.scaleSequential(chromatic['interpolateWarm']).domain([1,0.8]);
 
   let active = [];
   let level = 0;
@@ -52,7 +52,8 @@ export default function Lifeline() {
       .data(active, d => d.id);
 
     d3nodes
-      .attr('fill', d => color(d.model && d.model[feature_name] || 0));
+      // .attr('fill', d => color(d.model && d.model[feature_name] || 0));
+    .attr('fill', d => d3.rgb(color(d.model && d.model[feature_name] || 0)).brighter());
 
     d3nodes.exit()
       .attr('fill', 'white');
@@ -158,7 +159,7 @@ export default function Lifeline() {
   }
 
   function lifeline(selection) {
-    // console.log('lifeline', width, height);
+    console.log('lifeline', width, height);
     svg = selection
       .append('svg')
         .attr('class', 'lifeline')
@@ -210,10 +211,6 @@ export default function Lifeline() {
       .attr("dy", 5)
       .attr("result", "shadow");
 
-    // filter.append('feBlend')
-    //   .attr('in', 'SourceGraphic')
-    //   .attr('in2', 'blurOut')
-    //   .attr('mode', 'normal');
     let feMerge = filter.append("feMerge");
 
     feMerge.append("feMergeNode")
@@ -309,6 +306,7 @@ export default function Lifeline() {
   lifeline.set_size = function(w, h) {
     width = w - margin.left - margin.right;
     height = h - margin.top - margin.bottom;
+    console.log('lifeline.setsize', width, height);
 
     pt_scale.range([0, width]);
     sx.range([0, width]);
@@ -323,7 +321,7 @@ export default function Lifeline() {
         .attr('transform', `translate(0,${height})`);
 
       svg.select('.x .axis-label')
-        .attr('transform', `translate(${width / 2}, ${/*height + */margin.top + 20})`);
+        .attr('transform', `translate(${width / 2}, ${margin.top + 20})`);
 
       svg.select('.y .axis-label')
         .attr('y', 0 - margin.left)
