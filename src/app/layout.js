@@ -89,8 +89,6 @@ let state = localStorage.getItem('layout.state');
 let layout = new GoldenLayout( state && JSON.parse(state) || config, $('#layoutContainer'));
 layout._isFullPage = true;
 
-layout.on('stateChanged', save);
-
 
 export function register(name, component) {
   layout.registerComponent(name, component);
@@ -98,6 +96,7 @@ export function register(name, component) {
 
 export function init() {
   layout.init();
+  // layout.on('stateChanged', save);
 }
 
 export function on(event, cb, ctx) {

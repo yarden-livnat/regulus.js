@@ -46,15 +46,3 @@
   font-size: 10pt;
 }
 
-#persistence-slider {
-  /*display: inline-block;*/
-}
-
-.slider-wrapper {
-  display: inline-grid;
-  width: 600px;
-}
-
-#fitness-value {
-  padding-left: 10px;
-}

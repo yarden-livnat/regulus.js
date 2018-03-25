@@ -18,6 +18,14 @@ let slider = Slider();
 let prevent = false;
 let saved = [0, 0];
 
+let features = [
+  {id: 0, name: 'fitness', range: [0.8,1], step: 0.001, value: 0.5},
+  {id: 1, name: 'parent_similarity', range: [0, 1], step: 0.01, value: 0.5},
+  {id: 2, name: 'sibling_similarity', range: [0, 1], step: 0.01, value: 0.5}
+];
+
+let current_feature = features[0];
+
 export function setup(el) {
   root = d3.select(el);
   root.html(template);
@@ -31,7 +39,9 @@ export function setup(el) {
     .on('select', (node, on) => publish('partition.selected', node, on))
     .on('details', (node, on) => publish('partition.details', node, on))
     .y_type(y_type)
-    .y_min(y_min);
+    .y_min(y_min)
+    .feature_name('fitness')
+    .feature_value(0.5);
 
   root.select('.tree').call(tree);
   resize();
@@ -43,18 +53,30 @@ export function setup(el) {
   root.select('#persistence-slider')
     .call(slider);
 
-  root.select('.fitness-slider')
-    .on('input', on_fitness);
+  root.select('.feature-name')
+    .on('change', select_feature)
+    .selectAll('option')
+      .data(features)
+    .enter()
+      .append('option')
+      .attr('value', d => d.id)
+      .text(d => d.name);
 
-  root.select('#fitness-value').text(+root.select('.fitness-slider').attr('value'));
+  root.select('.feature-slider')
+    .on('input', update_feature);
+
+  root.select('.feature-value').text(+root.select('.feature-slider').attr('value'));
 
   subscribe('data.new', (topic, data) => reset(data));
   subscribe('data.loaded', (topic, data) => reset(null));
+  subscribe('data.updated', () => tree.update());
+
   subscribe('partition.highlight', (topic, partition, on) => tree.highlight(partition, on));
   subscribe('partition.details', (topic, partition, on) => tree.details(partition, on));
   subscribe('partition.selected', (topic, partition, on) => tree.selected(partition, on));
   subscribe('persistence.range', (topic, range) => set_persistence_range(range) );
-  subscribe('data.updated', () => tree.update());
+
+  subscribe('color-by', (topic, on) => tree.show_simcf)
 }
 
 export function set_size(w, h) {
@@ -72,10 +94,54 @@ function resize() {
 function reset(data) {
   msc = data;
 
+  process_data();
+
   if (!data)
     tree.data([], null);
   else
     tree.data(msc.partitions, msc.tree);
+}
+
+function process_data() {
+  if (!msc) return;
+  visit(msc.tree, 'parent_similarity', node => node.parent);
+  visit(msc.tree, 'sibling_similarity', sibling );
+
+  function visit(node, feature, func) {
+    let other = func(node);
+    if (other) {
+      let c = node.model.linear_reg.coeff;
+      let o = other.model.linear_reg.coeff;
+
+      if (c.norm === undefined) c.norm = norm(c);
+      if (o.norm === undefined) o.norm = norm(o);
+
+      node.model[feature] = dot(c,o)/(c.norm * o.norm);
+      // console.log('similarity:', node.id, node.similarity);
+    } else {
+      node.model[feature] = 0;
+    }
+    for (let child of node.children)
+      visit(child, feature, func);
+  }
+
+  function norm(vec) {
+    return Math.sqrt(vec.reduce( (a,v) => a + v*v, 0));
+  }
+
+  function dot(v1, v2) {
+    let d = 0;
+    for (let i=0; i<v1.length; i++) d += v1[i]*v2[i];
+    return d;
+  }
+
+  function sibling(node) {
+    if (node.parent) {
+      for (let child of node.parent.children)
+        if (child !== node) return child;
+      return null;
+    }
+  }
 }
 
 function select_y_type() {
@@ -107,7 +173,21 @@ function slider_range_update(range) {
   if (prevent) console.log('tree slider prevent');
 }
 
-function on_fitness() {
-  root.select('#fitness-value').text(+this.value);
-  tree.front(+this.value);
+function select_feature() {
+  current_feature = features[+this.value];
+  root.select('.feature-slider')
+    .attr('min', current_feature.range[0])
+    .attr('max', current_feature.range[1])
+    .attr('step', current_feature.step)
+    .attr('value', current_feature.value);
+
+  tree.feature_name(current_feature.name)
+    .feature_value(current_feature.value);
+}
+
+function update_feature() {
+  let value = +this.value;
+  root.select('#feature-value').text(value);
+  current_feature.value = value;
+  tree.feature_value(value);
 }

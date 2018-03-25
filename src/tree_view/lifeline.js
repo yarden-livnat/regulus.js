@@ -26,6 +26,8 @@ export default function Lifeline() {
 
   let active = [];
   let level = 0;
+  let feature = null;
+  let feature_value = 0;
 
   let dispatch = d3.dispatch('highlight', 'select', 'details');
 
@@ -37,24 +39,25 @@ export default function Lifeline() {
   }
 
   function update_front() {
+    if (!svg) return;
     for (let node of active)
       node.front = false;
 
     active = [];
-    if (root && root.model)
+    if (root && root.model && feature)
       visit(root);
 
     let d3nodes = svg.select('.nodes').selectAll('.node')
       .data(active, d => d.id);
 
     d3nodes
-      .attr('fill', d => color(d.model && d.model.fitness || 0));
+      .attr('fill', d => color(d.model && d.model[feature] || 0));
 
     d3nodes.exit()
       .attr('fill', 'white');
 
     function visit(node) {
-      if (node.model.fitness > level) {
+      if (node.model[feature] > feature_value) {
         node.front = true;
         active.push(node);
       }
@@ -115,8 +118,11 @@ export default function Lifeline() {
       .merge(d3nodes)
         .attr('x', d => sx(d.pos.x))
         .attr('y', d => sy(d.pos.yp))
-        .attr('width', d => sx(d.pos.x + d.pos.w) - sx(d.pos.x)-1)
-        .attr('height', d => sy(d.pos.y) - sy(d.pos.yp)-1)
+        .attr('width', d => {
+          // console.log(d.id, d.pos.x, d.pos.w, sx(d.pos.x + d.pos.w), sx(d.pos.x));
+          return Math.max(0, sx(d.pos.x + d.pos.w) - sx(d.pos.x)-1)
+        })
+        .attr('height', d => Math.max(0, sy(d.pos.y) - sy(d.pos.yp)-1))
         .classed('highlight', d => d.highlight)
         .classed('selected', d => d.selected)
         .classed('details', d => d.details);
@@ -285,8 +291,14 @@ export default function Lifeline() {
     return this;
   };
 
-  lifeline.front = function(_) {
-    level = _;
+  lifeline.feature_value = function(_) {
+    feature_value = _;
+    update_front();
+    return this;
+  };
+
+  lifeline.feature_name = function(_) {
+    feature = _;
     update_front();
     return this;
   };

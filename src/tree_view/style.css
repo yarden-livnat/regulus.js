@@ -1,0 +1,12 @@
+#persistence-slider {
+  /*display: inline-block;*/
+}
+
+.slider-wrapper {
+  display: inline-grid;
+  width: 300px;
+}
+
+#feature-value {
+  padding-left: 10px;
+}
