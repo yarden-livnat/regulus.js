@@ -35,16 +35,7 @@ def sample(spec, data_dir):
     updated_json = reg_file.save_json()
 
 
-    status = {}
-
     status = subprocess.run(['python', 'post.py', '-d', str(dims), '--name', name, '--p', updated_json])
-
-    #if reg_file.name == 'test':
-    #    status = subprocess.run(['python', 'post.py', '-k', '50', '-d', '4', '--name', 'test', updated_json])
-    #elif reg_file.name == 'deployment':
-    #else:
-    #    print("can't resample for selected data")
-    #    exit(255)
     linear_fit(updated_json)
 
     print("New Results are available")
@@ -77,18 +68,6 @@ def sample_without_processing(spec, data_dir):
     # Adding a dummy subprocess here?
 
 
-
-# def createsample(received, data_dir):
-#     if received is not None:
-#
-#         reg_file = RegulusFile()
-#         reg_file.load_reg_json(spec= received, dir = data_dir)
-#         reg_file.update(spec = received)
-#
-#         thread = threading.Thread(target=sample_in_thread, args=[reg_file])
-#         thread.start()
-#
-#     return
 
 if __name__ == '__main__':
     pass

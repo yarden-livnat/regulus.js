@@ -3,8 +3,6 @@
 from sys import argv
 import json
 import numpy as np
-from sklearn.metrics import r2_score as fitness
-from sklearn.metrics import explained_variance_score
 from sklearn import linear_model
 
 
@@ -24,6 +22,7 @@ def update_partition(partition, idx, pts, ndims, measure):
     data = pts[pts_idx, :]
     x = data[:, 0:ndims]
     y = data[:, ndims + measure]
+
     reg = linear_model.LinearRegression()
     reg.fit(x, y)
 
@@ -68,3 +67,4 @@ if __name__ == '__main__':
         linear_fit(argv[1],argv[2])
     else:
         linear_fit(argv[1])
+
