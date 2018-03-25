@@ -1,6 +1,7 @@
 import subprocess
 import testfun
 from regulus_file import RegulusFile
+
 from linearfit import linear_fit
 
 
@@ -24,6 +25,7 @@ def update_params(reg, spec):
 
     newparams = decode(spec["params"])
 
+
     for key, value in newparams.items():
         if value!= '':
             for msc in reg.mscs:
@@ -33,8 +35,10 @@ def update_params(reg, spec):
     reg.version = spec["new_version"]
 
 
+
 def compute(spec, data_dir):
     print(spec)
+
     reg_file = RegulusFile()
     reg_file.load_reg_json(spec=spec, dir=data_dir)
 
@@ -56,7 +60,6 @@ def compute(spec, data_dir):
     #    exit(255)
 
     linear_fit(updated_json)
-
 
     print("New Structure is available")
     return status.returncode
