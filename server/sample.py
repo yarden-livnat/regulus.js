@@ -1,6 +1,5 @@
 import subprocess
 import numpy as np
-import pandas as pd
 from pathlib import Path
 
 import testfun
@@ -33,8 +32,11 @@ def sample(spec, data_dir):
         y = data[:, -1]
         model = Predictor(X, y)
         new_data = model.predict(sample_input)
-        np.savetxt(sim_dir / sim_out,
-                   np.hstack((np.array(sample_input), np.atleast_2d(new_data).T)), delimiter=',')
+        path = Path(sim_dir)
+        if not path.exists():
+            path.mkdir()
+        np.savetxt(sim_dir / Path(sim_out), np.hstack((np.array(sample_input), np.atleast_2d(new_data).T)),
+                   delimiter=',')
     else:
         print("can't resample for " + reg_file.name)
         exit(255)
@@ -45,7 +47,6 @@ def sample(spec, data_dir):
     reg_file.add_pts_from_csv(sim_dir+'/'+sim_out)
     updated_dataset = reg_file.save_all_pts()
     updated_json = reg_file.save_json()
-
 
     status = subprocess.run(['python', 'post.py', '-d', str(dims), '--name', name, '--p', updated_json])
     linear_fit(updated_json)
