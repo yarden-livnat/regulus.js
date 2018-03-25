@@ -34,11 +34,13 @@ def sample(spec, data_dir):
         print(y)
         model = Predictor(X, y)
         new_data = model.predict(sample_input)
+
         path = Path(sim_dir)
         if not path.exists():
             path.mkdir()
         np.savetxt(sim_dir / Path(sim_out), np.hstack((np.array(sample_input), np.atleast_2d(new_data).T)),
                    delimiter=',')
+
     else:
         print("can't resample for " + reg_file.name)
         exit(255)
