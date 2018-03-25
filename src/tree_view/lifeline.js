@@ -22,7 +22,7 @@ export default function Lifeline() {
   let y_axis = d3.axisLeft(sy).ticks(4, '.1e');
   let x_axis = d3.axisBottom(pt_scale).ticks(8, 's');
   let value_scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0,1]).clamp(true);
-  let color = d3.scaleSequential(chromatic['interpolateWarm']).domain([1,0.8]);
+  let color = d3.scaleSequential(chromatic['interpolateRdYlBu']).domain([1,0.8]);
 
   let active = [];
   let level = 0;
@@ -53,7 +53,7 @@ export default function Lifeline() {
 
     d3nodes
       // .attr('fill', d => color(d.model && d.model[feature_name] || 0));
-    .attr('fill', d => d3.rgb(color(d.model && d.model[feature_name] || 0)).brighter());
+    .attr('fill', d => d3.rgb(color(d.model && d.model[feature_name] || 0)).brighter(2));
 
     d3nodes.exit()
       .attr('fill', 'white');

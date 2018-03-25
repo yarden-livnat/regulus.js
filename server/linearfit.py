@@ -34,6 +34,7 @@ def update_partition(partition, idx, pts, ndims, measure):
         'fitness': reg.score(x,y)
         }
 
+
 def update_msc(msc, pts, ndims, measure):
     print(msc['name'])
     if 'pts_idx' not in msc:
