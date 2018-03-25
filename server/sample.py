@@ -12,11 +12,13 @@ sim_out = 'new_sample_outputs.csv'
 sim_in = 'new_sample_inputs.csv'
 
 
+
 def sample(spec, data_dir):
     reg_file = RegulusFile()
     reg_file.load_reg_json(spec=spec, dir=data_dir)
     reg_file.update(spec=spec)
     reg_file.save_sample_inputs(sim_in)
+
 
     sample_input = reg_file.report_sample_input()
 
@@ -51,6 +53,7 @@ def sample(spec, data_dir):
     reg_file.add_pts_from_csv(sim_dir+'/'+sim_out)
     updated_dataset = reg_file.save_all_pts()
     updated_json = reg_file.save_json()
+
 
     status = subprocess.run(['python', 'post.py', '-d', str(dims), '--name', name, '--p', updated_json])
     linear_fit(updated_json)
@@ -90,6 +93,7 @@ def sample_without_processing(spec, data_dir):
 
     print("New Results are available")
     # Adding a dummy subprocess here?
+
 
 
 if __name__ == '__main__':

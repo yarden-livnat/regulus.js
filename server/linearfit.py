@@ -31,6 +31,7 @@ def update_partition(partition, idx, pts, ndims, measure):
             "coeff": reg.coef_.tolist(),
             "intercept": reg.intercept_
             },
+
         'fitness': reg.score(x,y)
         }
 
@@ -58,6 +59,7 @@ def linear_fit(filename, output=None):
 
     with open(output, 'w') as outfile:
         json.dump(regulus, outfile)
+
 
 
 if __name__ == '__main__':
