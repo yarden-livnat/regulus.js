@@ -22,22 +22,22 @@ export function setup(el) {
   root.html(template);
 
 
-  root.select('.submit')
+  root.select('#resample')
     // .attr('disabled', true)
-    .on('click', d => submit(root.select('.samples').property('value')));
+    .on('click', d => submit(root.select('#add-samples').property('value')));
 
-  root.select('.samples')
+  root.select('#add-samples')
     .on('input', function() {
       n_samples = +this.value;
       review();
     });
 
-  root.select('.sigma')
+  root.select('#add-sigma')
     .on('input', function() {
       update_sigma(+this.value);
     });
 
-  root.select('.compute')
+  root.select('#recompute')
     // .attr('disabled', true)
     .on('click', d => submit_params(root.select('.parameters').property('value')));
 

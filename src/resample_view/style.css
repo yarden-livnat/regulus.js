@@ -4,10 +4,29 @@
   /*width: 200px;*/
   padding: 5px
 }
+.resample_view .params {
+  border: 0.5px gray solid;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  padding: 5px;
+  margin: 5px;
+}
+
+.resample_view .params .sec {
+  text-transform: uppercase;
+  font-size: 9pt;
+  margin-bottom: 5px;
+  display: block;
+}
 
 .resample_view .params label {
   padding-right: 5px;
 }
+
+.resample_view .params button {
+  margin-top: 5px;
+}
+
 
 .resample_view .samples {
   width: 3em;
@@ -18,7 +37,7 @@
 }
 
 .resample_view .submit {
-  float: right;
+  /*float: right;*/
 }
 
 
