@@ -20,8 +20,8 @@ let saved = [0, 0];
 
 let features = [
   {id: 0, name: 'fitness', range: [0.8,1], step: 0.001, value: 0.5},
-  {id: 1, name: 'parent_similarity', range: [0, 1], step: 0.01, value: 0.5},
-  {id: 2, name: 'sibling_similarity', range: [0, 1], step: 0.01, value: 0.5}
+  {id: 1, name: 'parent_similarity', range: [-1, 1], step: 0.01, value: 0.5},
+  {id: 2, name: 'sibling_similarity', range: [-1, 1], step: 0.01, value: 0.5}
 ];
 
 let current_feature = features[0];
