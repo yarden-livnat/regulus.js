@@ -27,18 +27,14 @@ def sample(spec, data_dir):
         new_input = testfun.load_input(sample_input)
         new_data = testfun.generateres(new_input)
         testfun.savefile(new_data, sim_dir, sim_out)
-    elif 'PNNL' in reg_file.name:
-        df = pd.DataFrame(reg_file.pts)
-        data = df.as_matrix()
-        # print(df.columns)
-        # print(reg_file.pts[0])
-        print('poop')
+    elif 'pnnl' in reg_file.name.lower():
+        data = np.array(reg_file.pts)
         X = data[:, :-1]
         y = data[:, -1]
         model = Predictor(X, y)
         new_data = model.predict(sample_input)
-        np.savetxt(Path(sim_dir / sim_out), np.hstack((sample_input, new_data)),
-                   delimiter=',')
+        np.savetxt(sim_dir + '/' + sim_out,
+                   np.hstack((np.array(sample_input), np.atleast_2d(new_data).T)), delimiter=',')
     else:
         print("can't resample for " + reg_file.name)
         exit(255)
@@ -74,18 +70,14 @@ def sample_without_processing(spec, data_dir):
         new_input = testfun.load_input(sample_input)
         new_data = testfun.generateres(new_input)
         testfun.savefile(new_data, sim_dir, sim_out)
-    elif 'PNNL' in reg_file.name:
-        df = pd.DataFrame(reg_file.pts)
-        data = df.as_matrix()
-        # print(df.columns)
-        # print(reg_file.pts[0])
-        print('poop')
+    elif 'pnnl' in reg_file.name.lower():
+        data = np.array(reg_file.pts)
         X = data[:, :-1]
         y = data[:, -1]
         model = Predictor(X, y)
         new_data = model.predict(sample_input)
-        np.savetxt(Path(sim_dir / sim_out), np.hstack((sample_input, new_data)),
-                   delimiter=',')
+        np.savetxt(sim_dir + '/' + sim_out,
+                   np.hstack((np.array(sample_input), np.atleast_2d(new_data).T)), delimiter=',')
     else:
         print("can't resample for " + reg_file.name)
     reg_file.add_pts_from_csv(sim_dir + '/' + sim_out)
