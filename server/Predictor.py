@@ -11,28 +11,43 @@ from sklearn import neural_network
 from sklearn import svm
 from sklearn import tree
 
+# For the PNNL Data:
+# Gradient Boosting: 0.806777 +/- 0.096609
+# GP: 0.092744 +/- 0.352183
+# ARD: 0.192380 +/- 0.695032
+# ElasticNet: 0.298822 +/- 0.445474
+# Huber: 0.248975 +/- 0.656531
+# LARS: 0.237592 +/- 0.633618
+# LASSO: 0.238349 +/- 0.632020
+# OLS: 0.237592 +/- 0.633618
+# OMP: 0.169401 +/- 0.721100
+# PAR: 0.023094 +/- 0.236122
+# Ridge: 0.241813 +/- 0.624572
+# KNN: 0.285822 +/- 0.503111
+# Multi-layer Perceptron: -0.241078 +/- 0.226819
+
 class Predictor(object):
     def __init__(self, X, y):
         # String name for plotting, Instance, Dictionary of parameters
         # to cross-validate
         testModels = [
-                    #   ('AdaBoost', ensemble.AdaBoostRegressor(),
-                    #    {'loss': ['linear', 'square', 'exponential'],
-                    #     'n_estimators': [25, 50, 75, 100],
-                    #     'learning_rate': [0.01, 0.05, 0.1, 0.5]}),
-                    #   ('Bagging', ensemble.BaggingRegressor(),
-                    #    {'n_estimators': [25, 50, 75, 100],
-                    #     'max_samples': [0.25, 0.5, 0.75, 1.0],
-                    #     'max_features': [0.25, 0.5, 0.75, 1.0],
-                    #     'bootstrap_features': [False, True]}),
-                    #   ('Ensemble ET', ensemble.ExtraTreesRegressor(), {}),
+                      ('AdaBoost', ensemble.AdaBoostRegressor(),
+                       {'loss': ['linear', 'square', 'exponential'],
+                        'n_estimators': [25, 50, 75, 100],
+                        'learning_rate': [0.01, 0.05, 0.1, 0.5]}),
+                      ('Bagging', ensemble.BaggingRegressor(),
+                       {'n_estimators': [25, 50, 75, 100],
+                        'max_samples': [0.25, 0.5, 0.75, 1.0],
+                        'max_features': [0.25, 0.5, 0.75, 1.0],
+                        'bootstrap_features': [False, True]}),
+                      ('Ensemble ET', ensemble.ExtraTreesRegressor(), {}),
                       ('Gradient Boosting',
                        ensemble.GradientBoostingRegressor(),
                        {'loss': ['ls', 'lad', 'huber', 'quantile'],
                         'learning_rate': [0.01, 0.05, 0.1, 0.5],
                         'n_estimators': [25, 50, 75, 100, 250],
                         }),
-                    #   ('Random Forest', ensemble.RandomForestRegressor(), {}),
+                      ('Random Forest', ensemble.RandomForestRegressor(), {}),
                       ('GP', gaussian_process.GaussianProcessRegressor(),
                        {'n_restarts_optimizer': [0, 1, 5, 10],
                         'normalize_y': [False, True]}),
