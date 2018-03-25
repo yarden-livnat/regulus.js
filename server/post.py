@@ -447,6 +447,8 @@ def post(args=None):
             if "g" in param_in_file:
                 ns.gradient = param_in_file["g"]
 
+
+
     if ns.multiple:
         catalog_path = path / 'catalog.json'
         if catalog_path.exists():

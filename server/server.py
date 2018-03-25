@@ -5,6 +5,7 @@ from pathlib import Path
 import json
 import argparse
 from sample import sample
+from compute import compute
 
 p = argparse.ArgumentParser(description='Regulus server')
 p.add_argument('-d', '--data', default=None, help='data directory')
@@ -55,6 +56,18 @@ def resample():
 
     return json.dumps(job['id'])
 
+@app.post('/recompute')
+def recompute():
+    spec = request.json
+    print('resample request received', spec)
+
+    job = new_job()
+    job['status'] = 'scheduled'
+    job['code'] = 0
+    thread = threading.Thread(target=recompute_job, args=[job, spec])
+    thread.start()
+    return json.dumps(job['id'])
+
 
 @app.route('/status/<job_id>')
 def status(job_id):
@@ -88,5 +101,12 @@ def resample_job(job, spec):
         job['code'] = code
 
 
+def recompute_job(job, spec):
+    job['status'] = 'running'
+    code = compute(spec, data_dir)
+    print('job {} done with code:{}'.format(job['id'], code))
+    with jobs_lock:
+        job['status'] = 'done' if code == 0 else 'error'
+        job['code'] = code
 run(app, host='localhost', port=8081, debug=True, reloader=True)
 
