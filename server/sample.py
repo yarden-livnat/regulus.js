@@ -2,7 +2,7 @@ import subprocess
 import numpy as np
 import pandas as pd
 from pathlib import Path
-
+import os
 import testfun
 from regulus_file import RegulusFile
 from linearfit import linear_fit
@@ -35,6 +35,8 @@ def sample(spec, data_dir):
         print(y)
         model = Predictor(X, y)
         new_data = model.predict(sample_input)
+        if not os.path.exists(sim_dir):
+            os.makedirs(sim_dir)
         np.savetxt(sim_dir / sim_out,
                    np.hstack((np.array(sample_input), np.atleast_2d(new_data).T)), delimiter=',')
     else:
