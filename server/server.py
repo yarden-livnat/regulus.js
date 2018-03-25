@@ -108,6 +108,5 @@ def recompute_job(job, spec):
     with jobs_lock:
         job['status'] = 'done' if code == 0 else 'error'
         job['code'] = code
-
 run(app, host='localhost', port=8081, debug=True, reloader=True)
 

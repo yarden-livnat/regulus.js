@@ -5,7 +5,7 @@ from linearfit import linear_fit
 sim_dir = 'temp'
 sim_out = 'new_sample_outputs.csv'
 sim_in = 'new_sample_inputs.csv'
-
+from Predictor import Predictor
 
 
 def sample(spec, data_dir):
@@ -23,6 +23,20 @@ def sample(spec, data_dir):
         new_input = testfun.load_input(sample_input)
         new_data = testfun.generateres(new_input)
         testfun.savefile(new_data, sim_dir, sim_out)
+
+    elif 'PNNL' in reg_file.name:
+        df = pd.DataFrame(reg_file.pts)
+        data = df.as_matrix()
+        # print(df.columns)
+        # print(reg_file.pts[0])
+        print('poop')
+        X = data[:, :-1]
+        y = data[:, -1]
+        model = Predictor(X, y)
+        new_data = model.predict(sample_input)
+        np.savetxt(Path(sim_dir / sim_out), np.hstack((sample_input, new_data)),
+                   delimiter=',')
+
     else:
         print("can't resample for selected data")
         exit(255)
