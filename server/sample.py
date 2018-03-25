@@ -1,7 +1,7 @@
 import subprocess
 import numpy as np
 from pathlib import Path
-
+import os
 import testfun
 from regulus_file import RegulusFile
 from linearfit import linear_fit
