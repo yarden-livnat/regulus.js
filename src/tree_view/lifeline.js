@@ -32,8 +32,8 @@ export default function Lifeline() {
   let active = [];
   let level = 0;
   let feature = null;
-  let feature_name = null;
-  let feature_value = 0;
+  // let feature_name = null;
+  // let feature_value = 0;
   let front = false;
 
   let dispatch = d3.dispatch('highlight', 'select', 'details');
@@ -58,13 +58,13 @@ export default function Lifeline() {
       .data(active, d => d.id);
 
     d3nodes
-      .attr('fill', d => color(d.model && d.model[feature_name] || 0));
+      .attr('fill', d => color(d.model && d.model[feature.name] || 0));
 
     d3nodes.exit()
       .attr('fill', 'white');
 
     function visit(node) {
-      let match = node.model[feature_name] < feature_value;
+      let match = feature.cmp(node.model[feature.name], feature.value);
       if (match) {
         node.front = true;
         active.push(node);
@@ -318,16 +318,16 @@ export default function Lifeline() {
   };
 
   lifeline.feature_value = function(_) {
-    feature_value = _;
+    // feature_value = _;
     update_front();
     return this;
   };
 
   lifeline.feature = function(_) {
     feature = _;
-    feature_name = feature.name;
+    // feature_name = feature.name;
     color.domain([feature.domain[0], feature.domain[1]]);
-    feature_value = feature.value;
+    // feature_value = feature.value;
     update_front();
     return this;
   };

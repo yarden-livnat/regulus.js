@@ -18,9 +18,9 @@ let prevent = false;
 let saved = [0, 0];
 
 let features = [
-  {id: 0, name: 'fitness', domain: [0.5,1], step: 0.001, value: 0.5},
-  {id: 1, name: 'parent_similarity', domain: [-1, 1], step: 0.01, value: 0.5},
-  {id: 2, name: 'sibling_similarity', domain: [-1, 1], step: 0.01, value: 0.5}
+  {id: 0, name: 'fitness', domain: [0.5,1], step: 0.001, value: 0.5, cmp: (a,b) => a > b },
+  {id: 1, name: 'parent_similarity', domain: [-1, 1], step: 0.01, value: 0.5, cmp: (a, b) => a < b},
+  {id: 2, name: 'sibling_similarity', domain: [-1, 1], step: 0.01, value: 0.5, cmp: (a, b) => a < b}
 ];
 
 let sliders = [
@@ -103,7 +103,7 @@ function resize() {
 
 function init() {
   d3.select('.feature-name')
-    .on('change', select_feature)
+    .on('change', function() {select_feature(+this.value);})
     .selectAll('option')
     .data(features)
     .enter()
@@ -112,15 +112,17 @@ function init() {
     .property('selected', d => d.id === current_feature.id)
     .text(d => d.name);
 
-  d3.select('.feature-slider')
+  d3.select('#feature-slider')
     .property('value', current_feature.value)
-    .on('input', update_feature);
+    .on('input', function() { update_feature(+this.value); });
 
-  d3.select('.filtering_view .slider-wrapper')
+  select_feature(current_feature.id);
+  // update_feature(current_feature.value);
+  d3.select('#feature-cmap')
     .style('background-image', 'linear-gradient(to right, #3e926e, #f2f2f2, #9271e2');
 
-  d3.select('.feature-value')
-    .text(format(+d3.select('.feature-slider').attr('value')));
+  d3.select('#feature-value')
+    .text(format(+d3.select('#feature-slider').attr('value')));
 }
 
 function reset(data) {
@@ -225,21 +227,35 @@ function slider_range_update(range) {
   if (prevent) console.log('tree slider prevent');
 }
 
-function select_feature() {
-  current_feature = features[+this.value];
-  d3.select('.feature-slider')
+function select_feature(i) {
+  current_feature = features[i];
+  d3.select('#feature-slider')
     .attr('min', current_feature.domain[0])
     .attr('max', current_feature.domain[1])
     .attr('step', current_feature.step)
     .property('value', current_feature.value);
 
   tree.feature(current_feature);
-  localStorage.setItem('feature.current', String(+this.value))}
+  update_feature(current_feature.value);
+  localStorage.setItem('feature.current', String(i))}
 
-function update_feature() {
-  let value = +this.value;
-  d3.select('#feature-value').text(format(value));
+function update_feature(value) {
   current_feature.value = value;
+  let at = 100*(value-current_feature.domain[0])/(current_feature.domain[1] - current_feature.domain[0]);
+  let [left, right] = current_feature.id === 0 ? [0, 100-at] : [at, 0];
+
+  console.log(value, current_feature.domain, at);
+  d3.select('#feature-value').text(format(value));
+
+  if (current_feature.id === 0)
+    d3.select('#feature-cover')
+      .style('left', null)
+      .style('width', `${at}%`);
+  else
+    d3.select('#feature-cover')
+      .style('left', `${at}%`)
+      .style('width', `${100-at}%`);
+
   tree.feature_value(value);
   localStorage.setItem(`feature.${current_feature.name}`, String(value));
 }
