@@ -124,6 +124,11 @@ class Post(object):
     # build
     #
 
+    def follow(self, partition):
+        while partition in self.mapping:
+            partition = self.mapping[partition]
+        return partition
+
     def build(self):
         self.prepare()
         for merge in self.merges:
@@ -132,14 +137,18 @@ class Post(object):
                 continue
 
             # merge.dest may have been merged already (same persistence level: degenerate case)
-            dest = merge.dest
-            while dest in self.mapping:
-                dest = self.mapping[dest]
-            if merge.src == dest:
+            # dest = merge.dest
+            # while dest in self.mapping:
+            #     dest = self.mapping[dest]
+            dest = self.follow(merge.dest)
+            src = self.follow(merge.src)
+
+            if src == dest:
                 print('*** loop: dest points back to src', self.find_loop(dest))
                 continue
 
             merge.dest = dest
+            merge.src = src
             self.mapping[merge.src] = merge.dest
 
             if merge.is_max:
@@ -442,8 +451,6 @@ def post(args=None):
                 ns.graph = param_in_file["G"]
             if "g" in param_in_file:
                 ns.gradient = param_in_file["g"]
-
-
 
     if ns.multiple:
         catalog_path = path / 'catalog.json'
