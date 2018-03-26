@@ -6,6 +6,11 @@ function constFilter(x) {
   return item => item === x;
 }
 
+export function noop() {
+  function filter(item) { return true; }
+  return filter;
+}
+
 export function not(f) {
   f = typeof f === 'function' ? f : constFilter(f);
   return item => !f(item);

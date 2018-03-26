@@ -1,6 +1,7 @@
 import * as d3 from 'd3'
 import {ensure_single} from '../utils/events';
 import './lifeline.css';
+import {noop} from "../model/filter";
 import * as chromatic from "d3-scale-chromatic";
 
 export default function Lifeline() {
@@ -32,6 +33,8 @@ export default function Lifeline() {
   let active = [];
   let level = 0;
   let feature = null;
+  let filter = noop();
+  let color_by = null;
 
   let front = false;
 
@@ -50,20 +53,20 @@ export default function Lifeline() {
       node.front = false;
 
     active = [];
-    if (root && root.model && feature)
+    if (root && root.model)// && feature)
       visit(root);
 
     let d3nodes = svg.select('.nodes').selectAll('.node')
       .data(active, d => d.id);
 
     d3nodes
-      .attr('fill', d => color(d.model && d.model[feature.name] || 0));
+      .attr('fill', d => color(color_by && d.model && d.model[color_by] || 0));
 
     d3nodes.exit()
       .attr('fill', 'white');
 
     function visit(node) {
-      let match = feature.cmp(node.model[feature.name], feature.value);
+      let match = filter(node.model); // feature.cmp(node.model[feature.name], feature.value);
       if (match) {
         node.front = true;
         active.push(node);
@@ -310,9 +313,25 @@ export default function Lifeline() {
 
   lifeline.feature = function(_) {
     feature = _;
-    // feature_name = feature.name;
     color.domain([feature.domain[0], feature.domain[1]]);
-    // feature_value = feature.value;
+    update_front();
+    return this;
+  };
+
+  lifeline.filter = function(_) {
+    filter = _;
+    update_front();
+    return this;
+  };
+
+  lifeline.color_by = function(feature) {
+    color_by = feature.name;
+    color.domain([feature.domain[0], feature.domain[1]]);
+    update_front();
+    return this;
+  };
+
+  lifeline.update = function() {
     update_front();
     return this;
   };
@@ -320,7 +339,6 @@ export default function Lifeline() {
   lifeline.set_size = function(w, h) {
     width = w - margin.left - margin.right;
     height = h - margin.top - margin.bottom;
-    console.log('lifeline.setsize', width, height);
 
     pt_scale.range([0, width]);
     sx.range([0, width]);

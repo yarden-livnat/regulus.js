@@ -1,6 +1,6 @@
 
 
-export function AttrFilter(a=null, r=null) {
+export function AttrRangeFilter(a=null, r=null) {
   let attr = a;
   let range = r;
   let active = a && r && r[0] < r[1];
@@ -33,9 +33,43 @@ export function AttrFilter(a=null, r=null) {
   return filter;
 }
 
+export function AttrValueFilter(a=null, v=null, c= (a,b) => a< b) {
+  let attr = a;
+  let value = v;
+  let cmp = c;
+  let active = a && v !== null;
+
+  function filter(pt) {
+    if (!active) return true;
+    let v = pt[attr];
+    return  cmp(v, value);
+  }
+
+  filter.attr = function(_) {
+    if (!arguments.length) return attr;
+    attr = _;
+    return this;
+  };
+
+  filter.value = function(_) {
+    if (!arguments.length) return value;
+    value = _;
+    return this;
+  };
+
+  filter.active = function(_) {
+    if (!arguments.length) return active;
+    active = _;
+    return this;
+  };
+
+  return filter;
+}
+
+
 export function XYFilter(pts, x, y, xr=null, yr=null) {
-  let xf = AttrFilter(x, xr);
-  let yf = AttrFilter(y, yr);
+  let xf = AttrRangeFilter(x, xr);
+  let yf = AttrRangeFilter(y, yr);
   let domain = new Set(pts);
   let active = true;
 

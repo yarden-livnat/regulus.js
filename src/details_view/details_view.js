@@ -3,7 +3,7 @@ import * as chromatic from 'd3-scale-chromatic';
 
 import {cmaps} from '../utils/colors';
 import {publish, subscribe} from "../utils";
-import {and, or, not, AttrFilter, XYFilter} from '../model';
+import {and, or, not, AttrRangeFilter, XYFilter} from '../model';
 import {ensure_single} from "../utils/events";
 
 import config from './config';
@@ -122,11 +122,11 @@ function reset(data) {
   dims = msc.dims.map( dim => ({
     name: dim.name,
     extent: dim.extent,
-    filter: AttrFilter(dim.name)
+    filter: AttrRangeFilter(dim.name)
   }));
 
   pts_filters = and();
-  let y_filter = AttrFilter(measure.name);
+  let y_filter = AttrRangeFilter(measure.name);
   pts_filters.add(y_filter);
   group.filter(y_filter);
   for (let dim of dims) {

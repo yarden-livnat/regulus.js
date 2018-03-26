@@ -102,6 +102,6 @@ export function save() {
   let t0 = performance.now();
   let state = JSON.stringify(layout.toConfig());
   localStorage.setItem('layout.state', state);
-  console.log(`layout save [${Math.round(performance.now() - t0)}]`);
+  // console.log(`layout save [${Math.round(performance.now() - t0)}]`);
 }
 

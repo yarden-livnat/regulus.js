@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import {publish, subscribe} from "../utils/pubsub";
-
+import {AttrValueFilter} from "../model/attr_filter";
+import {and} from '../model/filter';
 import Tree from './lifeline';
 import Slider from './slider'
 
@@ -20,9 +21,26 @@ let prevent = false;
 let saved = [0, 0];
 
 let features = [
-  {id: 0, name: 'fitness', label: 'fitness', domain: [0.8,1], step: 0.001, value: 1, cmp: (a,b) => a > b },
-  {id: 1, name: 'parent_dissimilarity', label: 'parent dissimilarity', domain: [-1, 1], step: 0.01, value: 0.5, cmp: (a, b) => a < b},
-  {id: 2, name: 'sibling_dissimilarity', label: 'sibling dissimilarity', domain: [-1, 1], step: 0.01, value: 0.5, cmp: (a, b) => a < b}
+  {id: 0, name: 'fitness', label: 'fitness',
+    domain: [0.8,1], step: 0.001, value: 1,
+    cmp: (a,b) => a > b,
+    filter: AttrValueFilter('fitness', null, (a,b) => a > b),
+    active: false
+  },
+
+  {id: 1, name: 'parent_similarity', label: 'parent similarity',
+    domain: [-1, 1], step: 0.01, value: 0.5,
+    cmp: (a, b) => a < b,
+    filter: AttrValueFilter('parent_similarity', null, (a,b) => a < b),
+    active: false
+  },
+
+  {id: 2, name: 'sibling_similarity', label: 'sibling similarity',
+    domain: [-1, 1], step: 0.01, value: 0.5,
+    cmp: (a, b) => a < b,
+    filter: AttrValueFilter('sibling_similarity', null, (a,b) => a < b),
+    active: false
+  }
 ];
 
 let sliders = [
@@ -30,7 +48,9 @@ let sliders = [
   { id: 'x', type: 'linear', domain: [Number.EPSILON, 1], ticks: {n: 5, format: 'd'}, selection: [0, 1]}
 ];
 
-let current_feature = features[0];
+let filter = and();
+
+features.forEach(f => filter.add(f.filter));
 
 export function setup(el) {
   root = d3.select(el);
@@ -52,8 +72,7 @@ export function setup(el) {
     .on('details', (node, on) => publish('partition.details', node, on))
     .y_type(sliders[0].type)
     .x_type(sliders[1].type)
-    .feature(current_feature)
-    .feature_value(current_feature.value);
+    .filter(filter);
 
   root.select('.tree').call(tree);
   resize();
@@ -83,10 +102,22 @@ let version='1';
 
 function load_setup() {
   if (localStorage.getItem('tree_view.version') === version) {
-    features[0].value = +localStorage.getItem(`feature.${features[0].name}`);
-    features[1].value = +localStorage.getItem(`feature.${features[1].name}`);
-    features[2].value = +localStorage.getItem(`feature.${features[2].name}`);
-    current_feature = features[+localStorage.getItem('feature.current')];
+    features[0].value = +localStorage.getItem(`feature.${features[0].name}.value`);
+    features[1].value = +localStorage.getItem(`feature.${features[1].name}.value`);
+    features[2].value = +localStorage.getItem(`feature.${features[2].name}.value`);
+    features[0].active = localStorage.getItem(`feature.${features[0].name}.active`) === 'on';
+    features[1].active = localStorage.getItem(`feature.${features[1].name}.active`) === 'on';
+    features[2].active = localStorage.getItem(`feature.${features[2].name}.active`) === 'on';
+
+    tree.color_by( features[+localStorage.getItem('feature.color_by') || 0]);
+    console.log('active = ',  features[0].active);
+    console.log('active = ',  features[1].active);
+    console.log('active = ',  features[2].active);
+
+    features.forEach(f => {
+      f.filter.active(f.active);
+      f.filter.value(f.value);
+    });
 
     sliders[0].type = localStorage.getItem('tree.y.type');
     sliders[1].type = localStorage.getItem('tree.x.type');
@@ -113,6 +144,10 @@ function init() {
 
   d3features.select('.feature-name').text(d => d.label);
 
+  d3features.select('.feature-active')
+    .property('checked', d => d.active)
+    .on('change', activate_filter);
+
   d3features.select('.feature-slider')
     .property('value', d => d.value)
     .on('input', update_feature);
@@ -133,11 +168,12 @@ function init() {
     });
 
   d3.select('.filtering_view .color-by .feature-name')
+    .on('change', update_color_by)
     .selectAll('option')
     .data(features)
     .enter()
     .append('option')
-    .attr('value', d => d.name)
+    .attr('value', d => d.id)
     .text(d => d.label);
 }
 
@@ -158,8 +194,8 @@ function reset(data) {
 
 function process_data() {
   if (!msc) return;
-  visit(msc.tree, 'parent_similarity', node => node.parent);
-  visit(msc.tree, 'sibling_similarity', sibling );
+  visit(msc.tree, features[1].name, node => node.parent);
+  visit(msc.tree, features[2].name, sibling );
 
   function visit(node, feature, func) {
     let other = func(node);
@@ -258,50 +294,45 @@ function select_feature(i) {
   localStorage.setItem('feature.current', String(i));
 }
 
-// function update_feature(value) {
-//   current_feature.value = value;
-//   let at = 100*(value-current_feature.domain[0])/(current_feature.domain[1] - current_feature.domain[0]);
-//   let [left, right] = current_feature.id === 0 ? [0, 100-at] : [at, 0];
-//
-//   console.log(value, current_feature.domain, at);
-//   d3.select('#feature-value').text(format(value));
-//
-//   if (current_feature.id === 0)
-//     d3.select('#feature-cover')
-//       .style('left', null)
-//       .style('width', `${at}%`);
-//   else
-//     d3.select('#feature-cover')
-//       .style('left', `${at}%`)
-//       .style('width', `${100-at}%`);
-//
-//   tree.feature_value(value);
-//   localStorage.setItem(`feature.${current_feature.name}`, String(value));
-// }
 
 function update_feature(feature) {
   let section = d3.select(this.parentNode.parentNode);
 
   feature.value = +this.value;
+  feature.filter.value(feature.value);
   let at = 100*(feature.value - feature.domain[0])/(feature.domain[1] - feature.domain[0]);
   let [left, right] = feature.id === 0 ? [0, 100-at] : [at, 0];
 
-  console.log(feature.value, feature.domain, at);
   section.select('.feature-value').text(format(feature.value));
 
-  section.select('.feature-cover')
-      .style('left', null)
-      .style('width', `${at}%`);
-
-  // if (feature.id === 0)
-  //   section.select('.feature-cover')
+  // section.select('.feature-cover')
   //     .style('left', null)
   //     .style('width', `${at}%`);
-  // else
-  //   section.select('.feature-cover')
-  //     .style('left', `${at}%`)
-  //     .style('width', `${100-at}%`);
-  //
-  // tree.feature_value(value);
-  localStorage.setItem(`feature.${feature.name}`, String(feature.value));
+
+  if (feature.id === 0)
+    section.select('.feature-cover')
+      .style('left', null)
+      .style('width', `${at}%`);
+  else
+    section.select('.feature-cover')
+      .style('left', `${at}%`)
+      .style('width', `${100-at}%`);
+
+  tree.update();
+  localStorage.setItem(`feature.${feature.name}.value`, String(feature.value));
+}
+
+function activate_filter(feature) {
+  let active = d3.select(this).property('checked');
+  console.log('active:', active);
+  feature.active = active;
+  feature.filter.active(feature.active);
+  tree.update();
+  localStorage.setItem(`feature.${feature.name}.active`, feature.active ? 'on' : 'off');
+}
+
+function update_color_by() {
+  let feature = features[+this.value];
+  tree.color_by(feature);
+  localStorage.setItem('feature.color_by', feature.id);
 }
