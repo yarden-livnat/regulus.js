@@ -8,33 +8,6 @@
   /*display: inline-block;*/
 }
 
-.slider-wrapper {
-  display: inline-grid;
-  width: 75%;
-  margin: 5px;
-  height: 20px;
-}
-
-#feature-cmap, #feature-cover {
-  height: 20px;
-}
-
-#feature-cover {
-  background-color: #fafafa;
-  position: relative;
-  top: -20px;
-}
-
-#feature-slider {
-  position: relative;
-  top: -40px;
-}
-
-#feature-value {
-  padding-left: 10px;
-}
-
-
 .y-axis, .x-axis {
   display: flex;
   align-items: center;

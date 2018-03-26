@@ -32,8 +32,7 @@ export default function Lifeline() {
   let active = [];
   let level = 0;
   let feature = null;
-  // let feature_name = null;
-  // let feature_value = 0;
+
   let front = false;
 
   let dispatch = d3.dispatch('highlight', 'select', 'details');

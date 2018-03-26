@@ -5,7 +5,9 @@ import Tree from './lifeline';
 import Slider from './slider'
 
 import template from './tree_view.html';
+import feature_template from './feature.html';
 import './style.css';
+import './feature.css';
 
 let root = null;
 let msc = null;
@@ -18,9 +20,9 @@ let prevent = false;
 let saved = [0, 0];
 
 let features = [
-  {id: 0, name: 'fitness', domain: [0.5,1], step: 0.001, value: 0.5, cmp: (a,b) => a > b },
-  {id: 1, name: 'parent_similarity', domain: [-1, 1], step: 0.01, value: 0.5, cmp: (a, b) => a < b},
-  {id: 2, name: 'sibling_similarity', domain: [-1, 1], step: 0.01, value: 0.5, cmp: (a, b) => a < b}
+  {id: 0, name: 'fitness', label: 'fitness', domain: [0.8,1], step: 0.001, value: 1, cmp: (a,b) => a > b },
+  {id: 1, name: 'parent_dissimilarity', label: 'parent dissimilarity', domain: [-1, 1], step: 0.01, value: 0.5, cmp: (a, b) => a < b},
+  {id: 2, name: 'sibling_dissimilarity', label: 'sibling dissimilarity', domain: [-1, 1], step: 0.01, value: 0.5, cmp: (a, b) => a < b}
 ];
 
 let sliders = [
@@ -102,27 +104,41 @@ function resize() {
 }
 
 function init() {
-  d3.select('.feature-name')
-    .on('change', function() {select_feature(+this.value);})
+  let d3features = d3.select('.filtering_view')
+    .selectAll('.feature')
+    .data(features)
+    .enter()
+    .append('div')
+    .html(feature_template);
+
+  d3features.select('.feature-name').text(d => d.label);
+
+  d3features.select('.feature-slider')
+    .property('value', d => d.value)
+    .on('input', update_feature);
+
+  d3features.select('.feature-cmap')
+    .style('background-image', 'linear-gradient(to right, #3e926e, #f2f2f2, #9271e2');
+
+  d3features.select('.feature-value')
+    .text(d => format(d.value));
+
+  d3features.select('.feature-slider')
+    .attr('min', d => d.domain[0])
+    .attr('max', d => d.domain[1])
+    .attr('step', d => d.step)
+    .property('value', d => d.value)
+    .each( function(d) {
+      update_feature.call(this, d);
+    });
+
+  d3.select('.filtering_view .color-by .feature-name')
     .selectAll('option')
     .data(features)
     .enter()
     .append('option')
-    .attr('value', d => d.id)
-    .property('selected', d => d.id === current_feature.id)
-    .text(d => d.name);
-
-  d3.select('#feature-slider')
-    .property('value', current_feature.value)
-    .on('input', function() { update_feature(+this.value); });
-
-  select_feature(current_feature.id);
-  // update_feature(current_feature.value);
-  d3.select('#feature-cmap')
-    .style('background-image', 'linear-gradient(to right, #3e926e, #f2f2f2, #9271e2');
-
-  d3.select('#feature-value')
-    .text(format(+d3.select('#feature-slider').attr('value')));
+    .attr('value', d => d.name)
+    .text(d => d.label);
 }
 
 function reset(data) {
@@ -183,11 +199,13 @@ function process_data() {
 
 function select_y_type() {
   tree.y_type(this.value);
+  root.select('#persistence_slider').call(slider);
   localStorage.setItem('tree.y.type', this.value);
 }
 
 function select_x_type() {
   tree.x_type(this.value);
+  root.select('#size_slider').call(slider);
   localStorage.setItem('tree.x.type', this.value);
 }
 
@@ -237,25 +255,53 @@ function select_feature(i) {
 
   tree.feature(current_feature);
   update_feature(current_feature.value);
-  localStorage.setItem('feature.current', String(i))}
+  localStorage.setItem('feature.current', String(i));
+}
 
-function update_feature(value) {
-  current_feature.value = value;
-  let at = 100*(value-current_feature.domain[0])/(current_feature.domain[1] - current_feature.domain[0]);
-  let [left, right] = current_feature.id === 0 ? [0, 100-at] : [at, 0];
+// function update_feature(value) {
+//   current_feature.value = value;
+//   let at = 100*(value-current_feature.domain[0])/(current_feature.domain[1] - current_feature.domain[0]);
+//   let [left, right] = current_feature.id === 0 ? [0, 100-at] : [at, 0];
+//
+//   console.log(value, current_feature.domain, at);
+//   d3.select('#feature-value').text(format(value));
+//
+//   if (current_feature.id === 0)
+//     d3.select('#feature-cover')
+//       .style('left', null)
+//       .style('width', `${at}%`);
+//   else
+//     d3.select('#feature-cover')
+//       .style('left', `${at}%`)
+//       .style('width', `${100-at}%`);
+//
+//   tree.feature_value(value);
+//   localStorage.setItem(`feature.${current_feature.name}`, String(value));
+// }
 
-  console.log(value, current_feature.domain, at);
-  d3.select('#feature-value').text(format(value));
+function update_feature(feature) {
+  let section = d3.select(this.parentNode.parentNode);
 
-  if (current_feature.id === 0)
-    d3.select('#feature-cover')
+  feature.value = +this.value;
+  let at = 100*(feature.value - feature.domain[0])/(feature.domain[1] - feature.domain[0]);
+  let [left, right] = feature.id === 0 ? [0, 100-at] : [at, 0];
+
+  console.log(feature.value, feature.domain, at);
+  section.select('.feature-value').text(format(feature.value));
+
+  section.select('.feature-cover')
       .style('left', null)
       .style('width', `${at}%`);
-  else
-    d3.select('#feature-cover')
-      .style('left', `${at}%`)
-      .style('width', `${100-at}%`);
 
-  tree.feature_value(value);
-  localStorage.setItem(`feature.${current_feature.name}`, String(value));
+  // if (feature.id === 0)
+  //   section.select('.feature-cover')
+  //     .style('left', null)
+  //     .style('width', `${at}%`);
+  // else
+  //   section.select('.feature-cover')
+  //     .style('left', `${at}%`)
+  //     .style('width', `${100-at}%`);
+  //
+  // tree.feature_value(value);
+  localStorage.setItem(`feature.${feature.name}`, String(feature.value));
 }

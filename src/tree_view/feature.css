@@ -1,0 +1,33 @@
+
+.feature-name {
+  text-transform: uppercase;
+  font-size: 9pt;
+  display: block;
+}
+
+.slider-wrapper {
+  display: inline-grid;
+  width: 75%;
+  margin: 5px;
+  height: 20px;
+}
+
+.feature-cmap, #feature-cover {
+  height: 20px;
+}
+
+.feature-cover {
+  background-color: #fafafa;
+  position: relative;
+  top: -20px;
+  height: 20px;
+}
+
+.feature-slider {
+  position: relative;
+  top: -40px;
+}
+
+.feature-value {
+  padding-left: 10px;
+}
