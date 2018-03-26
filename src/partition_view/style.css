@@ -2,6 +2,13 @@
   padding: 5px;
 }
 
+.partition_view .info {
+  border: 0.5px gray solid;
+  border-radius: 5px;
+  background-color: #fafafa;
+  margin: 5px;
+}
+
 .partition_view .scroll {
   overflow: auto;
 }

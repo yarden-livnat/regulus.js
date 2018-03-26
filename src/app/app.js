@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import * as layout from './layout';
 import Component from '../components/component'
-import {subscribe} from "../utils/pubsub";
+import {publish, subscribe} from "../utils/pubsub";
 
 import * as dataset_view from '../dataset_view';
 import * as details_view from '../details_view';
@@ -31,6 +31,7 @@ function setup() {
 }
 
 function init() {
+  publish('init');
   dataset_view.init();
 }
 

@@ -18,7 +18,7 @@ export function setup(el) {
       load_data(this.value);
     });
 
-  root.select('#reload').on('click', init);
+  root.select('#refresh').on('click', init);
 }
 
 export function init() {

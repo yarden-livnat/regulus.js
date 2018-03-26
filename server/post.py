@@ -389,7 +389,6 @@ def post(args=None):
 
     p.add_argument('--p', action='store_true', help='use parameters in json')
 
-
     p.add_argument('--multiple', action='store_true', help='save to multiple jsons')
 
     p.add_argument('-d', '--dims', type=int, default=None, help='number of input dimensions')
@@ -401,9 +400,6 @@ def post(args=None):
     p.add_argument('--debug', action='store_true', help='process all measures')
 
     ns = p.parse_args(args)
-
-
-
 
     filename = Path(ns.filename)
     path = filename.parent

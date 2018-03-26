@@ -1,12 +1,29 @@
+.tree_view.config {
+  padding: 5px;
+  display: flex;
+  flex-direction: row;
+}
+
 #persistence-slider {
   /*display: inline-block;*/
 }
 
 .slider-wrapper {
   display: inline-grid;
-  width: 300px;
+  width: 75%;
+  margin: 5px;
 }
 
 #feature-value {
   padding-left: 10px;
+}
+
+.y-axis, .x-axis {
+  display: flex;
+  align-items: center;
+  margin-right: 30px;
+}
+
+.y-axis select, .x-axis select {
+  margin-left: 10px;
 }

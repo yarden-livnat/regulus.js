@@ -16,10 +16,6 @@ let saved = [0,1];
 let sx = d3.scaleLog().clamp(true);
 let sy = d3.scaleLinear();
 
-// let similarity = Similarity()
-//   .on('filter', report_filter);
-
-
 export function setup(el) {
   root = d3.select(el);
   root.html(template);
@@ -34,7 +30,6 @@ export function setup(el) {
     // else console.log('ctrl move prevent');
   });
 
-  // similarity(root);
 
   subscribe('persistence.range', (topic, range) => move_range(range));
   subscribe('data.new', (topic, data) => reset(data));

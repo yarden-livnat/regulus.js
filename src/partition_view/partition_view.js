@@ -16,6 +16,7 @@ let measure = null;
 let width = 0, height=0;
 
 let format = d3.format('.2g');
+let format_f = d3.format('.3f');
 
 let box_plot = BoxPlot()
   .width(100)
@@ -109,10 +110,17 @@ function show_partition(init=false) {
   root.select('.partition_size')
     .text(current && current.size || '');
 
+  root.select('.partition_fitness')
+    .text(current && current.model && format_f(current.model.fitness));
+
+  root.select('.partition_parent_similarity')
+    .text(current && current.model && format_f(current.model.parent_similarity));
+
+  root.select('.partition_sibling_similarity')
+    .text(current && current.model && format_f(current.model.sibling_similarity));
   root.select('.partition_notes')
     .property('value', current && current.notes || "")
     .attr('disabled', current ? null : true);
-
 
   let stat = current && Array.from(current.statistics.values()) || [];
 

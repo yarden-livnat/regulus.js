@@ -13,22 +13,28 @@ export default function Lifeline() {
   let nodes = [];
   let selected = null;
 
-  let pt_scale = d3.scaleLinear().domain([0,1]).range([0,width]);
-  let y_min = +Number.EPSILON;
-  let range = [0, 1];
-  let y_type = 'log';
-  let sx = d3.scaleLinear().domain([0, 1]).range([0, width]);
+  let y_type = 'log', y_min = +Number.EPSILON, y_range;
+  let x_type = 'linear', x_min = 0, x_range;
+
+  let sx = d3.scaleLinear().domain([0, 1]).range([0, width]).clamp(true);
   let sy = d3.scaleLog().domain([y_min, 1]).range([height, 0]).clamp(true);
+  let value_scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0,1]).clamp(true);
+  let pt_scale = d3.scaleLinear().domain([0,1]).range([0,width]);
+
   let y_axis = d3.axisLeft(sy).ticks(4, '.1e');
   let x_axis = d3.axisBottom(pt_scale).ticks(8, 's');
-  let value_scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0,1]).clamp(true);
-  let color = d3.scaleSequential(chromatic['interpolateRdYlBu']).domain([1,0.8]);
+
+  let cmapBWR = d3.interpolateRgbBasis(["#4472a5", "#f2f2f2", "#d73c4a"]);
+  let cmapGWP = d3.interpolateRgbBasis(["#3e926e", "#f2f2f2", "#9271e2"]);
+
+  let color = d3.scaleSequential(cmapGWP /* chromatic['interpolateRdYlBu']*/ ).domain([1,0.8]);
 
   let active = [];
   let level = 0;
   let feature = null;
   let feature_name = null;
   let feature_value = 0;
+  let front = false;
 
   let dispatch = d3.dispatch('highlight', 'select', 'details');
 
@@ -52,18 +58,18 @@ export default function Lifeline() {
       .data(active, d => d.id);
 
     d3nodes
-      // .attr('fill', d => color(d.model && d.model[feature_name] || 0));
-    .attr('fill', d => d3.rgb(color(d.model && d.model[feature_name] || 0)).brighter(2));
+      .attr('fill', d => color(d.model && d.model[feature_name] || 0));
 
     d3nodes.exit()
       .attr('fill', 'white');
 
     function visit(node) {
-      if (node.model[feature_name] > feature_value) {
+      let match = node.model[feature_name] < feature_value;
+      if (match) {
         node.front = true;
         active.push(node);
       }
-      // else
+      if (!match || !front)
         node.children.forEach(visit);
     }
   }
@@ -86,14 +92,14 @@ export default function Lifeline() {
 
   function layout() {
     if (!root) return;
-    visit(root, [0, 1]);
+    visit(root, [0, root.size]);
 
     function visit(node, range) {
       let w = range[1] - range[0];
       node.pos = {x: range[0], y: node.lvl, w: w, yp: node.parent && node.parent.lvl || 1};
       let from = range[0];
       for (let child of node.children) {
-        let to = from + w * child.size / node.size;
+        let to = from + child.size; // w * child.size / node.size;
         visit(child, [from, to]);
         from = to;
       }
@@ -256,35 +262,57 @@ export default function Lifeline() {
     return this;
   };
 
-  lifeline.update = function() {
-    // not implemented yet
-    return this;
-  };
 
   lifeline.y_type = function(type) {
     y_type = type;
     if (type === 'linear') {
-      sy = d3.scaleLinear().domain(range).range([height, 0]).clamp(true);
+      sy = d3.scaleLinear().domain(sy.domain()).range([height, 0]).clamp(true);
       y_axis.scale(sy);
     }
     else {
-      sy = d3.scaleLog().domain(range).range([height, 0]).clamp(true);
+      sy = d3.scaleLog().domain(sy.domain()).range([height, 0]).clamp(true);
       y_axis.scale(sy);
     }
     render();
     return this;
   };
 
-  lifeline.y_min = function(value) {
-    y_min = y_type === 'linear' ? value : value+Number.EPSILON;
-    sy.domain([y_min, 1]);
+  // lifeline.y_min = function(value) {
+  //   y_min = y_type === 'linear' ? value : value+Number.EPSILON;
+  //   sy.domain([y_min, 1]);
+  //   render();
+  //   return this;
+  // };
+
+  lifeline.y_range = function(_) {
+    sy.domain(_);
     render();
     return this;
   };
 
-  lifeline.range = function(_) {
-    range = _;
-    sy.domain(range);
+  lifeline.x_type = function(type) {
+    x_type = type;
+    if (type === 'linear') {
+      sx = d3.scaleLinear().domain(sx.domain()).range([0, width]).clamp(true);
+      x_axis.scale(sx);
+    }
+    else {
+      sx = d3.scaleLog().domain(sx.domain()).range([0, width]).clamp(true);
+      x_axis.scale(sx);
+    }
+    render();
+    return this;
+  };
+
+  // lifeline.x_min = function(value) {
+  //   x_min = x_type === 'linear' ? value : value+Number.EPSILON;
+  //   sx.domain([x_min, 1]);
+  //   render();
+  //   return this;
+  // };
+
+  lifeline.x_range = function(_) {
+    sx.domain(_);
     render();
     return this;
   };
@@ -298,7 +326,8 @@ export default function Lifeline() {
   lifeline.feature = function(_) {
     feature = _;
     feature_name = feature.name;
-    color.domain([feature.range[1], feature.range[0]]);
+    color.domain([feature.domain[0], feature.domain[1]]);
+    feature_value = feature.value;
     update_front();
     return this;
   };

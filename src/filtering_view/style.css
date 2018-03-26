@@ -27,3 +27,11 @@
 .brush .selection {
   fill: lightgray;
 }
+
+.filter {
+  border: 0.5px gray solid;
+  border-radius: 5px;
+  background-color: #fafafa;
+  padding: 5px;
+  margin-bottom: 5px;
+}
