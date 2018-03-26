@@ -77,7 +77,7 @@ let config = {
 };
 
 
-let load_layout = null;
+let load_layout = true;
 
 let state = load_layout && localStorage.getItem('layout.state');
 let layout = new GoldenLayout(state && JSON.parse(state) || config, $('#layoutContainer'));
