@@ -326,7 +326,7 @@ export default function Lifeline() {
 
   lifeline.color_by = function(feature) {
     color_by = feature.name;
-    color.domain([feature.domain[0], feature.domain[1]]);
+    color = d3.scaleSequential(d3.interpolateRgbBasis(feature.cmap)).domain(feature.domain);
     update_front();
     return this;
   };

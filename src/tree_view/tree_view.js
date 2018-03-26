@@ -25,21 +25,24 @@ let features = [
     domain: [0.8,1], step: 0.001, value: 1,
     cmp: (a,b) => a > b,
     filter: AttrValueFilter('fitness', null, (a,b) => a > b),
-    active: false
+    active: false,
+    cmap: ["#3e926e", "#f2f2f2", "#9271e2"]
   },
 
   {id: 1, name: 'parent_similarity', label: 'parent similarity',
     domain: [-1, 1], step: 0.01, value: 0.5,
     cmp: (a, b) => a < b,
     filter: AttrValueFilter('parent_similarity', null, (a,b) => a < b),
-    active: false
+    active: false,
+    cmap: ["#4472a5", "#f2f2f2", "#d73c4a"]
   },
 
   {id: 2, name: 'sibling_similarity', label: 'sibling similarity',
     domain: [-1, 1], step: 0.01, value: 0.5,
     cmp: (a, b) => a < b,
     filter: AttrValueFilter('sibling_similarity', null, (a,b) => a < b),
-    active: false
+    active: false,
+    cmap: ["#4472a5", "#f2f2f2", "#d73c4a"]
   }
 ];
 
@@ -153,7 +156,7 @@ function init() {
     .on('input', update_feature);
 
   d3features.select('.feature-cmap')
-    .style('background-image', 'linear-gradient(to right, #3e926e, #f2f2f2, #9271e2');
+    .style('background-image', d => `linear-gradient(to right, ${d.cmap.join()}`);
 
   d3features.select('.feature-value')
     .text(d => format(d.value));
@@ -304,10 +307,6 @@ function update_feature(feature) {
   let [left, right] = feature.id === 0 ? [0, 100-at] : [at, 0];
 
   section.select('.feature-value').text(format(feature.value));
-
-  // section.select('.feature-cover')
-  //     .style('left', null)
-  //     .style('width', `${at}%`);
 
   if (feature.id === 0)
     section.select('.feature-cover')
