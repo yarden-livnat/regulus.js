@@ -1,6 +1,6 @@
 .lifeline .node {
   /*fill: white;*/
-  stroke: steelblue;
+  stroke: gray;
   stroke-width: 0.5px;
 }
 
@@ -15,15 +15,16 @@
 }
 
 .lifeline .node.highlight {
-  stroke-width: 2px;
+  stroke-width: 4px;
   stroke: gray;
-  filter: url('#drop-shadow');
+  /*filter: url('#drop-shadow');*/
 }
 
 .lifeline .node.details {
-  /*stroke-width: 2px;*/
+  stroke-width: 4px;
+  stroke: lightgreen;
   /*fill: lightgreen;*/
-  filter: url('#drop-shadow');
+  /*filter: url('#drop-shadow');*/
 }
 
 .lifeline .node.filtered {

@@ -30,7 +30,6 @@ export function setup(el) {
 
   root.select('.partition_alias')
     .property('disabled', true)
-    // .attr('placeholder', 'assign alias')
     .on('change', alias_changed)
     .on('input', alias_changed);
 
@@ -71,6 +70,7 @@ function reset(_) {
   selected = null;
   highlight = null;
   measure = null;
+
   show_partition(true);
 }
 
@@ -82,7 +82,6 @@ function select_partition(partition, show) {
 
 
 function highlight_partition(partition, show) {
-  // console.log('highlight', show, timer !== null);
   if (!show) {
     timer = d3.timeout( () => {highlight = null; show_partition(); }, 250);
   } else {
@@ -131,8 +130,13 @@ function show_partition(init=false) {
   let measures = stat.filter(s => s.type === 'measure')
     .sort( (a,b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
   show('.measures', measures, true);
-  if (init && measures.length === 1) {
-    select_measure(measures[0]);
+  if (init) {
+    if (measures.length === 1)
+      select_measure(measures[0]);
+    else {
+      let name = localStorage.getItem(`partition_view.${shared_msc.name}.measure`);
+      select_measure(measures.find( d => d.name === name));
+    }
   }
 }
 
@@ -170,13 +174,14 @@ function show(selector, data, listen=false) {
 }
 
 function select_measure(d) {
-  if (measure === d /*|| !d.available*/) return;
+  if (!d || measure === d) return;
 
   measure = d;
   root.select('.measures').selectAll('.name')
     .classed('selected', d => d.name === measure.name);
   selected = highlight = null;
 
+  localStorage.setItem(`partition_view.${shared_msc.name}.measure`, d.name);
   publish('data.new', shared_msc.msc(d.name));
 }
 

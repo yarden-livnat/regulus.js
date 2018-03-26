@@ -24,8 +24,8 @@ let features = [
 ];
 
 let sliders = [
-  { id: 'y', type: 'log', domain: [Number.EPSILON, 1], ticks:{ n: 3, format: '.1e'}},
-  { id: 'x', type: 'linear', domain: [0, 1], ticks: {n: 5, format: 'd'}}
+  { id: 'y', type: 'log', domain: [Number.EPSILON, 1], ticks:{ n: 3, format: '.1e'}, selection: [0.3, 1]},
+  { id: 'x', type: 'linear', domain: [0, 1], ticks: {n: 5, format: 'd'}, selection: [0, 1]}
 ];
 
 let current_feature = features[0];
@@ -33,6 +33,8 @@ let current_feature = features[0];
 export function setup(el) {
   root = d3.select(el);
   root.html(template);
+
+  load_setup();
 
   root.select('#tree-y-type')
     .on('change', select_y_type)
@@ -75,6 +77,22 @@ export function set_size(w, h) {
   if (root) resize();
 }
 
+let version='1';
+
+function load_setup() {
+  if (localStorage.getItem('tree_view.version') === version) {
+    features[0].value = +localStorage.getItem(`feature.${features[0].name}`);
+    features[1].value = +localStorage.getItem(`feature.${features[1].name}`);
+    features[2].value = +localStorage.getItem(`feature.${features[2].name}`);
+    current_feature = features[+localStorage.getItem('feature.current')];
+
+    sliders[0].type = localStorage.getItem('tree.y.type');
+    sliders[1].type = localStorage.getItem('tree.x.type');
+  } else {
+    localStorage.setItem('tree_view.version', version);
+  }
+}
+
 function resize() {
   let rw = parseInt(root.style('width'));
   let rh = parseInt(root.style('height'));
@@ -91,9 +109,11 @@ function init() {
     .enter()
     .append('option')
     .attr('value', d => d.id)
+    .property('selected', d => d.id === current_feature.id)
     .text(d => d.name);
 
   d3.select('.feature-slider')
+    .property('value', current_feature.value)
     .on('input', update_feature);
 
   d3.select('.filtering_view .slider-wrapper')
@@ -161,17 +181,23 @@ function process_data() {
 
 function select_y_type() {
   tree.y_type(this.value);
+  localStorage.setItem('tree.y.type', this.value);
 }
 
 function select_x_type() {
   tree.x_type(this.value);
+  localStorage.setItem('tree.x.type', this.value);
 }
 
 function on_slider_change(data, range) {
-  if (data.id === 'x')
+  if (data.id === 'x') {
     tree.x_range(range);
-  else
+    localStorage.setItem('tree.x.range', JSON.stringify(range));
+  }
+  else {
     tree.y_range(range);
+    localStorage.setItem('tree.y.range', JSON.stringify(range));
+  }
 }
 
 function set_persistence_range(range) {
@@ -205,14 +231,15 @@ function select_feature() {
     .attr('min', current_feature.domain[0])
     .attr('max', current_feature.domain[1])
     .attr('step', current_feature.step)
-    .attr('value', current_feature.value);
+    .property('value', current_feature.value);
 
   tree.feature(current_feature);
-}
+  localStorage.setItem('feature.current', String(+this.value))}
 
 function update_feature() {
   let value = +this.value;
   d3.select('#feature-value').text(format(value));
   current_feature.value = value;
   tree.feature_value(value);
+  localStorage.setItem(`feature.${current_feature.name}`, String(value));
 }

@@ -27,6 +27,8 @@ export function init() {
 }
 
 function set_catalog(_) {
+  let selected = localStorage.getItem('catalog.selection');
+
   let opts = root.select('select').selectAll('option')
     .data(['select dataset'].concat(_));
 
@@ -34,17 +36,21 @@ function set_catalog(_) {
     .append('option')
     .merge(opts)
     .attr('value', d => d)
+    .property('selected', d => d === selected)
     .text(d => d);
 
   opts.exit().remove();
 
-  if (_.length === 1) {
+  if (_.length === 1)
     load_data(_[0]);
-  }
+  else if (selected && _.find(name => name === selected))
+    load_data(selected);
+
 }
 
 function load_data(name) {
   if (!name) return;
+  localStorage.setItem('catalog.selection', name);
   remove_placeholder();
   service.load_dataset(name)
     .then(data => new MultiMSC(data))

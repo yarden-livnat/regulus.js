@@ -61,7 +61,7 @@ export default function Slider() {
 
       all.select('.brush')
         .call(brush)
-        // .call(brush.move, d.domain)
+        // .call(brush.move, d.selection.map(scale))
       ;
     });
   }
