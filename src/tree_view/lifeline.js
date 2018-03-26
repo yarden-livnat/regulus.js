@@ -276,13 +276,6 @@ export default function Lifeline() {
     return this;
   };
 
-  // lifeline.y_min = function(value) {
-  //   y_min = y_type === 'linear' ? value : value+Number.EPSILON;
-  //   sy.domain([y_min, 1]);
-  //   render();
-  //   return this;
-  // };
-
   lifeline.y_range = function(_) {
     sy.domain(_);
     render();
@@ -302,13 +295,6 @@ export default function Lifeline() {
     render();
     return this;
   };
-
-  // lifeline.x_min = function(value) {
-  //   x_min = x_type === 'linear' ? value : value+Number.EPSILON;
-  //   sx.domain([x_min, 1]);
-  //   render();
-  //   return this;
-  // };
 
   lifeline.x_range = function(_) {
     sx.domain(_);

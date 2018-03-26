@@ -27,7 +27,7 @@ let features = [
 
 let sliders = [
   { id: 'y', type: 'log', domain: [Number.EPSILON, 1], ticks:{ n: 3, format: '.1e'}, selection: [0.3, 1]},
-  { id: 'x', type: 'linear', domain: [0, 1], ticks: {n: 5, format: 'd'}, selection: [0, 1]}
+  { id: 'x', type: 'linear', domain: [Number.EPSILON, 1], ticks: {n: 5, format: 'd'}, selection: [0, 1]}
 ];
 
 let current_feature = features[0];
