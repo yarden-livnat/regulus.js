@@ -201,6 +201,10 @@ function process_data() {
   visit(msc.tree, features[2].name, sibling );
 
   function visit(node, feature, func) {
+    if (!node ) {
+      console.log("**** process_data: null node");
+      return;
+    }
     let other = func(node);
     if (other) {
       let c = node.model.linear_reg.coeff;
