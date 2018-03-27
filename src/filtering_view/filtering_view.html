@@ -3,8 +3,20 @@
 
   <!--<div class='size_chart'></div>-->
 
-  <div class='color-by filter'>
-    <label>Color by:</label> <select class="feature-name"></select>
+  <div class='filter'>
+    <div class="color-by ">
+      <label class="filter-opt">Color by:</label> <select class="feature-color"></select>
+    </div>
+    <div class="filter-show">
+      <label class="filter-opt">Show: </label>
+
+      <input type="radio" id="show-all" name="show-nodes" value="all">
+      <label for="show-all">All</label>
+      <input type="radio" id="show-path" name="show-nodes" value="active">
+      <label for="show-path">Path</label>
+      <input type="radio" id="show-front" name="show-nodes" value="front">
+      <label for="show-front">Front</label>
+    </div>
   </div>
 
 </div>

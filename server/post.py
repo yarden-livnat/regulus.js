@@ -484,7 +484,7 @@ def post(args=None):
         try:
             print('\npost ', measure)
             y = np_data[:, ndims+i]
-            msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm, connect=True)
+            msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm, connect=True, debug=True)
             msc.build(X=x, Y=y, names=regulus['dims']+[measure])
             # if ns.debug:
             #     msc.save(path/ (measure + '_hierarchy.csv'), path / (measure + '_partition.json'))

@@ -28,7 +28,8 @@
 }
 
 .lifeline .node.filtered {
-  color: #f0f0f0;
+  color: white;
+  stroke: none;
 }
 
 .lifeline {

@@ -170,7 +170,7 @@ function init() {
       update_feature.call(this, d);
     });
 
-  d3.select('.filtering_view .color-by .feature-name')
+  d3.select('.filtering_view .feature-color')
     .on('change', update_color_by)
     .selectAll('option')
     .data(features)
@@ -178,6 +178,9 @@ function init() {
     .append('option')
     .attr('value', d => d.id)
     .text(d => d.label);
+
+  d3.select('.filtering_view').selectAll('input[name="show-nodes')
+    .on('change', function() { tree.show(this.value); })
 }
 
 function reset(data) {

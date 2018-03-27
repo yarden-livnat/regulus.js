@@ -35,8 +35,9 @@ export default function Lifeline() {
   let feature = null;
   let filter = noop();
   let color_by = null;
+  let show = 'all';
 
-  let front = false;
+  let front_mode = false;
 
   let dispatch = d3.dispatch('highlight', 'select', 'details');
 
@@ -49,30 +50,29 @@ export default function Lifeline() {
 
   function update_front() {
     if (!svg) return;
-    for (let node of active)
-      node.front = false;
 
-    active = [];
-    if (root && root.model)// && feature)
+    nodes.forEach(node => node.front = node.on_path = false);
+    if (root && root.model)
       visit(root);
 
-    let d3nodes = svg.select('.nodes').selectAll('.node')
-      .data(active, d => d.id);
+    let d3nodes = svg.select('.nodes').selectAll('.node');
 
     d3nodes
-      .attr('fill', d => color(color_by && d.model && d.model[color_by] || 0));
-
-    d3nodes.exit()
-      .attr('fill', 'white');
+      .attr('fill', d => d.front ? color(d.model[color_by]) : 'white')
+      .classed('filtered', d => show !== 'all'
+        && (show !== 'front' || !d.front) && (show !=='active' || !d.on_path))
+    ;
 
     function visit(node) {
-      let match = filter(node.model); // feature.cmp(node.model[feature.name], feature.value);
-      if (match) {
-        node.front = true;
-        active.push(node);
+      let match = filter(node.model);
+      node.front = match;
+      node.on_path = match;
+      if (show !== 'front' || !match) {
+        for (let child of node.children) {
+          node.on_path = visit(child) || node.on_path;
+        }
       }
-      if (!match || !front)
-        node.children.forEach(visit);
+      return node.on_path;
     }
   }
 
@@ -327,6 +327,12 @@ export default function Lifeline() {
   lifeline.color_by = function(feature) {
     color_by = feature.name;
     color = d3.scaleSequential(d3.interpolateRgbBasis(feature.cmap)).domain(feature.domain);
+    update_front();
+    return this;
+  };
+
+  lifeline.show = function(_) {
+    show = _;
     update_front();
     return this;
   };
