@@ -17,9 +17,3 @@
   margin-left: 10px;
 }
 
-.tree_view .brush .selection {
-  fill: gray;
-  /*fill-opacity: 0;*/
-  stroke: black;
-  stroke-width: 1px;
-}

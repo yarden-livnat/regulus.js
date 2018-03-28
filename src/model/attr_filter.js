@@ -19,8 +19,8 @@ export function AttrRangeFilter(a=null, r=null) {
 
   filter.range = function(_) {
     if (!arguments.length) return range;
-    range = _;
-    active = range && range[0] < range[1];
+    range = _.concat();
+    // active = range && range[0] < range[1];
     return this;
   };
 

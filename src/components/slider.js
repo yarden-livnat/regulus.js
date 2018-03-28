@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import './slider.css';
 
 export default function Slider() {
   let margin = {top: 15, right: 10, bottom: 0, left: 10};
@@ -59,8 +60,11 @@ export default function Slider() {
         .call(d3.axisBottom(scale).ticks(d.ticks.n, d.ticks.format));
 
       all.select('.brush')
-        .call(brush)
-        // .call(brush.move, d.selection.map(scale))
+        .call(brush);
+
+      if (d.selection)
+        all.select('.brush')
+        .call(brush.move, d.selection.map(scale))
       ;
     });
   }
