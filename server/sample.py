@@ -6,6 +6,7 @@ import testfun
 from regulus_file import RegulusFile
 from linearfit import linear_fit
 from Predictor import Predictor
+from ackley import calc_ackley,saveackley
 
 sim_dir = 'temp'
 sim_out = 'new_sample_outputs.csv'
@@ -53,8 +54,7 @@ def sample(reg_file, sample_input):
         data = np.array(reg_file.pts)
         X = data[:, :-1]
         y = data[:, -1]
-        print(X)
-        print(y)
+
         model = Predictor(X, y)
         new_data = model.predict(sample_input)
 
@@ -63,6 +63,13 @@ def sample(reg_file, sample_input):
             path.mkdir()
         np.savetxt(sim_dir / Path(sim_out), np.hstack((np.array(sample_input), np.atleast_2d(new_data).T)),
                    delimiter=',')
+    elif 'ackley' in reg_file.name:
+        out = calc_ackley(sample_input)
+        path = Path(sim_dir)
+        if not path.exists():
+            path.mkdir()
+        saveackley(sim_dir+'/'+sim_out, out)
+
 
     else:
         print("can't resample for " + reg_file.name)
@@ -70,7 +77,7 @@ def sample(reg_file, sample_input):
 
 def compute_msc(reg_file):
     try:
-        updated_dataset = reg_file.save_all_pts()
+        #updated_dataset = reg_file.save_all_pts()
         updated_json = reg_file.save_json()
         dims = len(reg_file.dims)
         name = reg_file.name

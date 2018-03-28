@@ -15,7 +15,7 @@ def remove_duplicates(input):
     unique_data = out.tolist()
 
     fname = input[:-4]+'_unique'+'.csv'
-    with open(fname, 'a') as f:
+    with open(fname, 'w') as f:
         report = csv.writer(f, delimiter=',')
         report.writerow(header)
         report.writerows(unique_data)
