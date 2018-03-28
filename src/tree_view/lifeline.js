@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import {ensure_single} from '../utils/events';
 import './lifeline.css';
 import {noop} from "../model/filter";
-import * as chromatic from "d3-scale-chromatic";
+// import * as chromatic from "d3-scale-chromatic";
 
 export default function Lifeline() {
   let margin = {top: 10, right: 10, bottom: 50, left:60},
@@ -14,18 +14,17 @@ export default function Lifeline() {
   let nodes = [];
   let selected = null;
 
-  let y_type = 'log', y_min = +Number.EPSILON, y_range;
-  let x_type = 'linear', x_min = 0, x_range;
+  let y_type = 'log';
+  let x_type = 'linear';
 
   let sx = d3.scaleLinear().domain([0, 1]).range([0, width]).clamp(true);
-  let sy = d3.scaleLog().domain([y_min, 1]).range([height, 0]).clamp(true);
-  let value_scale = d3.scaleLog().domain([Number.EPSILON, 1]).range([0,1]).clamp(true);
+  let sy = d3.scaleLog().domain([Number.EPSILON, 1]).range([height, 0]).clamp(true);
   let pt_scale = d3.scaleLinear().domain([0,1]).range([0,width]);
 
   let y_axis = d3.axisLeft(sy).ticks(4, '.1e');
   let x_axis = d3.axisBottom(pt_scale).ticks(8, 's');
 
-  let cmapBWR = d3.interpolateRgbBasis(["#4472a5", "#f2f2f2", "#d73c4a"]);
+  // let cmapBWR = d3.interpolateRgbBasis(["#4472a5", "#f2f2f2", "#d73c4a"]);
   let cmapGWP = d3.interpolateRgbBasis(["#3e926e", "#f2f2f2", "#9271e2"]);
 
   let color = d3.scaleSequential(cmapGWP /* chromatic['interpolateRdYlBu']*/ ).domain([1,0.8]);
@@ -36,8 +35,7 @@ export default function Lifeline() {
   let filter = noop();
   let color_by = null;
   let show = 'all';
-
-  let front_mode = false;
+  let use_gradient = true;
 
   let dispatch = d3.dispatch('highlight', 'select', 'details');
 
@@ -57,11 +55,19 @@ export default function Lifeline() {
 
     let d3nodes = svg.select('.nodes').selectAll('.node');
 
-    d3nodes
-      .attr('fill', d => d.front ? color(d.model[color_by]) : 'white')
-      .classed('filtered', d => show !== 'all'
-        && (show !== 'front' || !d.front) && (show !=='active' || !d.on_path))
-    ;
+    if (color_by ==='minmax') {
+      d3nodes
+        .style('fill', d => d.front ? `url(#g-${d.id})`: 'white')
+        .classed('filtered', d => show !== 'all'
+          && (show !== 'front' || !d.front) && (show !== 'active' || !d.on_path))
+        ;
+    }
+    else {
+      d3nodes
+        .style('fill', d => d.front ? color(d) : 'white')
+        .classed('filtered', d => show !== 'all'
+          && (show !== 'front' || !d.front) && (show !== 'active' || !d.on_path));
+    }
 
     function visit(node) {
       let match = filter(node.model);
@@ -115,6 +121,29 @@ export default function Lifeline() {
     svg.select('.x').call(x_axis);
     svg.select('.y').call(y_axis);
 
+
+    let gradients = svg.select('defs').selectAll('linearGradient')
+      .data(color_by === 'minmax' ? items : [],
+          d => `g-${d.id}`);
+
+    let defs = gradients.enter()
+      .append('linearGradient')
+      .attr('id', d => `g-${d.id}`)
+      .attr('x1', '0%').attr('y1', '0%')
+      .attr('x2', '0%').attr('y2', '100%');
+
+    defs.append('stop')
+      .attr('offset', '0%')
+      .attr('stop-color', d => color(d.minmax[d.parent && d.parent.merge === 'min' ? 0 : 1]))
+      .attr('opacity', 1);
+
+    defs.append('stop')
+      .attr('offset', '100%')
+      .attr('stop-color', d => color(d.minmax[d.parent && d.parent.merge === 'min' ? 1 : 0]))
+      .attr('opacity', 1);
+
+    gradients.exit().remove();
+
     let d3nodes = svg.select('.nodes').selectAll('.node')
       .data(items, d => d.id);
 
@@ -167,7 +196,6 @@ export default function Lifeline() {
   }
 
   function lifeline(selection) {
-    console.log('lifeline', width, height);
     svg = selection
       .append('svg')
         .attr('class', 'lifeline')
@@ -226,6 +254,12 @@ export default function Lifeline() {
     feMerge.append("feMergeNode")
       .attr("in", "SourceGraphic");
 
+    // let gradient = defs.append('linearGradient')
+    //   .attr('id', 'minmax');
+    // gradient.append('stop')
+    //   .attr('class', 'stop-bottom').style('offset', '0');
+    // gradient.append('stop')
+    //   .attr('class', 'stop-top').style('offset', '1');
 
     return lifeline;
   }
@@ -326,7 +360,8 @@ export default function Lifeline() {
 
   lifeline.color_by = function(feature) {
     color_by = feature.name;
-    color = d3.scaleSequential(d3.interpolateRgbBasis(feature.cmap)).domain(feature.domain);
+    color = feature.color;
+    render();
     update_front();
     return this;
   };

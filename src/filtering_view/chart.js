@@ -6,10 +6,7 @@ export default function Chart() {
     height = 120 - margin.top - margin.bottom;
 
   let brush = d3.brushX().extent([[0, 0], [width, height]])
-    .on('brush', brushed)
-    // .on('end', brush_ended)
-    // .on('start', brush_started)
-    ;
+    .on('brush', brushed);
 
   let dispatch = d3.dispatch('range');
 

@@ -94,6 +94,7 @@ function highlight_partition(partition, show) {
   }
 }
 
+
 function show_partition(init=false) {
   current = highlight || selected || shared_msc.as_partition;
 
@@ -108,6 +109,12 @@ function show_partition(init=false) {
 
   root.select('.partition_size')
     .text(current && current.size || '');
+
+  root.select('.partition_min')
+    .text(current && current.minmax && !isNaN(current.minmax[0]) ? d3.format('.2s')(current.minmax[0]) : '');
+
+  root.select('.partition_max')
+    .text(current && current.minmax && !isNaN(current.minmax[1]) ? d3.format('.2s')(current.minmax[1]) : '');
 
   root.select('.partition_fitness')
     .text(current && current.model && format_f(current.model.fitness));

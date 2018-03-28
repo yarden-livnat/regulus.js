@@ -41,6 +41,8 @@ export class MSC {
     this.tree = build_tree(this.partitions);
 
     this.measure = shared.measures.find( m => m.name === this.name);
+
+    this.minmax = this.partitions[0].minmax;
   }
 
   get root() { return this.tree; }

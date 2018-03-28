@@ -44,7 +44,6 @@ function reset(data) {
   msc = data;
 
   reset_persistence();
-  // similarity.data(msc.tree);
 }
 
 function move_range(range) {
@@ -52,7 +51,6 @@ function move_range(range) {
   if (!prevent) {
     prevent = true;
     if (saved[0] !== range[0] || saved[1] !== range[1]) {
-      // console.log('ctrl: range', range, 'mapped', sx(range[0]), sx(range[1]));
       root.select('.persistence_chart').selectAll('svg').call(chart.move, [sx(range[0]), sx(range[1])]);
     }
     prevent = false;

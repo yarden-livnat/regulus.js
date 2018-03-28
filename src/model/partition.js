@@ -11,10 +11,12 @@ export default class Partition {
 
     this.minmax_idx = data.minmax_idx;
     this.minmax = [msc.pts[data.minmax_idx[0]][msc.name], msc.pts[data.minmax_idx[1]][msc.name]];
+    if (this.minmax[0] > this.minmax[1])
+       console.log('partition:', this.id, ' minmax:', this.minmax);
     this.pts_idx = data.span;
     this._pts = data.pts;
     this.model = data.model;
-
+    this.merge = data.merge;
     this.parent = data.parent;
     this.children = data.children;
 

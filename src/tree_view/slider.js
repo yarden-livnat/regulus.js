@@ -27,7 +27,6 @@ export default function Slider() {
 
   function slider(selection) {
     selection.each( function(d, i) {
-      console.log(this, d, i);
       let s = d3.select(this).selectAll('svg')
         .data([d]);
 
