@@ -7,7 +7,7 @@ from collections import defaultdict
 from datetime import date
 from getpass import getuser
 
-from topopy.MorseSmaleComplex import MorseSmaleComplex as MSC
+from topopy.MorseSmaleComplex import MorseSmaleComplex as MSC, TopologicalObject
 
 
 class Merge(object):
@@ -114,6 +114,8 @@ class Post(object):
     def check_partition(self, p):
         min_v = self.data_pts[p.min_idx]
         max_v = self.data_pts[p.max_idx]
+        if min_v > max_v:
+            print('*** min > max', min_v, max_v)
         for pt_idx in p.base_pts:
             if pt_idx != p.min_idx and self.data_pts[pt_idx] < min_v:
                 print('*** Partition check p:{} min:{} at {} found min:{} at {}'.format(p.id, min_v, p.min_idx, self.data_pts[pt_idx], pt_idx))
@@ -310,6 +312,7 @@ class Post(object):
             'lvl': node.persistence,
             'span': [node.span[0], node.span[1]],
             'minmax_idx': [node.min_idx, node.max_idx],
+            'merge': 'max' if node.is_max_merge else 'min',
             'parent': node.parent.id if node.parent is not None else None,
             'children': [child.id for child in node.children] if node.persistence > 0 else []
         })
@@ -435,9 +438,16 @@ def post(args=None):
         measures = regulus['measures']
 
     data = regulus['pts']
+
     np_data = np.array(data)
     x = np_data[:, 0:ndims]
+    y = np_data[:, ndims:]
 
+    x, y = TopologicalObject.aggregate_duplicates(x, y)
+
+    np_data = np.concatenate((x, y), axis=1)
+    data = np_data.tolist()
+    regulus['pts'] = data
     if ns.p:
         param_in_file = regulus['mscs'][0]["params"]
         if type(param_in_file) is dict:
@@ -484,8 +494,14 @@ def post(args=None):
         try:
             print('\npost ', measure)
             y = np_data[:, ndims+i]
-            msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm, connect=True, debug=True)
+            msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm, debug=True, aggregator='mean')  # connect=True
             msc.build(X=x, Y=y, names=regulus['dims']+[measure])
+            print('msc done')
+
+            x = msc.X
+            y = msc.Y
+
+
             # if ns.debug:
             #     msc.save(path/ (measure + '_hierarchy.csv'), path / (measure + '_partition.json'))
 
