@@ -55,6 +55,7 @@ class RegulusFile(object):
 
     def add_points(self, pts):
         self.pts = self.pts + pts
+        self.new_samples = pts
 
     def add_pts_from_csv(self, filename):
         with open(filename, newline='') as csvfile:
