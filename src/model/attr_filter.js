@@ -33,6 +33,38 @@ export function AttrRangeFilter(a=null, r=null) {
   return filter;
 }
 
+export function RangeAttrRangeFilter(a=null, r=null) {
+  let attr = a;
+  let range = r;
+  let active = a && r && r[0] < r[1];
+
+  function filter(pt) {
+    if (!active) return true;
+    let v = pt[attr];
+    return range[0] <= v[1] && v[0] <= range[1];
+  }
+
+  filter.attr = function(_) {
+    if (!arguments.length) return attr;
+    attr = _;
+    return this;
+  };
+
+  filter.range = function(_) {
+    if (!arguments.length) return range;
+    range = _.concat();
+    // active = range && range[0] < range[1];
+    return this;
+  };
+
+  filter.active = function(_) {
+    if (!arguments.length) return active;
+    active = _;
+    return this;
+  };
+
+  return filter;
+}
 export function AttrValueFilter(a=null, v=null, c= (a,b) => a< b) {
   let attr = a;
   let value = v;

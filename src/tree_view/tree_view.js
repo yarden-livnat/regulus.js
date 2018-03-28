@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import * as chromatic from "d3-scale-chromatic";
 
 import {publish, subscribe} from "../utils/pubsub";
-import {AttrRangeFilter, AttrValueFilter} from "../model/attr_filter";
+import {AttrRangeFilter, RangeAttrRangeFilter} from "../model/attr_filter";
 import {and} from '../model/filter';
 import Tree from './lifeline';
 import Slider from '../components/slider'
@@ -42,14 +42,14 @@ function add_fitness_feature() {
 
   features.push({
     id: 0, name: name, label: 'fitness',
-    domain: domain, step: 0.001, value: 1,
+    domain: domain,
     cmp: (a, b) => a > b,
-    filter: AttrValueFilter('fitness', null, (a, b) => a > b),
     filter2: AttrRangeFilter('fitness', null),
     active: false,
     cmap: cmap,
     colorScale: colorScale,
     color: p => colorScale(p.model[name]),
+    ticks:{n: 4, format:'.2f'},
     interface: true
   });
 }
@@ -62,9 +62,8 @@ function add_parent_feature() {
 
   features.push({
     id: 1, name: name, label: 'parent similarity',
-    domain: domain, step: 0.01, value: 0.5,
+    domain: domain,
     cmp: (a, b) => a < b,
-    filter: AttrValueFilter('parent_similarity', null, (a, b) => a < b),
     filter2: AttrRangeFilter('parent_similarity', domain),
     active: false,
     cmap: cmap,
@@ -73,6 +72,7 @@ function add_parent_feature() {
       let c = colorScale(p.model[name]);
       return c;
     },
+    ticks:{n: 4, format:'.2f'},
     interface: true
   });
 }
@@ -85,13 +85,14 @@ function add_sibling_feature() {
 
   features.push({
     id: 2, name: name, label: 'sibling similarity',
-    domain: domain, step: 0.01, value: 0.5,
+    domain: domain,
     cmp: (a, b) => a < b,
     filter2: AttrRangeFilter('sibling', domain),
     active: false,
     cmap: cmap,
     colorScale: colorScale,
     color: p => colorScale(p.model[name]),
+    ticks:{n: 4, format:'.2f'},
     interface: true
   });
 }
@@ -105,9 +106,9 @@ function add_minmax_feature() {
 
   features.push({
     id: 3, name: name, label: 'min max',
-    domain: domain, step: 1, value: 0.5,
+    domain: domain,
     cmp: (a, b) => a < b,
-    filter2: AttrRangeFilter('minmax', domain),
+    filter2: RangeAttrRangeFilter('minmax', domain),
     active: false,
     cmap: cmap,
     colorScale: colorScale,
@@ -115,7 +116,8 @@ function add_minmax_feature() {
       let c= colorScale(p);
       return c;
     },
-    interface: false
+    ticks:{n: 4, format:'.2f'},
+    interface: true
   });
 }
 
@@ -175,7 +177,7 @@ export function setup(el) {
   subscribe('partition.highlight', (topic, partition, on) => tree.highlight(partition, on));
   subscribe('partition.details', (topic, partition, on) => tree.details(partition, on));
   subscribe('partition.selected', (topic, partition, on) => tree.selected(partition, on));
-  subscribe('persistence.range', (topic, range) => set_persistence_range(range) );
+   // subscribe('persistence.range', (topic, range) => set_persistence_range(range) );
 }
 
 export function set_size(w, h) {
@@ -187,11 +189,11 @@ let version='1';
 function load_setup() {
   if (localStorage.getItem('tree_view.version') === version) {
     features.forEach(f => {
-      let range = localStorage.getItem(`feature.${f.name}.range`);
-      f.range = range && JSON.parse(range) || f.domain;
+      let selection = localStorage.getItem(`feature.${f.name}.selection`);
+      f.selection = selection && JSON.parse(selection) || f.domain;
       f.active = localStorage.getItem(`feature.${features[0].name}.active`) === 'on';
       f.filter2.active(f.active);
-      f.filter2.range(f.range);
+      f.filter2.range(f.selection);
     });
 
   } else {
@@ -222,32 +224,12 @@ function init() {
     .on('change', activate_filter);
 
   d3features.select('.feature-slider2')
-    .each( function(d) {
-      d3.select(this)
-        .datum({id: d.name, type:'linear',
-          domain: d.domain,
-          ticks:{n: 4, format:'.2f'},
-          selection: d.range,
-          feature: d})
-        .call(feature_slider);
-    });
+    .call(feature_slider);
 
-  feature_slider.on('change', update_feature2);
+  feature_slider.on('change', update_feature);
 
   d3features.select('.feature-cmap')
     .style('background-image', d => `linear-gradient(to right, ${d.cmap.join()}`);
-
-  // d3features.select('.feature-value')
-  //   .text(d => format(d.value));
-
-  // d3features.select('.feature-slider')
-  //   .attr('min', d => d.domain[0])
-  //   .attr('max', d => d.domain[1])
-  //   .attr('step', d => d.step)
-  //   .property('value', d => d.value)
-  //   .each( function(d) {
-  //     update_feature.call(this, d);
-  //   });
 
   let idx = +localStorage.getItem('feature.color_by') || 0;
   tree.color_by(features[idx]);
@@ -269,8 +251,6 @@ function init() {
       tree.show(this.value);
       localStorage.setItem('feature.show_opt', this.value);
     });
-
-
 }
 
 function reset(data) {
@@ -287,8 +267,26 @@ function reset(data) {
 
     let mmf = features.find(f => f.name === 'minmax');
     mmf.domain =  [msc.minmax[0], msc.minmax[1]];
+    mmf.selection = mmf.domain.concat();
     mmf.colorScale.domain(mmf.domain);
+    mmf.filter2.range(mmf.domain);
+
     console.log(`new data: min/max: ${mmf.domain}`);
+
+    d3.selectAll('.feature-slider2')
+      .call(feature_slider);
+
+    // d3.selectAll('.feature-slider2')
+    //   .each( function(d) {
+    //     d3.select(this)
+    //       .datum({id: d.name, type:'linear',
+    //         domain: d.domain,
+    //         ticks:{n: 4, format:'.2f'},
+    //         selection: d.range,
+    //         feature: d})
+    //       .call(feature_slider);
+    //   });
+    // d3.select('.slider').call(feature_slider);
 
     tree.data(msc.partitions, msc.tree);
   }
@@ -298,6 +296,8 @@ function process_data() {
   if (!msc) return;
   visit(msc.tree, features[1].name, node => node.parent);
   visit(msc.tree, features[2].name, sibling );
+  msc.partitions.forEach( p => p.model.minmax = p.minmax);
+
 
   function visit(node, feature, func) {
     if (!node ) {
@@ -387,15 +387,15 @@ function slider_range_update(range) {
   if (prevent) console.log('tree slider prevent');
 }
 
-function update_feature2(obj, range) {
+function update_feature(obj, range) {
   let section = d3.select(this.parentNode.parentNode.parentNode.parentNode);
 
-  let feature = obj.feature;
+  let feature = obj; // .feature;
   feature.filter2.range(range);
   section.select('.feature-value').text(`[${format(range[0])}, ${format(range[1])}]`);
 
   tree.update();
-  localStorage.setItem(`feature.${feature.name}.range`, JSON.stringify(feature.range));
+  localStorage.setItem(`feature.${feature.name}.selection`, JSON.stringify(feature.selection));
 }
 
 

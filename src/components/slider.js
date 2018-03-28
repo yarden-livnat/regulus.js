@@ -62,10 +62,17 @@ export default function Slider() {
       all.select('.brush')
         .call(brush);
 
-      if (d.selection)
-        all.select('.brush')
-        .call(brush.move, d.selection.map(scale))
-      ;
+      try {
+        if (d.selection) {
+          // let s = d.selection.map(scale);
+          // console.log('move', d, d.domain, s, scale.domain(), scale.range());
+          all.select('.brush')
+            .call(brush.move, d.selection.map(scale))
+          ;
+        }
+      } catch(e) {
+        // console.log(e);
+      }
     });
   }
 
