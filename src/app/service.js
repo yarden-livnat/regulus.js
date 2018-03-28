@@ -45,12 +45,7 @@ export function request_samples(spec) {
             'Content-Type': 'application/json'
         }
     })
-        .then( response =>
-            {
-                let new_samples = response.json();
-                console.log(new_samples);
-            }
-        );
+        .then( response =>response.json());
 }
 
 function monitor_job(id) {

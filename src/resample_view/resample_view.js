@@ -182,7 +182,7 @@ function submit_validate(n) {
             version: msc.shared.version,
             new_version: msc.shared.version+'.1',
             pts: current.pts
-        })
+        }).then(process);
 }
 
 function submit_params(parameters) {
@@ -195,4 +195,9 @@ function submit_params(parameters) {
         new_version: msc.shared.version+'.1',
         params: parameters
     })
+}
+
+function process(pts){
+    console.log(pts);
+
 }
