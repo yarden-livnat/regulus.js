@@ -53,6 +53,8 @@ def sample(reg_file, sample_input):
         data = np.array(reg_file.pts)
         X = data[:, :-1]
         y = data[:, -1]
+        print(X)
+        print(y)
         model = Predictor(X, y)
         new_data = model.predict(sample_input)
 
@@ -61,6 +63,7 @@ def sample(reg_file, sample_input):
             path.mkdir()
         np.savetxt(sim_dir / Path(sim_out), np.hstack((np.array(sample_input), np.atleast_2d(new_data).T)),
                    delimiter=',')
+
     else:
         print("can't resample for " + reg_file.name)
         exit(255)

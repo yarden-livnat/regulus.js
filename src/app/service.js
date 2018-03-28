@@ -37,7 +37,21 @@ export function submit_recompute(spec) {
         .then(monitor_job);
 }
 
-
+export function request_samples(spec) {
+    return fetch('request_samples', {
+        method: 'post',
+        body: JSON.stringify(spec),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then( response =>
+            {
+                let new_samples = response.json();
+                console.log(new_samples);
+            }
+        );
+}
 
 function monitor_job(id) {
   publish('status', `job id:${id}`);

@@ -26,6 +26,8 @@ export function setup(el) {
     // .attr('disabled', true)
     .on('click', d => submit(root.select('#add-samples').property('value')));
 
+
+
   root.select('#add-samples')
     .on('input', function() {
       n_samples = +this.value;
@@ -36,6 +38,22 @@ export function setup(el) {
     .on('input', function() {
       update_sigma(+this.value);
     });
+
+  root.select('#validate')
+  // .attr('disabled', true)
+      .on('click', d => submit_validate(root.select('#add-samples').property('value')));
+
+
+  root.select('#validate-samples')
+      .on('input', function() {
+          n_samples = +this.value;
+          review();
+      });
+
+  root.select('#validate-sigma')
+      .on('input', function() {
+          update_sigma(+this.value);
+      });
 
   root.select('#recompute')
     // .attr('disabled', true)
@@ -154,6 +172,17 @@ function submit(n) {
       new_version: msc.shared.version+'.1',
       pts: current.pts
     })
+}
+
+function submit_validate(n) {
+    if (!current) return;
+    if(current.pts!=undefined)
+        service.request_samples({
+            name: msc.shared.name,
+            version: msc.shared.version,
+            new_version: msc.shared.version+'.1',
+            pts: current.pts
+        })
 }
 
 function submit_params(parameters) {

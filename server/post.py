@@ -500,7 +500,6 @@ def post(args=None):
             x = msc.X
             y = msc.Y
 
-
             # if ns.debug:
             #     msc.save(path/ (measure + '_hierarchy.csv'), path / (measure + '_partition.json'))
 
