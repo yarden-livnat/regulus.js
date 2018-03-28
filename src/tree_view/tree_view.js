@@ -402,8 +402,7 @@ function update_feature(feature) {
 }
 
 function activate_filter(feature) {
-  let active = d3.select(this).property('checked');
-  feature.active = active;
+  feature.active = d3.select(this).property('checked');;
   feature.filter.active(feature.active);
   tree.update();
   localStorage.setItem(`feature.${feature.name}.active`, feature.active ? 'on' : 'off');
