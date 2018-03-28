@@ -10,7 +10,7 @@ def remove_duplicates(input):
 
     arr = np.asarray(data)
     x = arr[:, 0:-1]
-    [a, b] = np.unique(x, axis=0, return_index=1)
+    [a, b] = np.unique( x.round(decimals=15), axis=0, return_index=1)
     out = arr[b, :]
     unique_data = out.tolist()
 

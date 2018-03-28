@@ -139,6 +139,7 @@ class Predictor(object):
             if cv_results.mean() > self.best_cv_score:
                 self.best_cv_score = cv_results.mean()
                 self.best_model = cvModel.best_estimator_
+                print("Inside if, best", cvModel.best_estimator_)
 
     def predict(self, X):
         return self.best_model.predict(X)

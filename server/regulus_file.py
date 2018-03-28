@@ -93,7 +93,7 @@ class RegulusFile(object):
 
     def extract_input(self, data):
         self.new_sample_input = [[ptdict[inputdim] for inputdim in self.dims] for ptdict in data]
-
+        print("NEW_SAMPLE_INPUT", self.new_sample_input)
     def save_sample_inputs(self, filename):
 
         with open(filename, 'w') as f:

@@ -45,7 +45,7 @@ def compute(spec, data_dir):
     update_params(reg_file, spec)
     dims = len(reg_file.dims)
     name = reg_file.name
-    updated_json = reg_file.save_json()
+    updated_json = reg_file.save_json(dir=data_dir)
 
     status = {}
 
