@@ -121,13 +121,11 @@ function add_minmax_feature() {
 
 
 let sliders = [
-  { id: 'y', type: 'log', domain: [Number.EPSILON, 1], ticks:{ n: 4, format: '.1e'}, selection: [0.3, 1]},
-  { id: 'x', type: 'linear', domain: [Number.EPSILON, 1], ticks: {n: 5, format: 'd'}, selection: [0, 1]}
+  { id: 'x', type: 'linear', domain: [Number.EPSILON, 1], ticks: {n: 5, format: 'd'}, selection: [0, 1]},
+  { id: 'y', type: 'log', domain: [Number.EPSILON, 1], ticks:{ n: 4, format: '.1e'}, selection: [0.3, 1]}
 ];
 
 let filter = and();
-
-features.forEach(f => filter.add(f.filter2));
 
 export function setup(el) {
   root = d3.select(el);
@@ -135,20 +133,27 @@ export function setup(el) {
 
   load_setup();
 
-  root.select('#tree-y-type')
-    .on('change', select_y_type)
-    .property('value', sliders[0].type);
+  sliders.forEach(slider => {
+    slider.type = localStorage.getItem(`tree.${slider.id}.type`);
+    let s = localStorage.getItem(`tree.${slider.id}.selection`);
+    console.log('slider section', slider.id, s);
+    slider.selection = s && JSON.parse(s) || slider.domain;
+  });
 
   root.select('#tree-x-type')
     .on('change', select_x_type)
+    .property('value', sliders[0].type);
+
+  root.select('#tree-y-type')
+    .on('change', select_y_type)
     .property('value', sliders[1].type);
 
   tree
     .on('highlight', (node, on) => publish('partition.highlight', node, on))
     .on('select', (node, on) => publish('partition.selected', node, on))
     .on('details', (node, on) => publish('partition.details', node, on))
-    .y_type(sliders[0].type)
-    .x_type(sliders[1].type)
+    .x_type(sliders[0].type)
+    .y_type(sliders[1].type)
     .filter(filter);
 
   root.select('.tree').call(tree);
@@ -157,8 +162,10 @@ export function setup(el) {
   slider.on('change', on_slider_change);
 
   let s = root.selectAll('.slider')
-    .data(sliders)
+    .data([sliders[1], sliders[0]])
     .call(slider);
+
+  features.forEach(f => filter.add(f.filter2));
 
   subscribe('init', init);
   subscribe('data.new', (topic, data) => reset(data));
@@ -187,10 +194,6 @@ function load_setup() {
       f.filter2.range(f.range);
     });
 
-    sliders[0].type = localStorage.getItem('tree.y.type');
-    sliders[0].selection = JSON.parse(localStorage.getItem('tree.y.selection')) || sliders[0].domain;
-    sliders[1].type = localStorage.getItem('tree.x.type');
-    sliders[1].selection = JSON.parse(localStorage.getItem('tree.x.selection')) || sliders[1].domain;
   } else {
     localStorage.setItem('tree_view.version', version);
   }
@@ -237,14 +240,14 @@ function init() {
   // d3features.select('.feature-value')
   //   .text(d => format(d.value));
 
-  d3features.select('.feature-slider')
-    .attr('min', d => d.domain[0])
-    .attr('max', d => d.domain[1])
-    .attr('step', d => d.step)
-    .property('value', d => d.value)
-    .each( function(d) {
-      update_feature.call(this, d);
-    });
+  // d3features.select('.feature-slider')
+  //   .attr('min', d => d.domain[0])
+  //   .attr('max', d => d.domain[1])
+  //   .attr('step', d => d.step)
+  //   .property('value', d => d.value)
+  //   .each( function(d) {
+  //     update_feature.call(this, d);
+  //   });
 
   let idx = +localStorage.getItem('feature.color_by') || 0;
   tree.color_by(features[idx]);
@@ -279,7 +282,7 @@ function reset(data) {
     tree.data([], null);
   else {
     tree.x_range([0, msc.pts.length]);
-    sliders[1].domain = [Number.EPSILON, msc.pts.length];
+    sliders[0].domain = [Number.EPSILON, msc.pts.length];
     root.selectAll('.slider').call(slider);
 
     let mmf = features.find(f => f.name === 'minmax');
@@ -351,11 +354,11 @@ function select_x_type() {
 function on_slider_change(data, range) {
   if (data.id === 'x') {
     tree.x_range(range);
-    localStorage.setItem('tree.x.range', JSON.stringify(range));
+    localStorage.setItem('tree.x.selection', JSON.stringify(range));
   }
   else {
     tree.y_range(range);
-    localStorage.setItem('tree.y.range', JSON.stringify(range));
+    localStorage.setItem('tree.y.selection', JSON.stringify(range));
   }
 }
 
@@ -389,7 +392,7 @@ function update_feature2(obj, range) {
 
   let feature = obj.feature;
   feature.filter2.range(range);
-  // section.select('.feature-value').text(format(feature.value));
+  section.select('.feature-value').text(`[${format(range[0])}, ${format(range[1])}]`);
 
   tree.update();
   localStorage.setItem(`feature.${feature.name}.range`, JSON.stringify(feature.range));
