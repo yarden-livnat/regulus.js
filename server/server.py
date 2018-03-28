@@ -53,7 +53,6 @@ def resample():
     job['code'] = 0
     thread = threading.Thread(target=resample_job, args=[job, spec])
     thread.start()
-
     return json.dumps(job['id'])
 
 @app.post('/recompute')
@@ -104,14 +103,18 @@ def resample_job(job, spec):
     try:
         reg_file = create_reg(spec, data_dir)
         code = compute_msc(reg_file)
+        with jobs_lock:
+            job['status'] = 'done' if code == 0 else 'error'
+            job['code'] = code
     except Exception as e:
         print(e)
         print("Error, Job Not Finished")
         code = 1
+        with jobs_lock:
+            job['status'] = 'done' if code == 0 else 'error'
+            job['code'] = code
     print('job {} done with code:{}'.format(job['id'], code))
-    with jobs_lock:
-        job['status'] = 'done' if code == 0 else 'error'
-        job['code'] = code
+
 
 
 def recompute_job(job, spec):
@@ -121,5 +124,7 @@ def recompute_job(job, spec):
     with jobs_lock:
         job['status'] = 'done' if code == 0 else 'error'
         job['code'] = code
+
+
 run(app, host='localhost', port=8081, debug=True, reloader=True)
 
