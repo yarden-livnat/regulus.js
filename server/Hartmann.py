@@ -34,8 +34,8 @@ def fx(x):
     for i in range(4):
         out += alpha[i] * np.exp(-np.sum(np.multiply(A[i, :], np.multiply(x - P[i, :], x - P[i, :]))))
     out = -out / 1.94
-
-    return out
+    # - for using MC
+    return -out
 
 def saveHart(filename, data):
     header = []

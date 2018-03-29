@@ -447,6 +447,7 @@ def post(args=None):
     np_data = np.concatenate((x, y), axis=1)
     data = np_data.tolist()
     regulus['pts'] = data
+
     if ns.p:
         param_in_file = regulus['mscs'][0]["params"]
         if type(param_in_file) is dict:
@@ -466,6 +467,7 @@ def post(args=None):
         if catalog_path.exists():
             with open(catalog_path) as f:
                 catalog = json.load(f)
+
     else:
         catalog = {
             'name': filename.parent,

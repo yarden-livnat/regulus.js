@@ -99,6 +99,7 @@ def compute_msc(reg_file):
         linear_fit(updated_json)
 
         return status.returncode
+
     except Exception as e:
         print(e)
         print("Error, Recompute MSC Not Finished")
