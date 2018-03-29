@@ -39,9 +39,10 @@ export default function Group() {
         g.select('.measure .name').text(measure.name);
         g.select('.measure .y_axis').call(y_axis);
 
-        let fdims = dims.filter( d => !d.disabled);
+        // let fdims = dims.filter( d => !d.disabled);
         let plots = g.select('.plots').selectAll('.plot')
-          .data(fdims, d => d.name);
+          .data(dims); //, d => d.name);
+
         let list = plots.enter()
           .append('div')
           .call(plot.create);

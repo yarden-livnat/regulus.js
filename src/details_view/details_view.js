@@ -182,7 +182,6 @@ function show_dims() {
     .text(d => d.name);
   list.exit().remove();
 
-
   let axis = root.select('.dims').selectAll('.dim')
     .data(dims.filter(d => !d.disabled));
 
