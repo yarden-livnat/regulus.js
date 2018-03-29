@@ -198,30 +198,39 @@ function submit_params(parameters) {
 
 function process(pts) {
     console.log(pts);
-    if(typeof(pts)==='string')
+    if (typeof(pts) === 'string') {
         root.select('#R2_val')
-            .text('  '+pts);
-    let coeff = current.partition.model.linear_reg.coeff;
-    let intercept = current.partition.model.linear_reg.intercept;
-    let measure = current.spec.name;
-    let dim_num = coeff.length;
-    let y_avg = pts.map(x=>x[measure]).reduce( ( p, c ) => p + c, 0 ) / pts.length;
-    let res = 0;
-    let tot = 0;
-    for (let pt of pts) {
-        let y_real = pt[measure];
-        let y_pred = intercept;
-        let allX = Object.values(pt);
-        for (let i =0;i<dim_num;i++) {
-            y_pred+=allX[i]*coeff[i];
-        }
-        res+=Math.pow((y_pred- y_real),2);
-        tot+=Math.pow((y_avg- y_real),2);
+            .text('  ' + pts);
     }
-    let fit = 1-(res/tot);
-    root.select('#R2_val')
-        .text("  R2:  "+ format(fit));
-    publish('resample.pts', pts);
-
+    else
+    {
+        let coeff = current.partition.model.linear_reg.coeff;
+        let intercept = current.partition.model.linear_reg.intercept;
+        let measure = current.spec.name;
+        let dim_num = coeff.length;
+        let y_avg = pts.map(x => x[measure]).reduce((p, c) => p + c, 0) / pts.length;
+        let res = 0;
+        let tot = 0;
+        for (let pt of pts) {
+            let y_real = pt[measure];
+            let y_pred = intercept;
+            let allX = Object.values(pt);
+            for (let i = 0; i < dim_num; i++) {
+                y_pred += allX[i] * coeff[i];
+            }
+            res += Math.pow((y_pred - y_real), 2);
+            tot += Math.pow((y_avg - y_real), 2);
+        }
+        if (tot === 0) {
+            root.select('#R2_val')
+                .text("  R2:  " + NaN);
+        }
+        else {
+            let fit = 1 - (res / tot);
+            root.select('#R2_val')
+                .text("  R2:  " + format(fit));
+        }
+        publish('resample.pts', pts);
+    }
 
 }
