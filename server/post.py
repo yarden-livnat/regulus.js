@@ -399,6 +399,7 @@ def post(args=None):
     p.add_argument('-G', '--graph', default='relaxed beta skeleton', help='graph')
 
     p.add_argument('--p', action='store_true', help='use parameters in json')
+    p.add_argument('-o', '--out', help='use parameters in json')
 
     p.add_argument('-d', '--dims', type=int, default=None, help='number of input dimensions')
     p.add_argument('-m', '--measure', default=None, help='measure name')
@@ -501,7 +502,14 @@ def post(args=None):
             print(error)
 
     regulus['mscs'] = list(mscs.values())
-    save_regulus(filename.with_suffix('.json'), regulus)
+
+    if ns.out:
+        out = ns.out
+    elif ns.morse:
+        out = filename.with_name(filename.stem+'_mc')
+    else:
+        out = filename
+    save_regulus(out.with_suffix('.json'), regulus)
 
 
 if __name__ == '__main__':
