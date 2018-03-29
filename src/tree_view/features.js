@@ -18,24 +18,30 @@ export default function Features() {
 
   let dispatch = d3.dispatch('show', 'update', 'color_by');
 
+  add_fitness_feature();
+  add_parent_feature();
+  add_sibling_feature();
+  add_minmax_feature();
+  add_no_cmap();
+
   if (localStorage.getItem('tree_view.version') === version) {
     features.forEach(f => {
-      let selection = localStorage.getItem(`feature.${f.name}.selection`);
-      f.selection = selection && JSON.parse(selection) || f.domain;
-      f.active = localStorage.getItem(`feature.${features[0].name}.active`) === 'on';
-      f.filter2.active(f.active);
-      f.filter2.range(f.selection);
+      if (f.interface) {
+        let selection = localStorage.getItem(`feature.${f.name}.selection`);
+        f.selection = selection !== "undefined" && JSON.parse(selection) || f.domain;
+        f.active = localStorage.getItem(`feature.${f.name}.active`) === 'on';
+        console.log('feature', f.name, f.active);
+        f.filter2.active(f.active);
+        f.filter2.range(f.selection);
+      }
     });
   } else {
     localStorage.setItem('tree_view.version', version);
   }
 
-  add_fitness_feature();
-  add_parent_feature();
-  add_sibling_feature();
-  add_minmax_feature();
 
-  features.forEach(f => filter.add(f.filter2));
+
+  features.forEach(f => f.interface && filter.add(f.filter2));
 
   function add_fitness_feature() {
     let name = 'fitness';
@@ -115,6 +121,16 @@ export default function Features() {
       color: p => colorScale(p),
       ticks:{n: 4, format:'.2f'},
       interface: true
+    });
+  }
+
+  function add_no_cmap() {
+    let name = 'no_cmap';
+
+    features.push({
+      id: 4, name: name, label: 'No Colors',
+      color: p => 'white',
+      interface: false
     });
   }
 

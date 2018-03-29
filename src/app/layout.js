@@ -48,6 +48,13 @@ let config = {
                 componentState: {},
                 title: 'Resample',
                 isClosable: false,
+              },
+              {
+                type: 'component',
+                componentName: 'extrema',
+                componentState: {},
+                title: 'Extrema',
+                isClosable: false,
               }
             ]
           }
@@ -77,7 +84,7 @@ let config = {
 };
 
 
-let load_layout = true;
+let load_layout = null;
 
 let state = load_layout && localStorage.getItem('layout.state');
 let layout = new GoldenLayout(state && JSON.parse(state) || config, $('#layoutContainer'));

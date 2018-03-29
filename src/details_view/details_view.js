@@ -170,8 +170,21 @@ function on_selected(partition, on) {
 }
 
 function show_dims() {
+  let list = root.select('.config .dims-list')
+    .selectAll('div')
+    .data(dims, d => d.name);
+
+  list.enter()
+    .append('div')
+    .attr('class', 'dim-ctrl')
+    .on('click', dim_clicked)
+    .merge(list)
+    .text(d => d.name);
+  list.exit().remove();
+
+
   let axis = root.select('.dims').selectAll('.dim')
-    .data(dims);
+    .data(dims.filter(d => !d.disabled));
 
   let enter = axis.enter()
     .append('div')
@@ -186,6 +199,12 @@ function show_dims() {
   axis.exit().remove();
 }
 
+function dim_clicked(d) {
+  d.disabled = !d.disabled;
+  d3.select(this).classed('non-active', d.disabled);
+  show_dims();
+  update(partitions, true);
+}
 function select_cmap(cmap) {
   colorScale.interpolator(cmap);
   update(partitions, true);
