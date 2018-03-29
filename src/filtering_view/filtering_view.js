@@ -15,10 +15,13 @@ let prevent = false;
 let saved = [0,1];
 let sx = d3.scaleLog().clamp(true);
 let sy = d3.scaleLinear();
+let width = 290, height = 450;
 
 export function setup(el) {
   root = d3.select(el);
   root.html(template);
+
+  resize();
 
   chart.on('range', range => {
     if (!prevent) {
@@ -90,6 +93,13 @@ function reset_persistence() {
     .call(chart);
 }
 
-function reset_size() {
+export function set_size(w, h) {
+  [width, height] = [w, h]
+  if (root) resize();
+}
 
+function resize() {
+  root.select('.filtering_view')
+    .style('max-width', `${width-5}px`)
+    .style('max-height', `${height}px`);
 }
