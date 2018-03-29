@@ -45,7 +45,7 @@ function add_fitness_feature() {
     id: 0, name: name, label: 'fitness',
     domain: domain,
     cmp: (a, b) => a > b,
-    filter2: AttrRangeFilter('fitness', null),
+    filter2: AttrRangeFilter(name, null),
     active: false,
     cmap: cmap,
     colorScale: colorScale,
@@ -65,7 +65,7 @@ function add_parent_feature() {
     id: 1, name: name, label: 'parent similarity',
     domain: domain,
     cmp: (a, b) => a < b,
-    filter2: AttrRangeFilter('parent_similarity', domain),
+    filter2: AttrRangeFilter(name, domain),
     active: false,
     cmap: cmap,
     colorScale: colorScale,
@@ -88,7 +88,7 @@ function add_sibling_feature() {
     id: 2, name: name, label: 'sibling similarity',
     domain: domain,
     cmp: (a, b) => a < b,
-    filter2: AttrRangeFilter('sibling', domain),
+    filter2: AttrRangeFilter(name, domain),
     active: false,
     cmap: cmap,
     colorScale: colorScale,
@@ -109,7 +109,7 @@ function add_minmax_feature() {
     id: 3, name: name, label: 'min max',
     domain: domain,
     cmp: (a, b) => a < b,
-    filter2: RangeAttrRangeFilter('minmax', domain),
+    filter2: RangeAttrRangeFilter(name, domain),
     active: false,
     cmap: cmap,
     colorScale: colorScale,
@@ -139,7 +139,6 @@ export function setup(el) {
   sliders.forEach(slider => {
     slider.type = localStorage.getItem(`tree.${slider.id}.type`);
     let s = localStorage.getItem(`tree.${slider.id}.selection`);
-    console.log('slider section', slider.id, s);
     slider.selection = s && JSON.parse(s) || slider.domain;
   });
 
@@ -270,9 +269,7 @@ function reset(data) {
     mmf.selection = mmf.domain.concat();
     mmf.colorScale.domain(mmf.domain);
     mmf.filter2.range(mmf.domain);
-
-    console.log(`new data: min/max: ${mmf.domain}`);
-
+    
     d3.selectAll('.feature-slider2')
       .call(feature_slider);
 
@@ -283,6 +280,7 @@ function reset(data) {
 function process_data() {
   if (!msc) return;
   visit(msc.tree, features[1].name, node => node.parent);
+
   visit(msc.tree, features[2].name, sibling );
   msc.partitions.forEach( p => p.model.minmax = p.minmax);
 
