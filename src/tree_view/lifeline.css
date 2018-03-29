@@ -1,5 +1,5 @@
 .lifeline .node {
-  /*fill: white;*/
+  fill: white;
   stroke: gray;
   stroke-width: 0.5px;
 }
@@ -8,15 +8,17 @@
   /*fill: lightgray;*/
   stroke-width: 2px;
   z-index: 10;
+  /*fill: lightblue;*/
 }
 
 .lifeline .node.selected {
   /*fill: lightblue;*/
 }
 
-.lifeline .node.highlight {
-  stroke-width: 4px;
-  stroke: gray;
+.lifeline .highlight {
+  /*stroke-width: 2px;*/
+  /*stroke: gray;*/
+  fill: lightyellow;
   /*filter: url('#drop-shadow');*/
 }
 

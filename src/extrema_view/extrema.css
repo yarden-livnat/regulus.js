@@ -1,11 +1,14 @@
 .extrema_view {
   overflow: auto;
+  padding: 5px;
 }
 
 .extrema {
   list-style: none;
   font-size: 9pt;
+  padding: 5px;
 }
 
 .extrema-pt {
+  padding: 2px 1px 2px 5pt
 }

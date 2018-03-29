@@ -8,7 +8,9 @@ import './extrema.css';
 
 let root = null;
 let msc = null;
+let extrema_map = new Map();
 let extrema = [];
+
 let width = 100, height = 100;
 
 let format = d3.format('.2g');
@@ -19,7 +21,7 @@ export function setup(el) {
 
   resize();
 
-  // subscribe('data.new', (topic, data) => reset(data));
+  subscribe('data.new', (topic, data) => reset(data));
 }
 
 
@@ -35,7 +37,7 @@ function resize() {
 }
 
 function reset(msc) {
-  let extrema_map = new Map();
+
   let measure = msc.measure;
   let m = measure.name;
   let entry;
@@ -59,7 +61,10 @@ function reset(msc) {
   }
 
   extrema = [];
-  for (let idx of extrema_map.values()) {
+  for (let idx of extrema_map.keys()) {
+    if (msc.pts[idx].id !== idx) {
+      console.log('pt index mismatch', msc.pts[idx], idx);
+    }
     extrema.push(msc.pts[idx]);
   }
 
@@ -72,20 +77,21 @@ function reset(msc) {
   d3pts.enter()
     .append('li')
     .attr('class', 'extrema-pt')
-    .on('mouseover', pt => highlight_pt(pt, true))
+    .on('mouseenter', pt => highlight_pt(pt, true))
     .on('mouseleave', pt => highlight_pt(pt, false))
     .on('click', select_pt)
     .merge(d3pts)
-    .text(d => d[m]);
+    .text(d => `${d.id}: ${d[m]}`);
 
   d3pts.exit().remove();
 }
 
 function select_pt(pt) {
-
+  console.log(pt);
 }
 
 
 function highlight_pt(pt, on) {
-
+  let partitions = extrema_map.get(pt.id);
+  publish('partitions.highlight', Array.from(partitions), on);
 }

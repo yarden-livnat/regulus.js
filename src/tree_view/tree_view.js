@@ -73,6 +73,8 @@ export function setup(el) {
   subscribe('data.updated', () => tree.update());
 
   subscribe('partition.highlight', (topic, partition, on) => tree.highlight(partition, on));
+  subscribe('partitions.highlight', (topic, partitions, on) => tree.highlight(partitions, on));
+
   subscribe('partition.details', (topic, partition, on) => tree.details(partition, on));
   subscribe('partition.selected', (topic, partition, on) => tree.selected(partition, on));
    // subscribe('persistence.range', (topic, range) => set_persistence_range(range) );
