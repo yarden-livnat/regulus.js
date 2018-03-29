@@ -361,7 +361,6 @@ def create_from_csv(filename, name, ndims):
         header = next(reader)
         data = [[float(x) for x in row] for row in reader]
         # data = [p for p in data if p[-1] > 700]
-        data = [p for p in data]
         # print('new len', len(data))
 
         if ndims is None:
@@ -500,7 +499,6 @@ def post(args=None):
 
             x = msc.X
             y = msc.Y
-
 
             # if ns.debug:
             #     msc.save(path/ (measure + '_hierarchy.csv'), path / (measure + '_partition.json'))

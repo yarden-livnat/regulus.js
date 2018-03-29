@@ -14,7 +14,7 @@ def decode(param_received):
     strip_list = [item.strip() for item in param_list]
     for idx, param in enumerate(strip_list):
         if param in param_map:
-            if param == "G":
+            if (param == "G" or param == "n") :
                 newparams[param] = strip_list[idx+1]
             elif param == "b":
                 newparams[param] = float(strip_list[idx+1])
@@ -45,7 +45,7 @@ def compute(spec, data_dir):
     update_params(reg_file, spec)
     dims = len(reg_file.dims)
     name = reg_file.name
-    updated_json = reg_file.save_json()
+    updated_json = reg_file.save_json(dir=data_dir)
 
     status = {}
 
