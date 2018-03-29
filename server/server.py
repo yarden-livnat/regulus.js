@@ -72,7 +72,10 @@ def validate():
     spec = request.json
     print('validate request received', spec)
     reg_file = create_reg(spec, data_dir)
-    return json.dumps(pts2json(reg_file))
+    if reg_file == 0:
+        return json.dumps("Can't resample provided data")
+    else:
+        return json.dumps(pts2json(reg_file))
 
 
 @app.route('/status/<job_id>')

@@ -197,6 +197,10 @@ function submit_params(parameters) {
 }
 
 function process(pts) {
+    console.log(pts);
+    if(typeof(pts)==='string')
+        root.select('#R2_val')
+            .text('  '+pts);
     let coeff = current.partition.model.linear_reg.coeff;
     let intercept = current.partition.model.linear_reg.intercept;
     let measure = current.spec.name;
