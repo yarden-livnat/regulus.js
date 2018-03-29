@@ -39,7 +39,9 @@ export default function Group() {
         g.select('.measure .name').text(measure.name);
         g.select('.measure .y_axis').call(y_axis);
 
-        let plots = g.select('.plots').selectAll('.plot').data(dims);
+        let fdims = dims.filter( d => !d.disabled);
+        let plots = g.select('.plots').selectAll('.plot')
+          .data(fdims, d => d.name);
         let list = plots.enter()
           .append('div')
           .call(plot.create);
@@ -67,6 +69,8 @@ export default function Group() {
           })
           .datum(d)
           .call(plot);
+
+        list.exit().remove();
       });
     // let t1 = performance.now();
     // console.log(`details group render: ${t1-t0} msec`);

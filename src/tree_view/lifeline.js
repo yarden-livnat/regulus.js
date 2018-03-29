@@ -159,7 +159,7 @@ export default function Lifeline() {
         .attr('y', d => sy(d.pos.yp))
         .attr('width', d => {
           // console.log(d.id, d.pos.x, d.pos.w, sx(d.pos.x + d.pos.w), sx(d.pos.x));
-          return Math.max(0, sx(d.pos.x + d.pos.w) - sx(d.pos.x)-1)
+          return Math.max(1, sx(d.pos.x + d.pos.w) - sx(d.pos.x)-1)
         })
         .attr('height', d => Math.max(0, sy(d.pos.y) - sy(d.pos.yp)-1))
         .classed('highlight', d => d.highlight)
