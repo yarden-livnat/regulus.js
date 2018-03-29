@@ -7,7 +7,7 @@ from regulus_file import RegulusFile
 from linearfit import linear_fit
 from Predictor import Predictor
 from ackley import calc_ackley,saveackley
-
+from Hartmann import calc_Hartmann, saveHart
 sim_dir = 'temp'
 sim_out = 'new_sample_outputs.csv'
 sim_in = 'new_sample_inputs.csv'
@@ -76,6 +76,14 @@ def sample(reg_file, sample_input):
         saveackley(sim_dir+'/'+sim_out, out)
         return 1
 
+    elif 'hart' in reg_file.name.lower():
+        out = calc_Hartmann(sample_input)
+        path = Path(sim_dir)
+        if not path.exists():
+            path.mkdir()
+        saveHart(sim_dir + '/' + sim_out, out)
+        return 1
+
     else:
         print("can't resample for " + reg_file.name)
         #exit(255)
@@ -90,7 +98,7 @@ def compute_msc(reg_file):
         status = subprocess.run(['python', 'post.py', '-d', str(dims), '--name', name, '--p', updated_json])
         linear_fit(updated_json)
 
-        return status
+        return status.returncode
     except Exception as e:
         print(e)
         print("Error, Recompute MSC Not Finished")

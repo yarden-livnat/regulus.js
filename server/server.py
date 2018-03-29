@@ -106,6 +106,7 @@ def resample_job(job, spec):
     try:
         reg_file = create_reg(spec, data_dir)
         code = compute_msc(reg_file)
+        print("code",code)
         with jobs_lock:
             job['status'] = 'done' if code == 0 else 'error'
             job['code'] = code
@@ -113,9 +114,9 @@ def resample_job(job, spec):
         print(e)
         print("Error, Job Not Finished")
         code = 1
-        with jobs_lock:
-            job['status'] = 'done' if code == 0 else 'error'
-            job['code'] = code
+        #with jobs_lock:
+        #job['status'] = 'done' if code == 0 else 'error'
+        job['code'] = code
     print('job {} done with code:{}'.format(job['id'], code))
 
 
