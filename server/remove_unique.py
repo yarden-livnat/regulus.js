@@ -10,12 +10,12 @@ def remove_duplicates(input):
 
     arr = np.asarray(data)
     x = arr[:, 0:-1]
-    [a, b] = np.unique(x, axis=0, return_index=1)
+    [a, b] = np.unique( x.round(decimals=15), axis=0, return_index=1)
     out = arr[b, :]
     unique_data = out.tolist()
 
     fname = input[:-4]+'_unique'+'.csv'
-    with open(fname, 'a') as f:
+    with open(fname, 'w') as f:
         report = csv.writer(f, delimiter=',')
         report.writerow(header)
         report.writerows(unique_data)

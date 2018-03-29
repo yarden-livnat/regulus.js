@@ -1,9 +1,10 @@
 
 
-export function AttrRangeFilter(a=null, r=null) {
+export function AttrRangeFilter(a=null, r=null, auto_=false) {
   let attr = a;
   let range = r;
   let active = a && r && r[0] < r[1];
+  let auto = auto_;
 
   function filter(pt) {
     if (!active) return true;
@@ -19,8 +20,45 @@ export function AttrRangeFilter(a=null, r=null) {
 
   filter.range = function(_) {
     if (!arguments.length) return range;
-    range = _;
-    active = range && range[0] < range[1];
+    range = _ && _.concat();
+    active = auto ? range && range[0] < range[1] : active;
+    return this;
+  };
+
+  filter.active = function(_) {
+    if (!arguments.length) return active;
+    active = _;
+    return this;
+  };
+
+  filter.valid = function() {
+    return range && range[0] < range[1];
+  };
+
+  return filter;
+}
+
+export function RangeAttrRangeFilter(a=null, r=null) {
+  let attr = a;
+  let range = r;
+  let active = a && r && r[0] <= r[1];
+
+  function filter(pt) {
+    if (!active) return true;
+    let v = pt[attr];
+    return range[0] <= v[1] && v[0] <= range[1];
+  }
+
+  filter.attr = function(_) {
+    if (!arguments.length) return attr;
+    attr = _;
+    return this;
+  };
+
+  filter.range = function(_) {
+    if (!arguments.length) return range;
+    range = _.concat();
+    // active = range && range[0] < range[1];
     return this;
   };
 
@@ -32,7 +70,6 @@ export function AttrRangeFilter(a=null, r=null) {
 
   return filter;
 }
-
 export function AttrValueFilter(a=null, v=null, c= (a,b) => a< b) {
   let attr = a;
   let value = v;
@@ -68,8 +105,8 @@ export function AttrValueFilter(a=null, v=null, c= (a,b) => a< b) {
 
 
 export function XYFilter(pts, x, y, xr=null, yr=null) {
-  let xf = AttrRangeFilter(x, xr);
-  let yf = AttrRangeFilter(y, yr);
+  let xf = AttrRangeFilter(x, xr, true);
+  let yf = AttrRangeFilter(y, yr, true);
   let domain = new Set(pts);
   let active = true;
 
