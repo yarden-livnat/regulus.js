@@ -406,7 +406,7 @@ def post(args=None):
     p.add_argument('-c', '--col', type=int, default=None, help='measure column index starting at 0')
 
     p.add_argument('--name', default=None, help='dataset name')
-    p.add_argument('--morse', action='store_true', help='compute Morse Complex not Morse-Smale Complex')
+    p.add_argument('--morse', default='smale', choices=['smale', 'ascend', 'descend'], help='type of complex to compute')
 
     p.add_argument('--debug', action='store_true', help='process all measures')
 
@@ -484,10 +484,14 @@ def post(args=None):
             x = msc.X
             y = msc.Y
 
-            if ns.morse:
+            if ns.morse == 'descend':
                 tmp = Post(ns.debug) \
                     .data(y) \
                     .msc(msc.descending_partitions, msc.max_hierarchy)
+            elif ns.morse == 'ascend':
+                tmp = Post(ns.debug) \
+                    .data(y) \
+                    .msc(msc.ascending_partitions, msc.min_hierarchy)
             else:
                 tmp = Post(ns.debug) \
                     .data(y) \
@@ -505,8 +509,10 @@ def post(args=None):
 
     if ns.out:
         out = ns.out
-    elif ns.morse:
-        out = filename.with_name(filename.stem+'_mc')
+    elif ns.morse == 'ascend':
+        out = filename.with_name(filename.stem+'_ascend')
+    elif ns.morse == 'descend':
+        out = filename.with_name(filename.stem + '_descend')
     else:
         out = filename
     save_regulus(out.with_suffix('.json'), regulus)
