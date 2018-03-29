@@ -92,10 +92,16 @@ def compute_msc(reg_file):
     try:
         #updated_dataset = reg_file.save_all_pts()
         updated_json = reg_file.save_json()
+        print(updated_json)
         dims = len(reg_file.dims)
         name = reg_file.name
+        if 'hart' in reg_file.name.lower():
+            status = subprocess.run(['python', 'post.py', '-d', str(dims), '--p', '--morse', updated_json])
+            print("Use Morse Complex")
+        else:
+            status = subprocess.run(['python', 'post.py', '-d', str(dims), '--name', name, '--p', updated_json])
 
-        status = subprocess.run(['python', 'post.py', '-d', str(dims), '--name', name, '--p', updated_json])
+        print(updated_json)
         linear_fit(updated_json)
 
         return status.returncode
