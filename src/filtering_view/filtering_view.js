@@ -94,7 +94,7 @@ function reset_persistence() {
 }
 
 export function set_size(w, h) {
-  [width, height] = [w, h]
+  [width, height] = [w, h];
   if (root) resize();
 }
 
@@ -102,4 +102,11 @@ function resize() {
   root.select('.filtering_view')
     .style('max-width', `${width-5}px`)
     .style('max-height', `${height}px`);
+
+  let features = root.select('.features');
+  if (!features.empty()) {
+    let w = root.select('.features').attr('width');
+    let h = root.select('.features').attr('height');
+    console.log('resize', w, h);
+  }
 }

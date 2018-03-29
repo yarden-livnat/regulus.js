@@ -2,7 +2,7 @@
 .feature-name {
   text-transform: uppercase;
   font-size: 8pt;
-  display: block;
+  display: inline-block;
 }
 
 .feature-active {
@@ -28,12 +28,8 @@
   height: 20px;
 }
 
-/*.feature-slider {*/
-  /*position: relative;*/
-  /*top: -40px;*/
-/*}*/
-
 .feature-value {
   padding-left: 10px;
   font-size: 8pt;
+  float: right;
 }
