@@ -400,13 +400,12 @@ def post(args=None):
 
     p.add_argument('--p', action='store_true', help='use parameters in json')
 
-    p.add_argument('--multiple', action='store_true', help='save to multiple jsons')
-
     p.add_argument('-d', '--dims', type=int, default=None, help='number of input dimensions')
     p.add_argument('-m', '--measure', default=None, help='measure name')
     p.add_argument('-c', '--col', type=int, default=None, help='measure column index starting at 0')
 
     p.add_argument('--name', default=None, help='dataset name')
+    p.add_argument('--morse', action='store_true', help='compute Morse Complex not Morse-Smale Complex')
 
     p.add_argument('--debug', action='store_true', help='process all measures')
 
@@ -461,22 +460,7 @@ def post(args=None):
             if "g" in param_in_file:
                 ns.gradient = param_in_file["g"]
 
-    if ns.multiple:
-        catalog_path = path / 'catalog.json'
-        if catalog_path.exists():
-            with open(catalog_path) as f:
-                catalog = json.load(f)
-    else:
-        catalog = {
-            'name': filename.parent,
-            'data': filename.name,
-            'dims': ndims,
-            'msc': []
-        }
-    if ns.name is not None:
-        catalog['name'] = ns.name
 
-    available = set(catalog['msc'])
     mscs = dict()
     for msc in regulus['mscs']:
         mscs[msc['name']] = msc
@@ -495,41 +479,29 @@ def post(args=None):
             y = np_data[:, ndims+i]
             msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm, debug=True, aggregator='mean')  # connect=True
             msc.build(X=x, Y=y, names=regulus['dims']+[measure])
-            print('msc done')
 
             x = msc.X
             y = msc.Y
 
-            # if ns.debug:
-            #     msc.save(path/ (measure + '_hierarchy.csv'), path / (measure + '_partition.json'))
-
-            if ns.multiple:
-                Post(ns.debug)\
-                    .data(y)\
-                    .msc(msc.base_partitions, msc.hierarchy)\
-                    .build()\
-                    .verify()\
-                    .save(path, measure, params)
-            else:
-                tree = Post(ns.debug) \
+            if ns.morse:
+                tmp = Post(ns.debug) \
                     .data(y) \
-                    .msc(msc.base_partitions, msc.hierarchy) \
-                    .build() \
-                    .verify() \
-                    .get_tree(measure, params)
-                mscs[measure] = tree
-            available.add(measure)
+                    .msc(msc.descending_partitions, msc.max_hierarchy)
+            else:
+                tmp = Post(ns.debug) \
+                    .data(y) \
+                    .msc(msc.base_partitions, msc.hierarchy)
+
+            mscs[measure] = tmp \
+                .build() \
+                .verify() \
+                .get_tree(measure, params)
+
         except RuntimeError as error:
             print(error)
 
-    catalog['msc'] = sorted(list(available))
-
-    if not ns.multiple:
-        regulus['mscs'] = list(mscs.values())
-        save_regulus(filename.with_suffix('.json'), regulus)
-    else:
-        with open(path / 'catalog.json', 'w') as f:
-            json.dump(catalog, f, indent=2)
+    regulus['mscs'] = list(mscs.values())
+    save_regulus(filename.with_suffix('.json'), regulus)
 
 
 if __name__ == '__main__':
