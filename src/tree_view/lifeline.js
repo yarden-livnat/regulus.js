@@ -48,13 +48,13 @@ export default function Lifeline() {
 
   function update_front() {
     if (!svg) return;
-    return;
+    // return;
 
     nodes.forEach(node => node.front = node.on_path = false);
     if (root && root.model)
       visit(root);
 
-    let d3nodes = svg.select('.nodes').selectAll('.node').filter('.highlight');
+    let d3nodes = svg.select('.nodes').selectAll('.node').filter( n => !n.highlight);
 
     if (color_by ==='minmax') {
       d3nodes
@@ -280,7 +280,17 @@ export default function Lifeline() {
   lifeline.highlight = function(items, on) {
     items = Array.isArray(items) && items || [items];
     items.forEach(n => n.highlight = on);
-    svg.selectAll('.node').data(items, d => d.id).classed('highlight', on);
+    svg.selectAll('.node').data(items, d => d.id)
+      .each( function(d) {
+        if (on) {
+          d._fill = d3.select(this).style('fill');
+          d3.select(this).style('fill', null);
+        }
+        else
+          d3.select(this).style('fill', d._fill);
+      })
+      .classed('highlight', on);
+
     if (on) render_names();
     return this;
   };
