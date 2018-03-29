@@ -48,6 +48,13 @@ let config = {
                 componentState: {},
                 title: 'Resample',
                 isClosable: false,
+              },
+              {
+                type: 'component',
+                componentName: 'extrema',
+                componentState: {},
+                title: 'Extrema',
+                isClosable: false,
               }
             ]
           }

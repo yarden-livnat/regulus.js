@@ -18,12 +18,19 @@ export default function Features() {
 
   let dispatch = d3.dispatch('show', 'update', 'color_by');
 
+  add_fitness_feature();
+  add_parent_feature();
+  add_sibling_feature();
+  add_minmax_feature();
+  add_no_cmap();
+
   if (localStorage.getItem('tree_view.version') === version) {
     features.forEach(f => {
       if (f.interface) {
         let selection = localStorage.getItem(`feature.${f.name}.selection`);
-        f.selection = selection && JSON.parse(selection) || f.domain;
-        f.active = localStorage.getItem(`feature.${features[0].name}.active`) === 'on';
+        f.selection = selection !== "undefined" && JSON.parse(selection) || f.domain;
+        f.active = localStorage.getItem(`feature.${f.name}.active`) === 'on';
+        console.log('feature', f.name, f.active);
         f.filter2.active(f.active);
         f.filter2.range(f.selection);
       }
@@ -32,11 +39,7 @@ export default function Features() {
     localStorage.setItem('tree_view.version', version);
   }
 
-  add_fitness_feature();
-  add_parent_feature();
-  add_sibling_feature();
-  add_minmax_feature();
-  add_no_cmap();
+
 
   features.forEach(f => f.interface && filter.add(f.filter2));
 

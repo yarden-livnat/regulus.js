@@ -9,6 +9,7 @@ import * as tree_view from '../tree_view';
 import * as partition_view from '../partition_view';
 import * as controls_view from '../filtering_view';
 import * as resample_view from '../resample_view';
+import * as extema_view from '../extrema_view';
 
 // import '../style/fontawesome-all.min';
 import './style.css';
@@ -25,7 +26,7 @@ function setup() {
   layout.register('filtering', Component(controls_view));
   layout.register('details', Component(details_view));
   layout.register('resample', Component(resample_view));
-
+  layout.register('extrema', Component(extema_view));
   layout.on('initialised', init);
   layout.init();
 }
