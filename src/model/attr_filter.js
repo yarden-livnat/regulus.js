@@ -3,7 +3,7 @@
 export function AttrRangeFilter(a=null, r=null) {
   let attr = a;
   let range = r;
-  let active = a && r && r[0] < r[1];
+  let active = a && r && r[0] <= r[1];
 
   function filter(pt) {
     if (!active) return true;
@@ -36,7 +36,7 @@ export function AttrRangeFilter(a=null, r=null) {
 export function RangeAttrRangeFilter(a=null, r=null) {
   let attr = a;
   let range = r;
-  let active = a && r && r[0] < r[1];
+  let active = a && r && r[0] <= r[1];
 
   function filter(pt) {
     if (!active) return true;

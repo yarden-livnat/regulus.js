@@ -24,6 +24,7 @@ let prevent = false;
 let saved = [0, 0];
 
 let features = [];
+let version='1';
 
 init_features();
 
@@ -102,7 +103,7 @@ function add_minmax_feature() {
   let domain = [0, 1];
   let cmap = chromatic['interpolateRdYlBu'];
   // let colorScale = d3.scaleSequential(cmap).domain(domain);
-  let colorScale = d3.scaleLinear().domain(domain).range(['blue', 'red']);
+  let colorScale = d3.scaleLinear().domain(domain).range(['#bce2fe', /*'#fffebe',*/ '#fd666e']);
 
   features.push({
     id: 3, name: name, label: 'min max',
@@ -180,35 +181,6 @@ export function setup(el) {
    // subscribe('persistence.range', (topic, range) => set_persistence_range(range) );
 }
 
-export function set_size(w, h) {
-  if (root) resize();
-}
-
-let version='1';
-
-function load_setup() {
-  if (localStorage.getItem('tree_view.version') === version) {
-    features.forEach(f => {
-      let selection = localStorage.getItem(`feature.${f.name}.selection`);
-      f.selection = selection && JSON.parse(selection) || f.domain;
-      f.active = localStorage.getItem(`feature.${features[0].name}.active`) === 'on';
-      f.filter2.active(f.active);
-      f.filter2.range(f.selection);
-    });
-
-  } else {
-    localStorage.setItem('tree_view.version', version);
-  }
-}
-
-function resize() {
-  let rw = parseInt(root.style('width'));
-  let rh = parseInt(root.style('height'));
-  let ch = parseInt(root.select('.config').style('height'));
-
-  tree.set_size(rw, rh - ch);
-}
-
 function init() {
   let d3features = d3.select('.filtering_view')
     .selectAll('.feature')
@@ -253,6 +225,34 @@ function init() {
     });
 }
 
+
+export function set_size(w, h) {
+  if (root) resize();
+}
+
+function load_setup() {
+  if (localStorage.getItem('tree_view.version') === version) {
+    features.forEach(f => {
+      let selection = localStorage.getItem(`feature.${f.name}.selection`);
+      f.selection = selection && JSON.parse(selection) || f.domain;
+      f.active = localStorage.getItem(`feature.${features[0].name}.active`) === 'on';
+      f.filter2.active(f.active);
+      f.filter2.range(f.selection);
+    });
+  } else {
+    localStorage.setItem('tree_view.version', version);
+  }
+}
+
+function resize() {
+  let rw = parseInt(root.style('width'));
+  let rh = parseInt(root.style('height'));
+  let ch = parseInt(root.select('.config').style('height'));
+
+  tree.set_size(rw, rh - ch);
+}
+
+
 function reset(data) {
   msc = data;
 
@@ -275,18 +275,6 @@ function reset(data) {
 
     d3.selectAll('.feature-slider2')
       .call(feature_slider);
-
-    // d3.selectAll('.feature-slider2')
-    //   .each( function(d) {
-    //     d3.select(this)
-    //       .datum({id: d.name, type:'linear',
-    //         domain: d.domain,
-    //         ticks:{n: 4, format:'.2f'},
-    //         selection: d.range,
-    //         feature: d})
-    //       .call(feature_slider);
-    //   });
-    // d3.select('.slider').call(feature_slider);
 
     tree.data(msc.partitions, msc.tree);
   }
@@ -334,8 +322,8 @@ function process_data() {
     if (node.parent) {
       for (let child of node.parent.children)
         if (child !== node) return child;
-      return null;
     }
+    return null;
   }
 }
 
