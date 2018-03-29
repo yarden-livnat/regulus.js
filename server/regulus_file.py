@@ -52,6 +52,10 @@ class RegulusFile(object):
 
             elif (cur_dir/(name +'.json')).exists():
                 self.load_reg_json(filename = name + '.json', dir= cur_dir)
+            elif (cur_dir/(name +'_mc'+'.json')).exists():
+                self.load_reg_json(filename = name + '_mc'+'.json', dir= cur_dir)
+            elif (cur_dir/(name +'_mc'+version +'.json')).exists():
+                self.load_reg_json(filename = name + '_mc'+version +'.json', dir= cur_dir)
 
     def add_points(self, pts):
         self.pts = self.pts + pts
