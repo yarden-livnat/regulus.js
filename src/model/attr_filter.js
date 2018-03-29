@@ -3,7 +3,7 @@
 export function AttrRangeFilter(a=null, r=null, auto_=false) {
   let attr = a;
   let range = r;
-  let active = a && r && r[0] <= r[1];
+  let active = a && r && r[0] < r[1];
   let auto = auto_;
 
   function filter(pt) {
