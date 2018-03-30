@@ -104,6 +104,7 @@ def compute_msc(reg_file):
         #    status = subprocess.run(['python', 'post.py', '-d', str(dims), '--name', name, '--p', updated_json])
 
         #print(updated_json)
+
         linear_fit(updated_json)
 
         return status.returncode
