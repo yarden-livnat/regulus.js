@@ -385,6 +385,7 @@ def load_regulus(filename):
 
 
 def save_regulus(filename, regulus):
+    #print("Post_filename", filename)
     with open(filename, 'w') as f:
         json.dump(regulus, f, indent=2)
 
@@ -420,7 +421,8 @@ def post(args=None):
     measures = []
 
     if filename.suffix == '.csv':
-        regulus = create_from_csv(filename, ns.name or path.name or filename.stem, ns.dims)
+        print(filename.stem)
+        regulus = create_from_csv(filename, ns.name or filename.stem or path.name, ns.dims)
     elif filename.suffix == '.json':
         regulus = load_regulus(filename)
     else:
@@ -447,6 +449,7 @@ def post(args=None):
     np_data = np.concatenate((x, y), axis=1)
     data = np_data.tolist()
     regulus['pts'] = data
+
     if ns.p:
         param_in_file = regulus['mscs'][0]["params"]
         if type(param_in_file) is dict:
@@ -506,7 +509,7 @@ def post(args=None):
             print(error)
 
     regulus['mscs'] = list(mscs.values())
-
+    #print("filename",filename)
     if ns.out:
         out = ns.out
     elif ns.morse == 'ascend':
@@ -515,6 +518,7 @@ def post(args=None):
         out = filename.with_name(filename.stem + '_descend')
     else:
         out = filename
+    #print(out)
     save_regulus(out.with_suffix('.json'), regulus)
 
 
