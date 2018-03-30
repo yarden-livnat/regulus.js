@@ -22,6 +22,18 @@
   /*filter: url('#drop-shadow');*/
 }
 
+.lifeline .highlight_max {
+  /*stroke-width: 2px;*/
+  /*stroke: gray;*/
+  fill: lightsalmon;
+}
+
+.lifeline .highlight_min {
+  /*stroke-width: 2px;*/
+  /*stroke: gray;*/
+  fill: lightskyblue;
+}
+
 .lifeline .node.details {
   stroke-width: 4px;
   stroke: lightgreen;

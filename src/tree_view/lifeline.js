@@ -255,12 +255,6 @@ export default function Lifeline() {
     feMerge.append("feMergeNode")
       .attr("in", "SourceGraphic");
 
-    // let gradient = defs.append('linearGradient')
-    //   .attr('id', 'minmax');
-    // gradient.append('stop')
-    //   .attr('class', 'stop-bottom').style('offset', '0');
-    // gradient.append('stop')
-    //   .attr('class', 'stop-top').style('offset', '1');
 
     return lifeline;
   }
@@ -290,6 +284,25 @@ export default function Lifeline() {
           d3.select(this).style('fill', d._fill);
       })
       .classed('highlight', on);
+
+    if (on) render_names();
+    return this;
+  };
+
+  lifeline.highlight_list = function(list, on) {
+    list.partitions.forEach( p => p.highlight_type = on && list.type || null);
+
+    svg.selectAll('.node').data(list.partitions, d => d.id)
+      .each( function(d) {
+        if (on) {
+          d._fill = d3.select(this).style('fill');
+          d3.select(this).style('fill', null);
+        }
+        else
+          d3.select(this).style('fill', d._fill);
+      })
+      .classed('highlight_max', d => on && d.highlight_type === 'max')
+      .classed('highlight_min', d => on && d.highlight_type === 'min');
 
     if (on) render_names();
     return this;

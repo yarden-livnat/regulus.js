@@ -3,12 +3,53 @@
   padding: 5px;
 }
 
-.extrema {
-  list-style: none;
-  font-size: 9pt;
-  padding: 5px;
+.extrema-header {
+  display: block;
+  padding: 10px;
 }
 
-.extrema-pt {
-  padding: 2px 1px 2px 5pt
+.extrema_view .header {
+  /*background-color: lightgray;*/
+  font-weight: bold;
+  display: block;
+  padding: 2px 15px;
+}
+
+
+.extrema-ids {
+  display: inline-block;
+  font-size: 9pt;
+  padding: 2px 5px;
+}
+
+.extrema-id {
+  text-align: right;
+}
+
+.extrema-values {
+  display: inline-block;
+  font-size: 9pt;
+  padding: 2px 5px;
+}
+
+.extrema-value {
+  text-align: right;
+}
+
+.extrema-ns {
+  display: inline-block;
+  font-size: 9pt;
+  padding: 2px 5px;
+}
+
+.extrema-n {
+  text-align: right;
+}
+
+.extrema-min {
+  background-color: lightskyblue;
+}
+
+.extrema-max {
+  background-color: lightsalmon;
 }

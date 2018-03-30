@@ -8,12 +8,15 @@ import './extrema.css';
 
 let root = null;
 let msc = null;
+
 let extrema_map = new Map();
+
 let extrema = [];
+let sort_by = 'max';
 
 let width = 100, height = 100;
 
-let format = d3.format('.2g');
+let format = d3.format('.3g');
 
 export function setup(el) {
   root = d3.select(el);
@@ -36,54 +39,68 @@ function resize() {
     .style('max-height', `${height}px`);
 }
 
+function add(p, loc, map) {
+  let idx = p.minmax_idx[loc];
+  let entry = map.get(idx);
+  if (!entry) {
+    entry = {partitions: new Set(), type: loc};
+    map.set(idx, entry);
+  }
+  entry.partitions.add(p);
+}
+
 function reset(msc) {
 
   let measure = msc.measure;
   let m = measure.name;
-  let entry;
+  let map = new Map();
+
+  extrema_map = new Map();
+  extrema = [];
 
   if (msc) {
     for (let p of msc.partitions) {
-      entry = extrema_map.get(p.minmax_idx[0]);
-      if (!entry) {
-        entry = new Set();
-        extrema_map.set(p.minmax_idx[0], entry)
-      }
-      entry.add(p);
-
-      entry = extrema_map.get(p.minmax_idx[1]);
-      if (!entry) {
-        entry = new Set();
-        extrema_map.set(p.minmax_idx[1], entry)
-      }
-      entry.add(p);
+      add(p, 0, map);
+      add(p, 1, map);
     }
   }
 
-  extrema = [];
-  for (let idx of extrema_map.keys()) {
-    if (msc.pts[idx].id !== idx) {
-      console.log('pt index mismatch', msc.pts[idx], idx);
-    }
-    extrema.push(msc.pts[idx]);
+  let cols = [
+    {id: 'id', label: 'id', format: d3.format('d')},
+    {id: 'value', label: 'value', format: d3.format('.3g')},
+    {id: 'n', label: 'partitions', format: d3.format('d')}
+  ];
+
+  for (let [idx, entry] of map.entries()) {
+    extrema.push({'id': idx, 'value': msc.pts[idx][m], 'n':entry.partitions.size, type: entry.type && 'max' || 'min'});
+    extrema_map.set(idx, {type: entry.type && 'max' || 'min', partitions: Array.from(entry.partitions)});
   }
 
-  console.log('found', extrema.length, ' extrema');
-  extrema.sort((a, b) => (b[m] - a[m]));
+  if (sort_by === 'max')
+    extrema.sort((a, b) => (b.value - a.value));
+  else
+    extrema.sort((a, b) => (a.value - b.value));
 
-  let d3pts = root.select('.extrema').selectAll('li')
-    .data(extrema, d => d.id);
 
-  d3pts.enter()
-    .append('li')
-    .attr('class', 'extrema-pt')
-    .on('mouseenter', pt => highlight_pt(pt, true))
-    .on('mouseleave', pt => highlight_pt(pt, false))
-    .on('click', select_pt)
-    .merge(d3pts)
-    .text(d => `${d.id}: ${d[m]}`);
+  for (let col of cols) {
+    let type = `extrema-${col.id}`;
+    let list = root.select(`.${type}s`).selectAll(`.${type}`)
+      .data(extrema, d => d.id);
 
-  d3pts.exit().remove();
+    list.enter()
+      .append('div')
+      .attr('class', type)
+      .classed('extrema-max', d =>
+        col.id === 'id' &&  d.type === 'max')
+      .classed('extrema-min', d => col.id === 'id' &&  d.type === 'min')
+      .on('mouseenter', pt => highlight_pt(pt, true))
+      .on('mouseleave', pt => highlight_pt(pt, false))
+      .on('click', select_pt)
+      .merge(list)
+      .text(d => col.format(d[col.id]));
+
+    list.exit().remove();
+  }
 }
 
 function select_pt(pt) {
@@ -92,6 +109,7 @@ function select_pt(pt) {
 
 
 function highlight_pt(pt, on) {
-  let partitions = extrema_map.get(pt.id);
-  publish('partitions.highlight', Array.from(partitions), on);
+  let list = extrema_map.get(pt.id);
+  
+  publish('partitions.highlight', list, on);
 }
