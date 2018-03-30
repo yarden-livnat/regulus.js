@@ -1,5 +1,9 @@
+@import './_variables.less';
+
 html, body {
-  font: 10pt Arial;
+  font: @font;
+  /*font-size: 10pt;*/
+  /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
   height: 100%;
   /*background-color: #fafafa;*/
 }
@@ -16,8 +20,6 @@ html, body {
 }
 
 #layoutContainer{
-  /*width: 80%;*/
-  /*height: 100%;*/
   position:absolute;
   top: 51px;
   left: 5px;
@@ -49,12 +51,8 @@ body text {
   background-color: #666666;
 }
 
-.expand {
-  flex: 1 1 auto;
-}
-
-.shrink {
-  flex: 0 1 auto;
+.flex {
+  display: flex;
 }
 
 .row {
@@ -66,6 +64,15 @@ body text {
 }
 
 
+.expand {
+  flex: 1 1 auto;
+}
+
+.shrink {
+  flex: 0 1 auto;
+}
+
+
 .dataset_view {
   display: inline-block;
 }
@@ -73,4 +80,7 @@ body text {
 
 .scroll {
   overflow: auto;
+}
+
+.grid {
 }

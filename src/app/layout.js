@@ -84,7 +84,8 @@ let config = {
 };
 
 
-let load_layout =   false;
+let load_layout = false;
+let save_layout = false;
 
 
 let state = load_layout && localStorage.getItem('layout.state');
@@ -98,8 +99,8 @@ export function register(name, component) {
 
 export function init() {
   layout.init();
-  // if (save_layout)
-  // layout.on('stateChanged', save);
+  if (save_layout)
+    layout.on('stateChanged', save);
 }
 
 export function on(event, cb, ctx) {

@@ -1,25 +1,29 @@
 <div class="partition_view">
   <div class="pv_info">
-    <div class="pv_id_label">ID:</div>
-    <div class="pv_id"></div>
-    <div class="pv_name_label">Name:</div>
-    <input class="pv_name" type="text">
 
-    <div class="pv_size_label">Size</div>
-    <div class="pv_size"></div>
-    <div class="pv_min"></div>
-    <div class="pv_max"></div>
+    <div class="grid">
+      <div class="pv_id_label">ID:</div>
+      <div class="pv_id"></div>
+      <div class="pv_name_label">Name:</div>
+      <input class="pv_name" type="text">
 
-    <div class="pv_fitness_label">Fitness</div>
-    <div class="pv_fitness"></div>
+      <div class="pv_size_label">Size</div>
+      <div class="pv_size"></div>
+      <div class="pv_minmax_label">Range</div>
+      <div class="pv_min"></div>
+      <div class="pv_max"></div>
 
-    <div class="pv_similarity_label">Similarity</div>
-    <div class="pv_parent_similarity"></div>
-    <div class="pv_sibling_similarity"></div>
+      <div class="pv_fitness_label">Fitness</div>
+      <div class="pv_fitness"></div>
+
+      <div class="pv_similarity_label">Similarity</div>
+      <div class="pv_parent_similarity"></div>
+      <div class="pv_sibling_similarity"></div>
+    </div>
   </div>
 
   <div class="scroll">
-    <div class="pstatistics">
+    <div class="pv_stat">
       <label class="section-header">Dimensions</label>
       <div class="dims"></div>
 
@@ -28,7 +32,7 @@
     </div>
     <div class="notes">
         <label class="entry">Notes:</label>
-        <textarea class="partition_notes"></textarea>
+        <textarea class="pv_notes"></textarea>
     </div>
   </div>
 </div>

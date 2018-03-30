@@ -52,9 +52,7 @@ export function PartitionView(container_, state_) {
   function resize() {
     if (!root) setup();
 
-    // let w = parseInt(root.select('table').style('width'));
     let h = parseInt(root.select('.pv_info').style('height'));
-
     root.select('.scroll').style('max-height', `${container.height - h}px`);
     root.select('.scroll').style('max-width', `${container.width}px`);
   }
@@ -82,7 +80,6 @@ export function PartitionView(container_, state_) {
     current = selected || highlight;
     show_partition()
   }
-
 
   function highlight_partition(partition, show) {
     if (!show) {
@@ -131,7 +128,7 @@ export function PartitionView(container_, state_) {
     root.select('.pv_sibling_similarity')
       .text(current && current.model && format_f(current.model.sibling_similarity));
 
-    root.select('.partition_notes')
+    root.select('.pv_notes')
       .property('value', current && current.notes || "")
       .attr('disabled', current ? null : true);
 
@@ -144,6 +141,7 @@ export function PartitionView(container_, state_) {
     let measures = stat.filter(s => s.type === 'measure')
       .sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
     show('.measures', measures, true);
+
     if (init) {
       if (measures.length === 1)
         select_measure(measures[0]);
@@ -155,21 +153,21 @@ export function PartitionView(container_, state_) {
   }
 
   function show(selector, data, listen = false) {
-    let stats = root.select(selector).selectAll('.stat')
+    let stats = root.select(selector).selectAll('.pv_stat')
       .data(data, d => d.name);
 
     stats.exit().remove();
 
     let boxes = stats.enter()
       .append('div')
-      .attr('class', 'stat');
+      .attr('class', 'pv_stat');
 
     boxes.append('label').attr('class', 'name');
     if (listen) {
       boxes.on('click', select_measure);
     }
 
-    let margin = {top: 0, right: 0, bottom: 10, left: 20};
+    let margin = {top: 0, right: 20, bottom: 10, left: 20};
     let width = 100, height = 10;
     boxes.append('svg')
       .attr('class', 'box-plot')

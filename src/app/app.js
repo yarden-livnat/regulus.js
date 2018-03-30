@@ -12,11 +12,11 @@ import * as resample_view from '../resample_view';
 import * as extrema_view from '../extrema_view';
 
 // import '../style/fontawesome-all.min';
-import './style.css';
+import './style.less';
 
 
 setup();
-init();
+// init();
 
 function setup() {
   subscribe('status', report_status);
@@ -28,6 +28,7 @@ function setup() {
   layout.register('details', Component(details_view));
   layout.register('resample', Component(resample_view));
   layout.register('extrema', Component(extrema_view));
+  layout.on('initialised', init);
   layout.init();
 }
 
