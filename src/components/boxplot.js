@@ -7,7 +7,7 @@ function functor(v) {
 }
 
 export default function BoxPlot() {
-  let margin = {top: 0, right: 0, bottom: 10, left: 50};
+  let margin = {top: 0, right: 30, bottom: 10, left: 20};
 
   let width = 1,
     height = 1,
@@ -26,14 +26,13 @@ export default function BoxPlot() {
             min = d.min,
             max = d.max;
 
+          width = parseInt(svg.style('width')) - margin.left - margin.right;
+          height = parseInt(svg.style('height')) - margin.top - margin.bottom;
 
-          // // Compute outliers. If no whiskers are specified, all data are "outliers".
-          // // We compute the outliers as indices, so that we can join across transitions!
-          // let outlierIndices = whiskerIndices
-          //   ? d3.range(0, whiskerIndices[0]).concat(d3.range(whiskerIndices[1] + 1, n))
-          //   : d3.range(n);
+          let g = svg.select('g')
+            .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-          svg.selectAll('.frame').data([1])
+          g.selectAll('.frame').data([1])
             .enter()
             .append('rect')
             .attr('class', 'frame')
@@ -59,7 +58,7 @@ export default function BoxPlot() {
           // elements also fade in and out.
 
           // Update center line: the vertical line spanning the whiskers.
-          let center = svg.selectAll("line.center")
+          let center = g.selectAll("line.center")
             .data([[min, max]]);
 
           center.enter().insert("line", "rect")
@@ -97,7 +96,7 @@ export default function BoxPlot() {
             .remove();
 
           // Update innerquartile box.
-          let box = svg.selectAll("rect.box")
+          let box = g.selectAll("rect.box")
             .data([d.quantile]);
 
           box.enter().append("rect")
@@ -121,7 +120,7 @@ export default function BoxPlot() {
             .attr("width", d => x1(d[2]) - x1(d[0]));
 
           // Update median line.
-          let medianLine = svg.selectAll("line.median")
+          let medianLine = g.selectAll("line.median")
             .data([d.quantile[1]]);
 
           medianLine.enter().append("line")
@@ -141,7 +140,7 @@ export default function BoxPlot() {
             .attr("x2", x1);
 
           // Update whiskers.
-          let whisker = svg.selectAll("line.whisker")
+          let whisker = g.selectAll("line.whisker")
             .data([min, max]);
 
           whisker.enter().insert("line", "circle, text")
@@ -171,7 +170,7 @@ export default function BoxPlot() {
             .remove();
 
           // Update outliers.
-          // let outlier = svg.selectAll("circle.outlier")
+          // let outlier = g.selectAll("circle.outlier")
           //   .data(outlierIndices, Number);
 
           // outlier.enter().insert("circle", "text")
@@ -200,7 +199,7 @@ export default function BoxPlot() {
           let format = tickFormat || x1.tickFormat(8);
 
           // Update box ticks.
-          // let boxTick = svg.selectAll("text.box")
+          // let boxTick = g.selectAll("text.box")
           //   .data(d.quantile);
           //
           // boxTick.enter().append("text")
@@ -223,7 +222,7 @@ export default function BoxPlot() {
           // Update whisker ticks. These are handled separately from the box
           // ticks because they may or may not exist, and we want don't want
           // to join box ticks pre-transition with whisker ticks post-.
-          let whiskerTick = svg.selectAll("text.whisker")
+          let whiskerTick = g.selectAll("text.whisker")
             .data([min, max]);
 
           whiskerTick.enter().append("text")

@@ -5,6 +5,7 @@ import BoxPlot from '../components/boxplot';
 // import {shared_msc} from "../model/model";
 import template from './partition_view.html';
 import './style.less';
+import {shared_msc} from "../model/model";
 
 
 export function PartitionView(container_, state_) {
@@ -53,8 +54,13 @@ export function PartitionView(container_, state_) {
     if (!root) setup();
 
     let h = parseInt(root.select('.pv_info').style('height'));
-    root.select('.scroll').style('max-height', `${container.height - h}px`);
-    root.select('.scroll').style('max-width', `${container.width}px`);
+
+    console.log('pv:', h, container.width, container.height);
+    root.select('.pv_scroll')
+      .style('max-height', `${container.height - h}px`)
+      .style('max-width', `${container.width}px`);
+
+    if (shared_msc) show_partition(false);
   }
 
   function reset(_) {
@@ -134,62 +140,61 @@ export function PartitionView(container_, state_) {
 
     let stat = current && Array.from(current.statistics.values()) || [];
 
-    let dims = stat.filter(s => s.type === 'dim')
-      .sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
-    show('.dims', dims);
+    let all = stat.sort( (a, b) => a.type === b.type ? (a.name < b.name ? -1 : 1) : a.type === 'dim' ? -1 : 1);
+    show(all);
 
-    let measures = stat.filter(s => s.type === 'measure')
-      .sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
-    show('.measures', measures, true);
-
-    if (init) {
-      if (measures.length === 1)
-        select_measure(measures[0]);
+    if (init && shared_msc) {
+      if (shared_msc.measures.length === 1)
+        select_measure(shared_msc.measures[0]);
       else {
         let name = localStorage.getItem(`partition_view.${shared_msc.name}.measure`);
-        select_measure(measures.find(d => d.name === name));
+        select_measure(shared_msc.measures.find(d => d.name === name));
       }
     }
   }
 
-  function show(selector, data, listen = false) {
-    let stats = root.select(selector).selectAll('.pv_stat')
-      .data(data, d => d.name);
+  function show( data ) {
+    let ndims = data.reduce( (a, v) => v.type === 'dim' ? a+1 : a);
 
-    stats.exit().remove();
+    root.select('.pv_stat_grid.pv_measure')
+      .style('grid-row', ndims+2);
 
-    let boxes = stats.enter()
+    let labels = root.select('.pv_stat_grid').selectAll('.pv_label')
+      .data(data);
+
+    labels.enter()
       .append('div')
-      .attr('class', 'pv_stat');
+      .attr('class', 'pv_label')
+      .merge(labels)
+      .style('grid-row', (d, i) => d.type === 'dim' ? i+2 : i+3)
+      .classed('pv_measure', d => d.type === 'measure')
+      .on('click', select_measure)
+      .text(d => d.name);
+    labels.exit().remove();
 
-    boxes.append('label').attr('class', 'name');
-    if (listen) {
-      boxes.on('click', select_measure);
-    }
+    let boxes = root.select('.pv_stat_grid').selectAll('.pv_box')
+      .data(data);
 
-    let margin = {top: 0, right: 20, bottom: 10, left: 20};
-    let width = 100, height = 10;
-    boxes.append('svg')
-      .attr('class', 'box-plot')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-      .append('g')
-      .attr('transform', `translate(${margin.left}, ${margin.top})`);
+    let new_boxes = boxes.enter()
+      .append('svg')
+      .attr('class', 'pv_box');
 
-    let b = boxes.merge(stats);
-    b.select('.name')
-      .text(d => d.name)
-      .classed('selected', d => measure && d.name === measure.name);
+    new_boxes
+      .append('g');
 
-    b.select('svg')
+    new_boxes
+      .merge(boxes)
+      .style('grid-row', (d, i) => d.type === 'dim' ? i+2 : i+3)
       .call(box_plot);
+
+    boxes.exit().remove();
   }
 
   function select_measure(d) {
-    if (!d || measure === d) return;
+    if (!d || measure === d || d.type !== 'measure') return;
 
     measure = d;
-    root.select('.measures').selectAll('.name')
+    root.selectAll('.pv_measure')
       .classed('selected', d => d.name === measure.name);
     selected = highlight = null;
 
