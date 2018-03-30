@@ -9,7 +9,7 @@ let config = {
     hasHeaders: true,
     constrainDragToContainer: true,
     reorderEnabled: true,
-    selectionEnabled: false,
+    selectionEnabled: true,
     popoutWholeStack: false,
     blockedPopoutsThrowError: true,
     closePopoutsOnUnload: true,
@@ -92,22 +92,11 @@ let state = load_layout && localStorage.getItem('layout.state');
 export let layout = new GoldenLayout(state && JSON.parse(state) || config, $('#layoutContainer'));
 layout._isFullPage = true;
 
-
-export function register(name, component) {
-  layout.registerComponent(name, component);
-}
-
-export function init() {
-  layout.init();
-  if (save_layout)
-    layout.on('stateChanged', save);
-}
-
-export function on(event, cb, ctx) {
-  layout.on(event, cb, ctx);
-}
+if (save_layout)
+  layout.on('stateChanged', save);
 
 export function save() {
+  if (!layout.isInitialised) return;
   let t0 = performance.now();
   let state = JSON.stringify(layout.toConfig());
   localStorage.setItem('layout.state', state);

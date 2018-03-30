@@ -5,6 +5,8 @@ import * as service from "../app/service";
 import {publish} from "../utils/pubsub";
 import {MultiMSC} from "../model/multi_msc";
 
+import dropdown from '../components/dropdown';
+
 let root;
 let _init = true;
 

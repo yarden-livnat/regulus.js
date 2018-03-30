@@ -2,10 +2,9 @@ import * as d3 from 'd3';
 import {publish, subscribe} from '../utils/pubsub';
 import BoxPlot from '../components/boxplot';
 
-// import {shared_msc} from "../model/model";
 import template from './partition_view.html';
 import './style.less';
-import {shared_msc} from "../model/model";
+import * as model from "../model/model";
 
 
 export function PartitionView(container_, state_) {
@@ -44,6 +43,8 @@ export function PartitionView(container_, state_) {
       .on('change', notes_changed)
       .on('input', notes_changed);
 
+    shared_msc = model.shared_msc;
+
     subscribe('data.pts', (topic, data) => reset(data));
     subscribe('data.loaded', (topic, data) => reset(data));
     subscribe('partition.highlight', (topic, partition, show) => highlight_partition(partition, show));
@@ -52,10 +53,8 @@ export function PartitionView(container_, state_) {
 
   function resize() {
     if (!root) setup();
-
     let h = parseInt(root.select('.pv_info').style('height'));
 
-    console.log('pv:', h, container.width, container.height);
     root.select('.pv_scroll')
       .style('max-height', `${container.height - h}px`)
       .style('max-width', `${container.width}px`);
@@ -154,7 +153,9 @@ export function PartitionView(container_, state_) {
   }
 
   function show( data ) {
-    let ndims = data.reduce( (a, v) => v.type === 'dim' ? a+1 : a);
+    if (!data) return;
+
+    let ndims = data.reduce( (a, v) => v.type === 'dim' ? a+1 : a, 0);
 
     root.select('.pv_stat_grid.pv_measure')
       .style('grid-row', ndims+2);
