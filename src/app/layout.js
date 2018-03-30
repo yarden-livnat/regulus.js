@@ -13,7 +13,7 @@ let config = {
     popoutWholeStack: false,
     blockedPopoutsThrowError: true,
     closePopoutsOnUnload: true,
-    showPopoutIcon: false,
+    showPopoutIcon: true,
     showMaximiseIcon: true,
     showCloseIcon: false
   },
@@ -84,10 +84,11 @@ let config = {
 };
 
 
-let load_layout = true;
+let load_layout =   false;
+
 
 let state = load_layout && localStorage.getItem('layout.state');
-let layout = new GoldenLayout(state && JSON.parse(state) || config, $('#layoutContainer'));
+export let layout = new GoldenLayout(state && JSON.parse(state) || config, $('#layoutContainer'));
 layout._isFullPage = true;
 
 
@@ -98,7 +99,7 @@ export function register(name, component) {
 export function init() {
   layout.init();
   // if (save_layout)
-  layout.on('stateChanged', save);
+  // layout.on('stateChanged', save);
 }
 
 export function on(event, cb, ctx) {
@@ -111,4 +112,5 @@ export function save() {
   localStorage.setItem('layout.state', state);
   // console.log(`layout save [${Math.round(performance.now() - t0)}]`);
 }
+
 

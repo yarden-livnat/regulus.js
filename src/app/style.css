@@ -4,9 +4,9 @@ html, body {
   /*background-color: #fafafa;*/
 }
 
-/**, *:before, *:after {*/
-  /*box-sizing: border-box;*/
-/*}*/
+*, *:before, *:after {
+  box-sizing: border-box;
+}
 
 #wrapper{
   height: 100%;
@@ -68,4 +68,9 @@ body text {
 
 .dataset_view {
   display: inline-block;
+}
+
+
+.scroll {
+  overflow: auto;
 }

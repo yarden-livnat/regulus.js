@@ -1,31 +1,25 @@
 <div class="partition_view">
-  <table class="info">
-    <tr>
-      <td><label class="entry">ID:</label></td>
-      <td><label class="value partition_id"></label></td>
-      <td><label class="entry">Name:</label></td>
-      <td colspan="2"><input type="text" class="partition_alias"></td>
-    </tr>
-    <tr>
-      <td><label class="entry">Size</label></td>
-      <td><label class="value partition_size"></label></td>
-      <td><label class="entry">Min/Max</label></td>
-      <td><label class="value partition_min"></label></td>
-      <td><label class="value partition_max"></label></td>
-    </tr>
-    <tr>
-      <td><label class="entry">Fitness</label></td>
-      <td><label class="value partition_fitness"></label></td>
-    </tr>
-    <tr>
-      <td><label class="entry">Similarity</label></td>
-      <td><label class="value partition_parent_similarity"></label></td>
-      <td><label class="value partition_sibling_similarity"></label></td>
-    </tr>
-  </table>
-  <!--<div class="separator"></div>-->
+  <div class="pv_info">
+    <div class="pv_id_label">ID:</div>
+    <div class="pv_id"></div>
+    <div class="pv_name_label">Name:</div>
+    <input class="pv_name" type="text">
+
+    <div class="pv_size_label">Size</div>
+    <div class="pv_size"></div>
+    <div class="pv_min"></div>
+    <div class="pv_max"></div>
+
+    <div class="pv_fitness_label">Fitness</div>
+    <div class="pv_fitness"></div>
+
+    <div class="pv_similarity_label">Similarity</div>
+    <div class="pv_parent_similarity"></div>
+    <div class="pv_sibling_similarity"></div>
+  </div>
+
   <div class="scroll">
-    <div class="statistics">
+    <div class="pstatistics">
       <label class="section-header">Dimensions</label>
       <div class="dims"></div>
 

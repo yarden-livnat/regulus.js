@@ -1,0 +1,178 @@
+.partition_view {
+  padding: 5px;
+  font-size: 8pt;
+
+  .pv_info {
+    border: 0.5px gray solid;
+    border-radius: 5px;
+    background-color: #fafafa;
+    padding: 5px;
+
+    display: grid;
+    grid-template-columns: 1fr 30px 40px 1fr 1fr ;
+    grid-gap: 10px;
+    grid-auto-rows: auto;
+
+    .pv_id_label {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .pv_id {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .pv_name_label {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    .pv_name {
+      grid-column: 4;
+      grid-row: 1;
+    }
+
+    .pv_size_label {
+      grid-column: 1 / span 2;
+      grid-row: 2;
+    }
+
+    .pv_size {
+      grid-column: 3;
+      grid-row: 2;
+    }
+
+    .pv_min {
+      grid-column: 4;
+      grid-row: 2;
+    }
+
+    .pv_max {
+      grid-column: 5;
+      grid-row: 2;
+    }
+
+    .pv_fitness_label {
+      grid-column: 1 /  span 2;
+      grid-row: 3;
+    }
+
+    .pv_fitness {
+      grid-column: 3;
+      grid-row: 3;
+    }
+
+    .pv_similarity_label {
+      grid-column: 1 /  span 2;
+      grid-row: 4;
+    }
+
+    .pv_parent_similarity {
+      grid-column: 3;
+      grid-row: 4;
+    }
+
+    .pv_sibling_similarity {
+      grid-column: 4;
+      grid-row: 4
+    }
+  }
+
+  .partition_id.highlight {
+    background-color: lightgray;
+  }
+
+  .partition_id.selected {
+    background-color: lightblue;
+  }
+
+  .entry {
+    display: inline-block;
+    /*width: 30px;*/
+  }
+
+  .value {
+    display: inline-block;
+    width: 40px;
+    font-weight: bold;
+    font-size: 9pt;
+  }
+
+  input {
+    /*font: 10pt arial;*/
+    max-width: 100px;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 1px solid #999;
+    text-align: left;
+    font-weight: bold;
+    font-size: 9pt;
+  }
+
+  textarea {
+    vertical-align: top;
+    width: 170px;
+    max-width: 170px;
+    box-sizing: border-box;
+    margin-left: 20px;
+  }
+
+  input:focus, textarea:focus {
+    outline: none;
+  }
+
+  /*
+   * stats
+   */
+
+  .stat {
+    margin: 5px;
+    display: flex;
+  }
+
+  .name {
+    vertical-align: top;
+    display: inline-block;
+    width: 80px
+  }
+
+  .name:hover {
+    background-color: lightgray;
+  }
+
+  .name.selected {
+    background-color: lightblue;
+  }
+
+  .box-plot {
+    font: 10px sans-serif;
+    padding-left: 20px;
+  }
+
+  .box-plot .frame {
+    display: none;
+  }
+
+  .box-plot rect {
+    fill: lightblue;
+    stroke: #000;
+    stroke-width: 0.5px;
+  }
+
+  .box-plot line,
+  .box-plot circle {
+    fill: #fff;
+    stroke: #000;
+    stroke-width: 0.5px;
+  }
+
+  .box-plot .center {
+    stroke-dasharray: 3, 3;
+  }
+
+  .box-plot .outlier {
+    fill: none;
+    stroke: #ccc;
+  }
+}

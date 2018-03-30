@@ -54,7 +54,7 @@ function load_data(name) {
   remove_placeholder();
   service.load_dataset(name)
     .then(data => new MultiMSC(data))
-    .then(msc => publish('data.loaded', msc));
+    .then(shared_msc => publish('data.loaded', shared_msc));
 }
 
 function remove_placeholder() {
