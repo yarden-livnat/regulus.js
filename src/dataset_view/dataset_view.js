@@ -5,22 +5,16 @@ import * as service from "../app/service";
 import {publish} from "../utils/pubsub";
 import {MultiMSC} from "../model/multi_msc";
 
-import dropdown from '../components/dropdown';
+import Dropdown from '../components/dropdown';
 
 let root;
+let menu = Dropdown('Datasets', load_data);
+
 let _init = true;
 
 export function setup(el) {
-  root = d3.select(el);
-  root.classed('dataset_view', true);
-  root.html(template);
-
-  root.select('select')
-    .on('change', function () {
-      load_data(this.value);
-    });
-
-  root.select('#refresh').on('click', init);
+  root = d3.select(el)
+    .call(menu);
 }
 
 export function init() {
@@ -31,17 +25,7 @@ export function init() {
 function set_catalog(_) {
   let selected = localStorage.getItem('catalog.selection');
 
-  let opts = root.select('select').selectAll('option')
-    .data(['select dataset'].concat(_));
-
-  opts.enter()
-    .append('option')
-    .merge(opts)
-    .attr('value', d => d)
-    .property('selected', d => d === selected)
-    .text(d => d);
-
-  opts.exit().remove();
+  root.call(menu.items(_.map(name => ({label: name}))));
 
   if (_.length === 1)
     load_data(_[0]);
@@ -52,21 +36,15 @@ function set_catalog(_) {
 
 function load_data(name) {
   if (!name) return;
+  name = typeof name === 'string' && name || name.label;
+
   localStorage.setItem('catalog.selection', name);
-  remove_placeholder();
+
   service.load_dataset(name)
     .then(data => new MultiMSC(data))
     .then(shared_msc => publish('data.loaded', shared_msc));
 }
 
-function remove_placeholder() {
-  if (_init) {
-    root.select('select').selectAll('option')
-      .filter(d => d === 'select dataset')
-      .remove();
-    _init = false;
-  }
-}
 
 
 

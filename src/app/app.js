@@ -23,7 +23,7 @@ setup();
 
 function setup() {
   subscribe('status', report_status);
-  dataset_view.setup('.dataset_view');
+  dataset_view.setup('.datasets');
 
   layout.registerComponent('partition', PartitionView);
   layout.registerComponent('topology', Component(tree_view));
@@ -34,24 +34,8 @@ function setup() {
   layout.on('initialised', init);
   layout.init();
 
-  dropdown('.views', 'Views', views, add_item);
-
-  // let d3views = d3.select('.views')
-  //   .classed('dropdown', true);
-  //
-  // d3views.append('button')
-  //   .attr('class', 'drop-btn')
-  //   .text('Views');
-  //
-  // d3views.append('div')
-  //   .attr('class', 'dropdown-content')
-  //   .selectAll('div')
-  //   .data(views)
-  //   .enter()
-  //     .append('div')
-  //     .attr('class', 'dropdown-item')
-  //     .on('click', add_item)
-  //     .text(d => d.componentName);
+  d3.select('.views')
+    .call(dropdown('Views', add_item).items(views));
 }
 
 function add_item(d) {
