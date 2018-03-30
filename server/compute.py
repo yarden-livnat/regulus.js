@@ -48,8 +48,9 @@ def compute(spec, data_dir):
     updated_json = reg_file.save_json(dir=data_dir)
 
     status = {}
+    status = subprocess.run(['python', 'post.py', '-d', str(dims), '--p', '--morse', updated_json])
 
-    status = subprocess.run(['python', 'post.py', '-d', str(dims), '--name', name, '--p', updated_json])
+    #status = subprocess.run(['python', 'post.py', '-d', str(dims), '--name', name, '--p', updated_json])
 
     #if reg_file.name == 'test':
     #    status = subprocess.run(['python', 'post.py', '-d', dims, '--name', name, '-p', 1, updated_json])

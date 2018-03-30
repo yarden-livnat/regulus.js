@@ -6,7 +6,7 @@ let config = {
   group_offset: 0,
 
   pt_size: 2,
-  extra_pt_radius: 2,
+  extra_pt_radius: 1,
 
   duration: 1000
 };

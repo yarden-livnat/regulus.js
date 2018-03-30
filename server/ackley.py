@@ -41,7 +41,7 @@ def ackley(_x):
     eps = 0
     for i in range(d):
         eps += 1e-3*x[i]
-    return -a*np.exp(-b*np.sqrt(summand1/float(d))) - np.exp(summand2/float(d)) #+eps
+    return a*np.exp(-b*np.sqrt(summand1/float(d))) - np.exp(summand2/float(d)) #+eps
 
 def saveackley(filename, data):
     header = []
