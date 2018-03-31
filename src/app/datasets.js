@@ -1,8 +1,8 @@
 import * as d3 from 'd3';
 import fontawesome from '@fortawesome/fontawesome';
 import faSync from '@fortawesome/fontawesome-free-solid/faSyncAlt';
-import './style.css';
-import * as service from "../app/service";
+
+import * as service from "./service";
 import {publish} from "../utils/pubsub";
 import {MultiMSC} from "../model/multi_msc";
 
@@ -32,7 +32,6 @@ export function setup(el) {
 }
 
 export function init() {
-  console.log('init');
   service.load_catalog()
     .then(set_catalog);
 }

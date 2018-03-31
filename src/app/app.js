@@ -3,7 +3,6 @@ import {layout} from './layout';
 import Component from '../components/component';
 import {publish, subscribe} from "../utils/pubsub";
 import dropdown from '../components/dropdown';
-import * as dataset_view from '../dataset_view';
 import * as details_view from '../details_view';
 import * as tree_view from '../tree_view';
 import {PartitionView} from '../partition_view/partition_view';
@@ -11,7 +10,8 @@ import * as controls_view from '../filtering_view';
 import * as resample_view from '../resample_view';
 import * as extrema_view from '../extrema_view';
 
-// import '../style/fontawesome-all.min';
+import * as datasets from './datasets';
+
 import './style.less';
 
 
@@ -23,7 +23,7 @@ setup();
 
 function setup() {
   subscribe('status', report_status);
-  dataset_view.setup('.datasets');
+  datasets.setup('.datasets');
 
   layout.registerComponent('partition', PartitionView);
   layout.registerComponent('topology', Component(tree_view));
@@ -48,7 +48,7 @@ function add_item(d) {
 
 function init() {
   publish('init');
-  dataset_view.init();
+  datasets.init();
 }
 
 function report_status(topic, msg) {

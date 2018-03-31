@@ -1,1 +1,1 @@
-export * from './dataset_view';
+export * from '../app/dataset_view';

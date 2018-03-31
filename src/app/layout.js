@@ -1,5 +1,5 @@
 import 'golden-layout/src/css/goldenlayout-base.css';
-import '../style/goldenlayout-theme.less';
+import './goldenlayout-theme.less';
 
 import * as $ from 'jquery';
 import GoldenLayout from 'golden-layout/dist/goldenlayout';
