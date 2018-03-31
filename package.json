@@ -11,6 +11,9 @@
     "watch": "webpack --mode development --config webpack.dev.js --watch"
   },
   "dependencies": {
+    "@fortawesome/fontawesome": "^1.1.5",
+    "@fortawesome/fontawesome-free-regular": "^5.0.9",
+    "@fortawesome/fontawesome-free-solid": "^5.0.9",
     "d3": "^4.13.0",
     "d3-component": "^3.1.0",
     "d3-fetch": "^1.1.0",
@@ -23,16 +26,16 @@
     "validate.io-function": "^1.0.2"
   },
   "devDependencies": {
-    "html-loader": "^1.0.0-alpha.0",
     "clean-webpack-plugin": "^0.1.18",
     "css-loader": "^0.28.10",
     "file-loader": "^1.1.9",
+    "html-loader": "^1.0.0-alpha.0",
     "html-webpack-plugin": "webpack-contrib/html-webpack-plugin",
-    "style-loader": "^0.20.2",
-    "uglifyjs-webpack-plugin": "^1.2.2",
     "less": "^3.0.1",
     "less-loader": "^4.1.0",
     "less-plugin-clean-css": "^1.5.1",
+    "style-loader": "^0.20.2",
+    "uglifyjs-webpack-plugin": "^1.2.2",
     "webpack": "^4.0.0",
     "webpack-cli": "^2.0.9",
     "webpack-merge": "^4.1.2"

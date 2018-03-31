@@ -5,7 +5,8 @@ const CleanCSSPlugin = require("less-plugin-clean-css");
 
 module.exports = {
   entry: {
-    app: './src/app/app.js'
+    app: './src/app/app.js',
+
   },
   optimization: {
     splitChunks: {
@@ -26,20 +27,14 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader']
+      { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'] },
+      { test: /\.css$/,  use: [ 'style-loader', 'css-loader' ] },
+      { test: /\.(png|svg|jpg|gif)$/, use: [ 'file-loader' ] },
+      { test: /\.html$/, use: {loader: 'html-loader', options: {} }
+        // , exclude: /node_modules/
       },
-      {
-        test: /\.css$/,  use: [ 'style-loader', 'css-loader' ]
-      },
-      {
-        test: /\.(png|svg|jpg|gif)$/, use: [ 'file-loader' ]
-      },
-      {
-        test: /\.html$/,
-        // exclude: /node_modules/,
-        use: {loader: 'html-loader', options: {}}
-      }
+      { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
+      { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" }
     ]
   }
 };
