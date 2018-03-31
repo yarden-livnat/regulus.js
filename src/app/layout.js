@@ -1,8 +1,49 @@
 import 'golden-layout/src/css/goldenlayout-base.css';
 import './goldenlayout-theme.less';
-
+import * as d3 from 'd3';
 import * as $ from 'jquery';
 import GoldenLayout from 'golden-layout/dist/goldenlayout';
+import fontawesome from '@fortawesome/fontawesome';
+import faCogs from '@fortawesome/fontawesome-free-solid/faCogs';
+import faCog from '@fortawesome/fontawesome-free-solid/faCog';
+fontawesome.library.add(faCogs);
+fontawesome.library.add(faCog);
+
+
+let timer = null;
+export let layout = null;
+
+
+export function init_layout(load, do_save) {
+  let state = load && localStorage.getItem('layout.state');
+  layout = new GoldenLayout(state && JSON.parse(state) || config, $('#layoutContainer'));
+  layout._isFullPage = true;
+
+  layout.on('stackCreated',on_stack);
+  if (do_save)
+    layout.on('stateChanged', save);
+}
+
+function on_stack(stack) {
+  stack.header.controlsContainer.prepend('<div class="cogs"><i class="fas fa-cogs"></div>');
+  let cogs = d3.select(stack.header.controlsContainer[0]).select('.cogs')
+    .on('click', () => {
+      let item = stack.getActiveContentItem().container.emit('config');
+    });
+  stack.on('activeContentItemChanged', contentItem => {});
+  // stack.getActiveContentItem().container.extendState({});
+}
+
+function save() {
+  if (timer) return;
+
+  timer = setTimeout(() => {
+    let state = JSON.stringify(layout.toConfig());
+    localStorage.setItem('layout.state', state);
+    timer = null;
+  }, 5000);
+}
+
 
 let config = {
   settings: {
@@ -76,25 +117,3 @@ let config = {
     ]
   }]
 };
-
-
-let load_layout = false;
-let save_layout = false;
-
-
-let state = load_layout && localStorage.getItem('layout.state');
-export let layout = new GoldenLayout(state && JSON.parse(state) || config, $('#layoutContainer'));
-layout._isFullPage = true;
-
-if (save_layout)
-  layout.on('stateChanged', save);
-
-export function save() {
-  if (!layout.isInitialised) return;
-  let t0 = performance.now();
-  let state = JSON.stringify(layout.toConfig());
-  localStorage.setItem('layout.state', state);
-  // console.log(`layout save [${Math.round(performance.now() - t0)}]`);
-}
-
-

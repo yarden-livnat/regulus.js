@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {layout} from './layout';
+import {layout, init_layout} from './layout';
 import Component from '../components/component';
 import {publish, subscribe} from "utils/pubsub";
 import dropdown from '../components/dropdown';
@@ -24,6 +24,8 @@ let views = [
   {label:'Resample',  componentName: 'resample',  componentState: {}, type: 'component'},
 ];
 
+let params = new URLSearchParams(document.location.search.substring(1));
+init_layout(!params.has('noload'), !params.has('nosave'));
 
 subscribe('status', report_status);
 datasets.setup('.datasets');
@@ -43,7 +45,6 @@ d3.select('.views')
 
 
 function add_item(d) {
-  let l = layout;
   if (layout.selectedItem)
     layout.selectedItem.addChild(d);
   else
