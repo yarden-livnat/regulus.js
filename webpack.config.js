@@ -4,6 +4,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CleanCSSPlugin = require("less-plugin-clean-css");
 
 module.exports = {
+  mode: 'development',
   entry: {
     app: './src/app/app.js',
 
@@ -36,5 +37,9 @@ module.exports = {
       { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
       { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" }
     ]
+  },
+  resolve: {
+    extensions: ['.js', '.css', '.less', '.html'],
+    modules:['src', 'node_modules']
   }
 };

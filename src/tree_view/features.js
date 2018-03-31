@@ -30,7 +30,6 @@ export default function Features() {
         let selection = localStorage.getItem(`feature.${f.name}.selection`);
         f.selection = selection !== "undefined" && JSON.parse(selection) || f.domain;
         f.active = localStorage.getItem(`feature.${f.name}.active`) === 'on';
-        console.log('feature', f.name, f.active);
         f.filter2.active(f.active);
         f.filter2.range(f.selection);
       }

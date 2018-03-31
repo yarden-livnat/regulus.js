@@ -15,7 +15,7 @@ let config = {
     closePopoutsOnUnload: true,
     showPopoutIcon: true,
     showMaximiseIcon: true,
-    showCloseIcon: false
+    showCloseIcon: true
   },
   dimensions: {},
   content: [{
@@ -29,7 +29,6 @@ let config = {
             type: 'component',
             componentName: 'partition',
             componentState: {},
-            isClosable: false,
             title: 'Partition'
           },
           {
@@ -40,21 +39,18 @@ let config = {
                 componentName: 'filtering',
                 componentState: {},
                 title: 'Filtering',
-                isClosable: false,
               },
               {
                 type: 'component',
                 componentName: 'resample',
                 componentState: {},
                 title: 'Resample',
-                isClosable: false,
               },
               {
                 type: 'component',
                 componentName: 'extrema',
                 componentState: {},
                 title: 'Extrema',
-                isClosable: false,
               }
             ]
           }
@@ -65,17 +61,15 @@ let config = {
         content: [
           {
             type: 'component',
-            componentName: 'topology',
+            componentName: 'lifeline',
             componentState: {},
-            title: 'Topology',
-            isClosable: false,
+            title: 'Lifeline',
           },
           {
             type: 'component',
             componentName: 'details',
             componentState: {},
             title: 'Details',
-            isClosable: false,
           }
         ]
       }

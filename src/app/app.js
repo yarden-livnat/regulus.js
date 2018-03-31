@@ -1,42 +1,46 @@
 import * as d3 from 'd3';
 import {layout} from './layout';
 import Component from '../components/component';
-import {publish, subscribe} from "../utils/pubsub";
+import {publish, subscribe} from "utils/pubsub";
 import dropdown from '../components/dropdown';
-import * as details_view from '../details_view';
-import * as tree_view from '../tree_view';
-import {PartitionView} from '../partition_view/partition_view';
-import * as controls_view from '../filtering_view';
-import * as resample_view from '../resample_view';
-import * as extrema_view from '../extrema_view';
+
+import {DetailsView} from '../details_view';
+import {ExtremaView} from 'extrema_view';
+import {FilteringView} from '../filtering_view';
+import {LifelineView} from '../tree_view';
+import {PartitionView} from 'partition_view';
+import {ResampleView} from '../resample_view';
 
 import * as datasets from './datasets';
 
 import './style.less';
 
-
 let views = [
-  {label:'Partition', componentName: 'partition', componentState: {}, type: 'component'}
+  {label:'Details',   componentName: 'details',   componentState: {}, type: 'component'},
+  {label:'Extrema',   componentName: 'extrema',   componentState: {}, type: 'component'},
+  {label:'Filtering', componentName: 'filtering', componentState: {}, type: 'component'},
+  {label:'Lifeline',  componentName: 'lifeline',  componentState: {}, type: 'component'},
+  {label:'Partition', componentName: 'partition', componentState: {}, type: 'component'},
+  {label:'Resample',  componentName: 'resample',  componentState: {}, type: 'component'},
 ];
 
-setup();
 
-function setup() {
-  subscribe('status', report_status);
-  datasets.setup('.datasets');
+subscribe('status', report_status);
+datasets.setup('.datasets');
 
-  layout.registerComponent('partition', PartitionView);
-  layout.registerComponent('topology', Component(tree_view));
-  layout.registerComponent('filtering', Component(controls_view));
-  layout.registerComponent('details', Component(details_view));
-  layout.registerComponent('resample', Component(resample_view));
-  layout.registerComponent('extrema', Component(extrema_view));
-  layout.on('initialised', init);
-  layout.init();
+layout.registerComponent('details',   DetailsView);
+layout.registerComponent('extrema',   ExtremaView);
+layout.registerComponent('filtering', FilteringView);
+layout.registerComponent('lifeline',  LifelineView);
+layout.registerComponent('partition', PartitionView);
+layout.registerComponent('resample',  ResampleView);
 
-  d3.select('.views')
-    .call(dropdown('Views', add_item).items(views));
-}
+layout.on('initialised', init);
+layout.init();
+
+d3.select('.views')
+  .call(dropdown('Views', add_item).items(views));
+
 
 function add_item(d) {
   let l = layout;

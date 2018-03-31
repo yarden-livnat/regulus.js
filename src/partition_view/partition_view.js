@@ -4,11 +4,10 @@ import BoxPlot from '../components/boxplot';
 
 import template from './partition_view.html';
 import './style.less';
-import * as model from "../model/model";
+import * as model from "model/model";
 
 
 export function PartitionView(container_, state_) {
-
   let container = container_;
   let root = null;
   let highlight = null;
@@ -30,6 +29,7 @@ export function PartitionView(container_, state_) {
   container.on('destroy', () => console.log('PartitionView::destroy'));
 
   function setup() {
+    console.log('PV setup');
     root = d3.select(container.getElement()[0]);
     root.html(template);
 
@@ -52,6 +52,7 @@ export function PartitionView(container_, state_) {
   }
 
   function resize() {
+    console.log('PV resize');
     if (!root) setup();
     let h = parseInt(root.select('.pv_info').style('height'));
 

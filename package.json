@@ -8,7 +8,8 @@
   "private": true,
   "scripts": {
     "build": "webpack --mode development --config webpack.dev.js",
-    "watch": "webpack --mode development --config webpack.dev.js --watch"
+    "watch1": "webpack --mode development --config webpack.dev.js --watch",
+    "watch": "webpack --watch"
   },
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.5",
