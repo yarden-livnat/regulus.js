@@ -1,35 +1,8 @@
 import * as d3 from 'd3';
-import fontawesome from '@fortawesome/fontawesome';
-import faSync from '@fortawesome/fontawesome-free-solid/faSyncAlt';
 
 import * as service from "./service";
 import {publish} from "../utils/pubsub";
 import {MultiMSC} from "../model/multi_msc";
-
-import Dropdown from '../components/dropdown';
-
-fontawesome.library.add(faSync);
-
-let root;
-let menu = Dropdown('Datasets', load_data);
-
-let _init = true;
-
-export function setup(el) {
-  root = d3.select(el);
-
-  root.append('div')
-    .classed('menu', true)
-    .call(menu);
-
-  root.append('div')
-    .on('click', init)
-    .classed('sync', true)
-    .append('i')
-    .attr('class', 'fas fa-sync-alt')
-    .style('width', '8pt');
-
-}
 
 export function init() {
   service.load_catalog()
@@ -39,7 +12,17 @@ export function init() {
 function set_catalog(_) {
   let selected = localStorage.getItem('catalog.selection');
 
-  root.select('.menu').call(menu.items(_.map(name => ({label: name}))));
+  let items = d3.select('#datasets .dropdown-menu').selectAll('.dataset')
+    .data(_);
+
+  items.enter()
+    .insert('a', '.dropdown-divider')
+    .classed('dropdown-item dataset', true)
+    .on('click', load_data)
+    .merge(items)
+    .text(d => d);
+
+  items.exit().remove();
 
   if (_.length === 1)
     load_data(_[0]);
@@ -50,9 +33,11 @@ function set_catalog(_) {
 
 function load_data(name) {
   if (!name) return;
-  name = typeof name === 'string' && name || name.label;
 
   localStorage.setItem('catalog.selection', name);
+
+  d3.select('#datasets .dropdown-menu').selectAll('.dataset')
+    .classed('active', d => d == name);
 
   service.load_dataset(name)
     .then(data => new MultiMSC(data))

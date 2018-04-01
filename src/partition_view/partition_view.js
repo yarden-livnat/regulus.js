@@ -4,7 +4,7 @@ import {Model} from '../model/model';
 import BoxPlot from '../components/boxplot';
 
 import template from './partition_view.html';
-import './style.less';
+import './style.scss';
 
 export function PartitionView(container_, state_) {
   let container = container_;

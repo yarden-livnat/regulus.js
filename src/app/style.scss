@@ -1,32 +1,25 @@
-@import './_variables.less';
+@import './_variables';
+@import "~bootstrap/scss/bootstrap.scss";
 
 html, body {
-  font: @font;
-  /*font-size: 10pt;*/
-  /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
-  height: 100%;
-  /*background-color: #fafafa;*/
+  //height: 100%;
 }
 
-*, *:before, *:after {
-  box-sizing: border-box;
+nav {
+  font-size: 1rem;
+
+  .navbar-brand {
+    font-size: 1.25rem;
+    padding-bottom: 0;
+  }
 }
 
-#wrapper{
-  height: 100%;
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-}
-
-#layoutContainer{
+#workbench {
   position:absolute;
-  top: 51px;
+  top: 56px;
   left: 5px;
   right: 5px;
-  bottom: 5px;
-
-  /*box-shadow: -3px 0px 9px 0px rgba( 0, 0, 0, 0.4 );*/
+  bottom: 15px;
 }
 
 body text {
@@ -99,7 +92,7 @@ body text {
 
 
 .drop-btn {
-  font: @font;
+  //font: $font;
   font-size: 12pt;
   border: none;
 }

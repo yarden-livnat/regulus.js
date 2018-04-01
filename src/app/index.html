@@ -1,30 +1,63 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta charset="UTF-8">
-    <title>Regulus</title>
+    <title>REGULUS</title>
   </head>
 
   <body>
-    <div id="wrapper">
-      <div class="top">
-        <div class="title">Regulus</div>
-        <div class="header">
+  <nav class="navbar navbar-expand-lg navbar-light" >
+    <a class="navbar-brand mb-0 h1">Regulus</a>
 
-          <div class="datasets item"></div>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <div class="navbar-nav mr-auto">
 
-          <div class="views item"></div>
-
-          <div class="regulus-status item">
-           <label id="status_label">Status:</label>
-            <label id="status"></label>
+        <div id='datasets' class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Datasets
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" >Refresh</a>
           </div>
         </div>
-     </div>
+
+        <div id='views' class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Views
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </nav>
+
+  <div id='workbench' >
+  </div>
+    <!--<div id="wrapper">-->
+      <!--<div class="top">-->
+        <!--<div class="title">Regulus</div>-->
+        <!--<div class="header">-->
+
+          <!--<div class="datasets item"></div>-->
+
+          <!--<div class="views item"></div>-->
+
+          <!--<div class="regulus-status item">-->
+           <!--<label id="status_label">Status:</label>-->
+            <!--<label id="status"></label>-->
+          <!--</div>-->
+        <!--</div>-->
+     <!--</div>-->
 
       <div id="layoutContainer"></div>
-    </div>
+    <!--</div>-->
 
   </body>
 
 </html>
+

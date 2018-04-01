@@ -1,18 +1,26 @@
 import * as d3 from 'd3';
-import {layout, init_layout} from './layout';
-import {pubsub} from "utils/pubsub";
-import dropdown from '../components/dropdown';
+import 'bootstrap';
+// import 'bootstrap/js/dist/util';
+// import 'bootstrap/js/dist/dropdown';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+
+
+import {layout} from './layout';
+import {pubsub} from "../utils/pubsub";
 
 import {DetailsView} from '../details_view';
-import {ExtremaView} from 'extrema_view';
+import {ExtremaView} from '../extrema_view';
 import {FilteringView} from '../filtering_view';
 import {LifelineView} from '../tree_view';
-import {PartitionView} from 'partition_view';
+import {PartitionView} from '../partition_view';
 import {ResampleView} from '../resample_view';
 
 import * as datasets from './datasets';
 
-import './style.less';
+import './style.scss';
+
+let {publish, subscribe} = pubsub();
+subscribe('status', report_status);
 
 let views = [
   {label:'Details',   componentName: 'details',   componentState: {}, type: 'component', factory: DetailsView},
@@ -23,22 +31,17 @@ let views = [
   {label:'Resample',  componentName: 'resample',  componentState: {}, type: 'component', factory: ResampleView},
 ];
 
-let {publish, subscribe} = pubsub();
-
-let params = new URLSearchParams(document.location.search.substring(1));
-init_layout(!params.has('noload'), !params.has('nosave'));
-
-subscribe('status', report_status);
-datasets.setup('.datasets');
+d3.select('#views .dropdown-menu').selectAll('a')
+  .data(views)
+  .enter()
+  .append('a')
+  .attr('class', 'dropdown-item')
+  .on('click', add_item)
+  .text(d => d.label);
 
 views.forEach(view => layout.registerComponent(view.componentName, view.factory));
-
 layout.on('initialised', init);
-// layout.on('windowOpened', on_open);
 layout.init();
-
-d3.select('.views')
-  .call(dropdown('Views', add_item).items(views));
 
 
 function add_item(d) {
@@ -48,16 +51,12 @@ function add_item(d) {
     layout.root.contentItems[0].addChild(d);
 }
 
-function on_open() {
-  console.log('on open', arguments);
-}
-
 function init() {
   publish('init');
   datasets.init();
 }
 
 function report_status(topic, msg) {
-  d3.select('#status').text(msg);
+  // d3.select('#status').text(msg);
 }
 

@@ -13,10 +13,12 @@ fontawesome.library.add(faCog);
 let timer = null;
 export let layout = null;
 
+let params = new URLSearchParams(document.location.search.substring(1));
+init_layout(!params.has('noload'), !params.has('nosave'));
 
 export function init_layout(load, do_save) {
   let state = load && localStorage.getItem('layout.state');
-  layout = new GoldenLayout(state && JSON.parse(state) || config, $('#layoutContainer'));
+  layout = new GoldenLayout(state && JSON.parse(state) || config, $('#workbench'));
   layout._isFullPage = true;
 
   layout.on('stackCreated',on_stack);
