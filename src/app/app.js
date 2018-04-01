@@ -1,7 +1,6 @@
 import * as d3 from 'd3';
 import {layout, init_layout} from './layout';
-import Component from '../components/component';
-import {publish, subscribe} from "utils/pubsub";
+import {pubsub} from "utils/pubsub";
 import dropdown from '../components/dropdown';
 
 import {DetailsView} from '../details_view';
@@ -16,13 +15,15 @@ import * as datasets from './datasets';
 import './style.less';
 
 let views = [
-  {label:'Details',   componentName: 'details',   componentState: {}, type: 'component'},
-  {label:'Extrema',   componentName: 'extrema',   componentState: {}, type: 'component'},
-  {label:'Filtering', componentName: 'filtering', componentState: {}, type: 'component'},
-  {label:'Lifeline',  componentName: 'lifeline',  componentState: {}, type: 'component'},
-  {label:'Partition', componentName: 'partition', componentState: {}, type: 'component'},
-  {label:'Resample',  componentName: 'resample',  componentState: {}, type: 'component'},
+  {label:'Details',   componentName: 'details',   componentState: {}, type: 'component', factory: DetailsView},
+  {label:'Extrema',   componentName: 'extrema',   componentState: {}, type: 'component', factory: ExtremaView},
+  {label:'Filtering', componentName: 'filtering', componentState: {}, type: 'component', factory: FilteringView},
+  {label:'Lifeline',  componentName: 'lifeline',  componentState: {}, type: 'component', factory: LifelineView},
+  {label:'Partition', componentName: 'partition', componentState: {}, type: 'component', factory: PartitionView},
+  {label:'Resample',  componentName: 'resample',  componentState: {}, type: 'component', factory: ResampleView},
 ];
+
+let {publish, subscribe} = pubsub();
 
 let params = new URLSearchParams(document.location.search.substring(1));
 init_layout(!params.has('noload'), !params.has('nosave'));
@@ -30,14 +31,10 @@ init_layout(!params.has('noload'), !params.has('nosave'));
 subscribe('status', report_status);
 datasets.setup('.datasets');
 
-layout.registerComponent('details',   DetailsView);
-layout.registerComponent('extrema',   ExtremaView);
-layout.registerComponent('filtering', FilteringView);
-layout.registerComponent('lifeline',  LifelineView);
-layout.registerComponent('partition', PartitionView);
-layout.registerComponent('resample',  ResampleView);
+views.forEach(view => layout.registerComponent(view.componentName, view.factory));
 
 layout.on('initialised', init);
+// layout.on('windowOpened', on_open);
 layout.init();
 
 d3.select('.views')
@@ -49,6 +46,10 @@ function add_item(d) {
     layout.selectedItem.addChild(d);
   else
     layout.root.contentItems[0].addChild(d);
+}
+
+function on_open() {
+  console.log('on open', arguments);
 }
 
 function init() {

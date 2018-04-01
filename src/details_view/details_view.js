@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import * as chromatic from 'd3-scale-chromatic';
 
 import {cmaps} from '../utils/colors';
-import {publish, subscribe} from "../utils";
+import {pubsub} from "../utils/pubsub";
 import {and, or, not, AttrRangeFilter, XYFilter} from '../model';
 import {ensure_single} from "../utils/events";
 
@@ -13,10 +13,14 @@ import template from './details_view.html';
 import './style.css';
 
 
+// TODO: simplify or break up code
 export function DetailsView(container_, state_) {
 
   let container = container_;
   let root = null;
+  let listeners = new Map();
+
+  let {publish, subscribe, unsubscribe} = pubsub();
 
   let msc = null;
   let dims = [];
@@ -51,58 +55,70 @@ export function DetailsView(container_, state_) {
   let pts_filters = and();
   let plot_filter = null;
 
-  container.on('open', () => setup());
-  container.on('resize', () => resize());
-  container.on('destroy', () => console.log('DetailsView::destroy'));
+  root = d3.select(container.getElement()[0]);
+  root.html(template);
 
-// TODO: simplify or break up code
+  root.select('.config').select('#color-by')
+    .on('change', function (d) {
+      select_color(this.value);
+    });
 
-  function setup(el) {
-    root = d3.select(container.getElement()[0]);
-    root.html(template);
+  root.select('.config').select('#cmap')
+    .on('change', function (d) {
+      select_cmap(chromatic['interpolate' + this.value])
+    })
+    .selectAll('option').data(cmaps)
+    .enter()
+    .append('option')
+    .attr('value', d => d.name)
+    .property('selected', d => d.name === initial_cmap)
+    .text(d => d.name);
 
-    root.select('.config').select('#color-by')
-      .on('change', function (d) {
-        select_color(this.value);
-      });
+  root.select('#details_show_filtered')
+    .property('checked', true)
+    .on('change', on_show_filtered);
 
-    root.select('.config').select('#cmap')
-      .on('change', function (d) {
-        select_cmap(chromatic['interpolate' + this.value])
-      })
-      .selectAll('option').data(cmaps)
-      .enter()
-      .append('option')
-      .attr('value', d => d.name)
-      .property('selected', d => d.name === initial_cmap)
-      .text(d => d.name);
+  root.select('#details_show_regression')
+    .property('checked', true)
+    .on('change', on_show_regression);
 
-    root.select('#details_show_filtered')
-      .property('checked', true)
-      .on('change', on_show_filtered);
+  root.select('#details_use_canvas')
+    .property('checked', true)
+    .on('change', on_use_canvas);
 
-    root.select('#details_show_regression')
-      .property('checked', true)
-      .on('change', on_show_regression);
+  register();
 
-    root.select('#details_use_canvas')
-      .property('checked', true)
-      .on('change', on_use_canvas);
+  function register() {
+    container.on('open', () => on_open());
+    container.on('resize', () => resize());
+    container.on('destroy', () => on_close());
 
+    monitor('data.new', (topic, data) => reset(data));
+    monitor('data.loaded', (topic, data) => update([]));
+    monitor('partition.details', (topic, partition, on) => on ? add(partition) : remove(partition));
+    monitor('partition.highlight', (topic, partition, on) => on_highlight(partition, on));
+    monitor('partition.selected', (topic, partition, on) => on_selected(partition, on));
+    monitor('resample.pts', (topic, pts) => on_resample_pts(pts));
+  }
 
-    subscribe('data.new', (topic, data) => reset(data));
-    subscribe('data.loaded', (topic, data) => update([]));
-    subscribe('partition.details', (topic, partition, on) => on ? add(partition) : remove(partition));
-    subscribe('partition.highlight', (topic, partition, on) => on_highlight(partition, on));
-    subscribe('partition.selected', (topic, partition, on) => on_selected(partition, on));
-    subscribe('resample.pts', (topic, pts) => on_resample_pts(pts));
+  function monitor(topic, cb) {
+    listeners.set(topic, subscribe(topic, cb));
+  }
+
+  function on_open() {
+    console.log(' DV open');
+    // reset(shared_msc);
+  }
+
+  function on_close() {
+    console.log('DV closed');
+    for (let [topic, listener] of listeners) {
+      unsubscribe(topic, listener);
+    }
+    listeners = new Map();
   }
 
   function resize() {
-    if (!root) setup();
-
-    // let rw = parseInt(root.style('width'));
-    // let rh = parseInt(root.style('height'));
     let rw = container.width;
     let rh = container.height;
 
@@ -314,8 +330,8 @@ export function DetailsView(container_, state_) {
 
     let g = groups.enter()
       .append('div')
-      .on('mouseenter', d => publish('partition.highlight', d.p, true))
-      .on('mouseleave', d => publish('partition.highlight', d.p, false))
+      .on('mouseenter', d => publish('partition.highlight.details', d.p, true))
+      .on('mouseleave', d => publish('partition.highlight.details', d.p, false))
       .call(group.create);
 
     g.select('.group-header')

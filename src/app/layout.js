@@ -41,7 +41,7 @@ function save() {
     let state = JSON.stringify(layout.toConfig());
     localStorage.setItem('layout.state', state);
     timer = null;
-  }, 5000);
+  }, 2000);
 }
 
 

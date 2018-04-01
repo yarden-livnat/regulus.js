@@ -2,12 +2,24 @@
  * Created by yarden on 6/11/16.
  */
 
+
+export function pubsub() {
+  if (!window.pubsub)
+    window.pubsub = window.opener && window.opener.pubsub ||  {
+      publish: publish,
+      subscribe: subscribe,
+      unsubscribe: unsubscribe
+    };
+
+  return window.pubsub;
+}
+
 let channels = new Map();
 
-export function subscribe(channel, listener) {
-  if (!channels.has(channel)) channels.set(channel, new Set());
-  channels.get(channel).add(listener);
-  return this;
+export function subscribe(topic, listener) {
+  if (!channels.has(topic)) channels.set(topic, new Set());
+  channels.get(topic).add(listener);
+  return listener;
 }
 
 export function unsubscribe(topic, listener) {
@@ -20,7 +32,6 @@ export function unsubscribe(topic, listener) {
 }
 
 export function publish(msg, ...data) {
-  //console.log(data);
   _publish(false, msg, data);
   return this;
 }
@@ -60,6 +71,6 @@ function envelop(subscribers, msg, data) {
 function broadcast(topic, msg, data) {
   let channel = channels.get(topic) || {};
   for (let listener of channel) {
-    listener(topic, ...data);
+    listener(msg, ...data);
   }
 }

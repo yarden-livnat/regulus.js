@@ -15,6 +15,7 @@
     "@fortawesome/fontawesome": "^1.1.5",
     "@fortawesome/fontawesome-free-regular": "^5.0.9",
     "@fortawesome/fontawesome-free-solid": "^5.0.9",
+    "bootstrap": "^4.0.0",
     "d3": "^4.13.0",
     "d3-component": "^3.1.0",
     "d3-fetch": "^1.1.0",

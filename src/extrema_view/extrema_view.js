@@ -51,8 +51,6 @@ export function ExtremaView(container_, state_) {
   }
 
   function reset(msc) {
-    let t0 = performance.now();
-
     let measure = msc.measure;
     let m = measure.name;
     let map = new Map();
@@ -67,12 +65,6 @@ export function ExtremaView(container_, state_) {
       }
     }
 
-    let cols = [
-      {id: 'id', label: 'id', format: d3.format('d')},
-      {id: 'value', label: 'value', format: d3.format('.3g')},
-      {id: 'n', label: 'partitions', format: d3.format('d')}
-    ];
-
     for (let [idx, entry] of map.entries()) {
       extrema.push({
         'id': idx,
@@ -84,19 +76,15 @@ export function ExtremaView(container_, state_) {
     }
 
     root.select('.ev_header_value').text(extrema_map.size);
-    let t1 = performance.now();
+
     if (sort_by === 'max')
       extrema.sort((a, b) => (b.value - a.value));
     else
       extrema.sort((a, b) => (a.value - b.value));
 
-    let t2 = performance.now();
-
     show('id', extrema);
     show('value', extrema);
     show('n', extrema);
-
-    console.log(`${Math.round(performance.now()-t0)}  ${Math.round(t1-t0)}  ${Math.round(t2-t1)}`);
   }
 
   function show(field, data) {

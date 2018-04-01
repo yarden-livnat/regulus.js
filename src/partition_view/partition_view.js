@@ -1,14 +1,15 @@
 import * as d3 from 'd3';
-import {publish, subscribe} from '../utils/pubsub';
+import {pubsub} from '../utils/pubsub';
+import {Model} from '../model/model';
 import BoxPlot from '../components/boxplot';
 
 import template from './partition_view.html';
 import './style.less';
-import * as model from "model/model";
-
 
 export function PartitionView(container_, state_) {
   let container = container_;
+  // let state = state_;
+  let name = state_.componentName;
   let root = null;
   let highlight = null;
   let selected = null;
@@ -18,42 +19,65 @@ export function PartitionView(container_, state_) {
   let shared_msc = null;
   let format = d3.format('.2g');
   let format_f = d3.format('.3f');
+  let listeners = new Map();
 
   let box_plot = BoxPlot()
     .width(100)
     .height(10)
     .tickFormat(d3.format('.2s'));
 
-  container.on('open', () => setup());
-  container.on('resize', () => resize());
-  container.on('destroy', () => console.log('PartitionView::destroy'));
+  let {publish, subscribe, unsubscribe} = pubsub();
 
-  function setup() {
-    console.log('PV setup');
-    root = d3.select(container.getElement()[0]);
-    root.html(template);
+  let model = Model();
+  shared_msc = model.shared_msc;
 
-    root.select('.partition_alias')
-      .property('disabled', true)
-      .on('change', alias_changed)
-      .on('input', alias_changed);
+  console.log("PV created", model);
 
-    root.select('.partition_notes')
-      .property('disabled', true)
-      .on('change', notes_changed)
-      .on('input', notes_changed);
 
-    shared_msc = model.shared_msc;
+  root = d3.select(container.getElement()[0]);
+  root.html(template);
 
-    subscribe('data.pts', (topic, data) => reset(data));
-    subscribe('data.loaded', (topic, data) => reset(data));
-    subscribe('partition.highlight', (topic, partition, show) => highlight_partition(partition, show));
-    subscribe('partition.selected', (topic, partition, show) => select_partition(partition, show));
+  root.select('.partition_alias')
+    .property('disabled', true)
+    .on('change', alias_changed)
+    .on('input', alias_changed);
+
+  root.select('.partition_notes')
+    .property('disabled', true)
+    .on('change', notes_changed)
+    .on('input', notes_changed);
+
+  register();
+
+
+  function register() {
+    container.on('resize', () => resize());
+    container.on('destroy', () => on_close());
+    container.on('open', () => on_open);
+
+    container.on('close', () => console.log(name, ': close'));
+    container.on('config', () => console.log(name, ': config'));
+    container.on('hide', () => console.log(name, ': hide'));
+    container.on('show', () => console.log(name, ': show'));
+
+    monitor('data.pts', (topic, data) => reset(data));
+    monitor('data.loaded', (topic, data) => reset(data));
+    monitor('partition.highlight', (topic, partition, show) => highlight_partition(partition, show));
+    monitor('partition.selected', (topic, partition, show) => select_partition(partition, show));
+  }
+
+  function monitor(topic, cb) {
+    listeners.set(topic, subscribe(topic, cb));
+  }
+
+  function on_close() {
+    for (let [topic, listener] of listeners) {
+      unsubscribe(topic, listener);
+    }
+    listeners = new Map();
   }
 
   function resize() {
-    console.log('PV resize');
-    if (!root) setup();
     let h = parseInt(root.select('.pv_info').style('height'));
 
     root.select('.pv_scroll')
@@ -61,6 +85,10 @@ export function PartitionView(container_, state_) {
       .style('max-width', `${container.width}px`);
 
     if (shared_msc) show_partition(false);
+  }
+
+  function on_open() {
+    reset(shared_msc);
   }
 
   function reset(_) {
@@ -105,7 +133,8 @@ export function PartitionView(container_, state_) {
 
 
   function show_partition(init = false) {
-    current = highlight || selected || shared_msc.as_partition;
+    current = highlight || selected || (shared_msc && shared_msc.as_partition);
+    if (!current) return;
 
     root.select('.pv_id')
       .classed('selected', current === selected)

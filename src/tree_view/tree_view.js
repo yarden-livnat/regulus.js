@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
-import * as chromatic from "d3-scale-chromatic";
+
 import Features from './features';
-import {publish, subscribe} from "../utils/pubsub";
+import {pubsub} from "../utils/pubsub";
 
 
 import Tree from './lifeline';
@@ -17,6 +17,7 @@ export function LifelineView(container_, state_) {
   let root = null;
   let msc = null;
   let tree = Tree();
+  let listeners = new Map();
 
   let slider = Slider();
 
@@ -30,61 +31,77 @@ export function LifelineView(container_, state_) {
     { id: 'y', type: 'log', domain: [Number.EPSILON, 1], ticks:{ n: 4, format: '.1e'}, selection: [0.3, 1]}
   ];
 
-  container.on('open', () => setup());
-  container.on('resize', () => resize());
-  container.on('destroy', () => console.log('LifelineView::destroy'));
+  let {publish, subscribe, unsubscribe} = pubsub();
 
-  function setup() {
-    root = d3.select(container.getElement()[0]);
-    root.html(template);
+  root = d3.select(container.getElement()[0]);
+  root.html(template);
 
-    sliders.forEach(slider => {
-      slider.type = localStorage.getItem(`tree.${slider.id}.type`);
-      let s = localStorage.getItem(`tree.${slider.id}.selection`);
-      slider.selection = s && JSON.parse(s) || slider.domain;
-    });
+  sliders.forEach(slider => {
+    slider.type = localStorage.getItem(`tree.${slider.id}.type`);
+    let s = localStorage.getItem(`tree.${slider.id}.selection`);
+    slider.selection = s && JSON.parse(s) || slider.domain;
+  });
 
-    root.select('#tree-x-type')
-      .on('change', select_x_type)
-      .property('value', sliders[0].type);
+  root.select('#tree-x-type')
+    .on('change', select_x_type)
+    .property('value', sliders[0].type);
 
-    root.select('#tree-y-type')
-      .on('change', select_y_type)
-      .property('value', sliders[1].type);
+  root.select('#tree-y-type')
+    .on('change', select_y_type)
+    .property('value', sliders[1].type);
 
-    tree
-      .on('highlight', (node, on) => publish('partition.highlight', node, on))
-      .on('select', (node, on) => publish('partition.selected', node, on))
-      .on('details', (node, on) => publish('partition.details', node, on))
-      .x_type(sliders[0].type)
-      .y_type(sliders[1].type)
-      .filter(features.filter());
+  tree
+    .on('highlight', (node, on) => publish('partition.highlight.lifeline', node, on))
+    .on('select', (node, on) => publish('partition.selected', node, on))
+    .on('details', (node, on) => publish('partition.details', node, on))
+    .x_type(sliders[0].type)
+    .y_type(sliders[1].type)
+    .filter(features.filter());
 
-    root.select('.tree').call(tree);
+  root.select('.tree').call(tree);
 
-    features.on('show', value => tree.show(value));
-    features.on('update', () => tree.update());
-    features.on('color_by', feature => tree.color_by(feature));
+  features.on('show', value => tree.show(value));
+  features.on('update', () => tree.update());
+  features.on('color_by', feature => tree.color_by(feature));
 
-    resize();
+  // resize();
 
-    slider.on('change', on_slider_change);
+  slider.on('change', on_slider_change);
 
-    root.selectAll('.slider')
-      .data([sliders[1], sliders[0]])
-      .call(slider);
+  root.selectAll('.slider')
+    .data([sliders[1], sliders[0]])
+    .call(slider);
 
-    subscribe('init', init);
-    subscribe('data.new', (topic, data) => reset(data));
-    subscribe('data.loaded', (topic, data) => reset(null));
-    subscribe('data.updated', () => tree.update());
+  register();
 
-    subscribe('partition.highlight', (topic, partition, on) => tree.highlight(partition, on));
-    subscribe('partitions.highlight', (topic, partitions, on) => tree.highlight_list(partitions, on));
+  function register() {
+    container.on('resize', () => resize());
+    container.on('destroy', () => on_close());
+    container.on('open', () => on_open);
 
-    subscribe('partition.details', (topic, partition, on) => tree.details(partition, on));
-    subscribe('partition.selected', (topic, partition, on) => tree.selected(partition, on));
+    monitor('init', init);
+    monitor('data.new', (topic, data) => reset(data));
+    monitor('data.loaded', (topic, data) => reset(null));
+    monitor('data.updated', () => tree.update());
+
+    monitor('partition.highlight', (topic, partition, on) =>  tree.highlight(partition, on));
+    monitor('partitions.highlight', (topic, partitions, on) => tree.highlight_list(partitions, on));
+
+    monitor('partition.details', (topic, partition, on) => tree.details(partition, on));
+    monitor('partition.selected', (topic, partition, on) => tree.selected(partition, on));
      // subscribe('persistence.range', (topic, range) => set_persistence_range(range) );
+  }
+
+  function monitor(topic, cb) {
+    listeners.set(topic, subscribe(topic, cb));
+  }
+
+  function on_close() {
+    console.log('PV closed');
+    for (let [topic, listener] of listeners) {
+      unsubscribe(topic, listener);
+    }
+    listeners = new Map();
   }
 
   function init() {
@@ -93,8 +110,6 @@ export function LifelineView(container_, state_) {
 
 
   function resize() {
-    if (!root) setup();
-
     let rw = parseInt(root.style('width'));
     let rh = parseInt(root.style('height'));
     let ch = parseInt(root.select('.config').style('height'));
@@ -102,6 +117,10 @@ export function LifelineView(container_, state_) {
     tree.set_size(rw, rh - ch);
   }
 
+  function on_open() {
+    console.log(' TV open');
+    // reset(shared_msc);
+  }
 
   function reset(data) {
     msc = data;

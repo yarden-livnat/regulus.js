@@ -28,6 +28,7 @@ export default function BoxPlot() {
 
           width = parseInt(svg.style('width')) - margin.left - margin.right;
           height = parseInt(svg.style('height')) - margin.top - margin.bottom;
+          // console.log('box:', width, height, 'client:', svg.node().clientWidth, svg.node().clientHeight);
 
           let g = svg.select('g')
             .attr('transform', `translate(${margin.left}, ${margin.top})`);
