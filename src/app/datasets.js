@@ -4,6 +4,9 @@ import * as service from "./service";
 import {publish} from "../utils/pubsub";
 import {MultiMSC} from "../model/multi_msc";
 
+d3.select('#datasets .refresh')
+  .on('click', init);
+
 export function init() {
   service.load_catalog()
     .then(set_catalog);

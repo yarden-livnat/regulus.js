@@ -1,7 +1,5 @@
-const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const CleanCSSPlugin = require("less-plugin-clean-css");
 
 module.exports = {
   mode: 'development',
@@ -15,14 +13,13 @@ module.exports = {
     }
   },
   plugins: [
-    new CleanWebpackPlugin(['dist']),
+    new CleanWebpackPlugin(['dist'], {watch: true}),
     new HtmlWebpackPlugin({
       template: './src/app/index.html'
     }),
   ],
   output: {
     filename: '[name].[chunkhash].js',
-    // filename: '[name].js',
     path: path.resolve(__dirname, 'dist')
   },
   module: {
@@ -39,7 +36,6 @@ module.exports = {
               },
               { loader: 'sass-loader' }]
       },
-      { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'] },
       { test: /\.css$/,  use: [ 'style-loader', 'css-loader' ] },
       { test: /\.(png|svg|jpg|gif)$/, use: [ 'file-loader' ] },
       { test: /\.html$/, use: {loader: 'html-loader', options: {} }
@@ -50,7 +46,7 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.js', '.css', '.less', '.html'],
+    extensions: ['.js', '.css', '.html'],
     modules:['src', 'node_modules']
   }
 };

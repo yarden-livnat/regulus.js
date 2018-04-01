@@ -1,3 +1,5 @@
+@import "../app/variables";
+
 .lifeline .node {
   fill: white;
   stroke: gray;
@@ -23,15 +25,11 @@
 }
 
 .lifeline .highlight_max {
-  /*stroke-width: 2px;*/
-  /*stroke: gray;*/
-  fill: lightsalmon;
+  fill: $max_color;
 }
 
 .lifeline .highlight_min {
-  /*stroke-width: 2px;*/
-  /*stroke: gray;*/
-  fill: lightskyblue;
+  fill: $min_color;
 }
 
 .lifeline .node.details {

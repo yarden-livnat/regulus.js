@@ -1,8 +1,7 @@
 import * as d3 from 'd3'
 import {ensure_single} from '../utils/events';
-import './lifeline.css';
+import './lifeline.scss';
 import {noop} from "../model/filter";
-// import * as chromatic from "d3-scale-chromatic";
 
 export default function Lifeline() {
   let margin = {top: 10, right: 10, bottom: 50, left:60},
@@ -24,7 +23,6 @@ export default function Lifeline() {
   let y_axis = d3.axisLeft(sy).ticks(4, '.1e');
   let x_axis = d3.axisBottom(pt_scale).ticks(8, 's');
 
-  // let cmapBWR = d3.interpolateRgbBasis(["#4472a5", "#f2f2f2", "#d73c4a"]);
   let cmapGWP = d3.interpolateRgbBasis(["#3e926e", "#f2f2f2", "#9271e2"]);
 
   let color = d3.scaleSequential(cmapGWP /* chromatic['interpolateRdYlBu']*/ ).domain([1,0.8]);

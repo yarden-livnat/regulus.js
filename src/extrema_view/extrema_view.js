@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 
 import {publish, subscribe} from "../utils";
 import template from './extrema_view.html';
-import './extrema.less';
+import './extrema.scss';
 
 
 export function ExtremaView(container_, state_) {
@@ -82,6 +82,7 @@ export function ExtremaView(container_, state_) {
     else
       extrema.sort((a, b) => (a.value - b.value));
 
+    show_color(extrema);
     show('id', extrema);
     show('value', extrema);
     show('n', extrema);
@@ -95,8 +96,8 @@ export function ExtremaView(container_, state_) {
       .attr('class', `ev_${field}`)
       .merge(items)
       .style('grid-row', (d, i) => i+2)
-      .classed('ev_min', d => field == 'id' && d.type == 'min')
-      .classed('ev_max', d => field == 'id' && d.type == 'max')
+            .classed('ev_min', d => field == 'color' && d.type == 'min')
+      .classed('ev_max', d => field == 'color' && d.type == 'max')
       .text(d => format(d[field]));
     items.exit().remove();
 
@@ -104,6 +105,18 @@ export function ExtremaView(container_, state_) {
       all
         .on('mouseenter', d => highlight_pt(d, true))
         .on('mouseleave', d => highlight_pt(d, false));
+  }
+
+  function show_color(data) {
+    let items = root.select('.grid').selectAll(`.ev_color`).data(extrema);
+    let all = items.enter()
+      .append('div')
+      .attr('class', 'ev_color')
+      .merge(items)
+      .style('grid-row', (d, i) => i+2)
+      .classed('ev_min', d => d.type == 'min')
+      .classed('ev_max', d => d.type == 'max');
+    items.exit().remove();
   }
 
   function select_pt(pt) {
