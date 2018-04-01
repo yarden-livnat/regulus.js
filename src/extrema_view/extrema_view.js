@@ -27,7 +27,7 @@ export function ExtremaView(container_, state_) {
 
     resize();
 
-    subscribe('data.new', (topic, data) => reset(data));
+    subscribe('data.msc', (topic, data) => reset(data));
   }
 
   function resize() {
@@ -127,6 +127,6 @@ export function ExtremaView(container_, state_) {
   function highlight_pt(pt, on) {
     let list = extrema_map.get(pt.id);
 
-    publish('partitions.highlight', list, on);
+    publish('partition.highlight_list', list, on);
   }
 }

@@ -93,8 +93,8 @@ export function DetailsView(container_, state_) {
     container.on('resize', () => resize());
     container.on('destroy', () => on_close());
 
-    monitor('data.new', (topic, data) => reset(data));
-    monitor('data.loaded', (topic, data) => update([]));
+    monitor('data.msc', (topic, data) => reset(data));
+    monitor('data.shared_msc', (topic, data) => update([]));
     monitor('partition.details', (topic, partition, on) => on ? add(partition) : remove(partition));
     monitor('partition.highlight', (topic, partition, on) => on_highlight(partition, on));
     monitor('partition.selected', (topic, partition, on) => on_selected(partition, on));
@@ -294,7 +294,7 @@ export function DetailsView(container_, state_) {
       pt.filtered = !pts_filters(pt);
     }
     update(partitions, true);
-    publish('data.updated');
+    publish('filters.updated');
   }
 
   function start_pts_filter(pts, name, xr, yr) {

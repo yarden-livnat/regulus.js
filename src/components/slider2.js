@@ -3,12 +3,12 @@ import './slider.scss';
 
 export default function Slider() {
   let margin = {top: 15, right: 10, bottom: 0, left: 10};
-  let width = 250 - margin.left - margin.right;
-  let height = 35 - margin.top - margin.bottom;
+  let width = 1;
+  let height = 1;
 
   let range = [0, width];
   let name = 'x axis';
-  let brush = d3.brushX().extent([[0, -10], [width, 0]])
+  let brush = d3.brushX().extent([[0, -8], [width, 0]])
     .on('brush', brushed)
     .on('end', brush_ended)
     .on('start', brush_started);
@@ -28,23 +28,25 @@ export default function Slider() {
 
   function slider(selection) {
     selection.each( function(d, i) {
-      let s = d3.select(this).selectAll('svg')
-        .data([d]);
+      let svg = d3.select(this);
 
-      let svg = s.enter()
-        .append('svg')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
+      width = parseInt(svg.style('width')) - margin.left - margin.right;
+      height = parseInt(svg.style('height')) - margin.top - margin.bottom;
+
+      let g = svg.selectAll('g')
+        .data([1]).enter()
         .append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`);
+          .attr('transform', `translate(${margin.left},${margin.top})`);
 
-      svg.append('g')
+      g.append('rect');
+
+      g.append('g')
         .attr('class', 'x axis');
 
-      svg.append('g')
+      g.append('g')
         .attr('class', 'brush');
 
-      svg.append('text')
+      g.append('text')
         .attr('class', 'label')
         .attr('transform', `translate(${width / 2},${height + margin.top + 20})`)
         .style('text-anchor', 'middle');
@@ -53,17 +55,22 @@ export default function Slider() {
       scale.domain(d.domain).range([0, width]).clamp(true).nice();
       d.scale = scale;
 
-      let all = svg.merge(s);
-
-      all.select('.axis')
+      svg.select('.axis')
         .call(d3.axisBottom(scale).ticks(d.ticks.n, d.ticks.format));
 
-      all.select('.brush')
+      svg.select('rect')
+        .attr('y', -10)
+        .attr('width', width)
+        .attr('height', 10)
+        .attr('fill', 'url(#fs-gradient');
+
+      brush.extent([[0, -10], [width, 1]]);
+      svg.select('.brush')
         .call(brush);
 
       try {
         if (d.selection) {
-          all.select('.brush')
+          svg.select('.brush')
             .call(brush.move, d.selection.map(scale))
           ;
         }

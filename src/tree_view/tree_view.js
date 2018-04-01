@@ -80,12 +80,12 @@ export function LifelineView(container_, state_) {
     container.on('open', () => on_open);
 
     monitor('init', init);
-    monitor('data.new', (topic, data) => reset(data));
-    monitor('data.loaded', (topic, data) => reset(null));
-    monitor('data.updated', () => tree.update());
+    monitor('data.msc', (topic, data) => reset(data));
+    monitor('data.shared_msc', (topic, data) => reset(null));
+    monitor('filters.updated', () => tree.update());
 
     monitor('partition.highlight', (topic, partition, on) =>  tree.highlight(partition, on));
-    monitor('partitions.highlight', (topic, partitions, on) => tree.highlight_list(partitions, on));
+    monitor('partition.highlight_list', (topic, partitions, on) => tree.highlight_list(partitions, on));
 
     monitor('partition.details', (topic, partition, on) => tree.details(partition, on));
     monitor('partition.selected', (topic, partition, on) => tree.selected(partition, on));

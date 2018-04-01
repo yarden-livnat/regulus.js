@@ -44,7 +44,7 @@ function load_data(name) {
 
   service.load_dataset(name)
     .then(data => new MultiMSC(data))
-    .then(shared_msc => publish('data.loaded', shared_msc));
+    .then(shared_msc => publish('data.shared_msc', shared_msc));
 }
 
 

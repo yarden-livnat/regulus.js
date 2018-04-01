@@ -2,10 +2,10 @@ import * as d3 from 'd3';
 
 import {AttrRangeFilter, RangeAttrRangeFilter} from "../model/attr_filter";
 import {and} from '../model/filter';
-import Slider from '../components/slider'
+import Slider from '../components/slider2'
 
 import template from './feature.html';
-import './feature.css';
+import './feature.scss';
 import * as chromatic from "d3-scale-chromatic";
 
 let version='1';
@@ -30,8 +30,8 @@ export default function Features() {
         let selection = localStorage.getItem(`feature.${f.name}.selection`);
         f.selection = selection !== "undefined" && JSON.parse(selection) || f.domain;
         f.active = localStorage.getItem(`feature.${f.name}.active`) === 'on';
-        f.filter2.active(f.active);
-        f.filter2.range(f.selection);
+        f.filter.active(f.active);
+        f.filter.range(f.selection);
       }
     });
   } else {
@@ -40,7 +40,7 @@ export default function Features() {
 
 
 
-  features.forEach(f => f.interface && filter.add(f.filter2));
+  features.forEach(f => f.interface && filter.add(f.filter));
 
   function add_fitness_feature() {
     let name = 'fitness';
@@ -52,7 +52,7 @@ export default function Features() {
       id: 0, name: name, label: 'fitness',
       domain: domain,
       cmp: (a, b) => a > b,
-      filter2: AttrRangeFilter(name, domain),
+      filter: AttrRangeFilter(name, domain),
       active: false,
       cmap: cmap,
       colorScale: colorScale,
@@ -72,7 +72,7 @@ export default function Features() {
       id: 1, name: name, label: 'parent similarity',
       domain: domain,
       cmp: (a, b) => a < b,
-      filter2: AttrRangeFilter(name, domain),
+      filter: AttrRangeFilter(name, domain),
       active: false,
       cmap: cmap,
       colorScale: colorScale,
@@ -92,7 +92,7 @@ export default function Features() {
       id: 2, name: name, label: 'sibling similarity',
       domain: domain,
       cmp: (a, b) => a < b,
-      filter2: AttrRangeFilter(name, domain),
+      filter: AttrRangeFilter(name, domain),
       active: false,
       cmap: cmap,
       colorScale: colorScale,
@@ -113,7 +113,7 @@ export default function Features() {
       id: 3, name: name, label: 'min max',
       domain: domain,
       cmp: (a, b) => a < b,
-      filter2: RangeAttrRangeFilter(name, domain),
+      filter: RangeAttrRangeFilter(name, domain),
       active: false,
       cmap: cmap,
       colorScale: colorScale,
@@ -147,7 +147,7 @@ export default function Features() {
       .property('checked', d => d.active)
       .on('change', activate_filter);
 
-    d3features.select('.feature-slider2')
+    d3features.select('.feature-slider')
       .call(slider);
 
     slider.on('change', update_feature);
@@ -164,29 +164,25 @@ export default function Features() {
       .enter()
       .append('option')
       .attr('value', d => d.id)
-      .property('selected', d => +d.id === idx)
-      .text(d => d.label);
+        .property('selected', d => +d.id === idx)
+        .text(d => d.label);
 
     let show = localStorage.getItem('feature.show_opt');
     d3.select('.filtering_view').selectAll('input[name="show-nodes')
       .property('checked', function() { return this.value === show;})
       .on('change', function() {
         dispatch.call('show', this, this.value);
-        // tree.show(this.value);
         localStorage.setItem('feature.show_opt', this.value);
       });
-
 
     dispatch.call('color_by', this, features[idx]);
   }
 
   function update_feature(feature, range) {
     let section = d3.select(this.parentNode.parentNode.parentNode.parentNode);
-
-    feature.filter2.range(range);
+    feature.filter.range(range);
     section.select('.feature-value').text(`[${format(range[0])}, ${format(range[1])}]`);
 
-    // tree.update();
     localStorage.setItem(`feature.${feature.name}.selection`, JSON.stringify(feature.selection));
     dispatch.call('update');
   }
@@ -194,7 +190,7 @@ export default function Features() {
 
   function activate_filter(feature) {
     feature.active = d3.select(this).property('checked');
-    feature.filter2.active(feature.active);
+    feature.filter.active(feature.active);
     // tree.update();
     localStorage.setItem(`feature.${feature.name}.active`, feature.active ? 'on' : 'off');
     dispatch.call('update');
@@ -212,7 +208,7 @@ export default function Features() {
     mmf.domain =  [range[0], range[1]];
     mmf.selection = mmf.domain.concat();
     mmf.colorScale.domain(mmf.domain);
-    mmf.filter2.range(mmf.domain);
+    mmf.filter.range(mmf.domain);
 
     d3.selectAll('.feature-slider2')
       .call(slider);

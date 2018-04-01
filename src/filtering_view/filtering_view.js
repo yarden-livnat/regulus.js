@@ -1,16 +1,18 @@
 import * as d3 from 'd3';
 import PriorityQueue from 'js-priority-queue';
 
+import {pubsub} from '../utils/pubsub';
 import Chart from './chart';
 
-import {publish, subscribe} from "../utils";
 import template from './filtering_view.html';
-import './style.css';
+import './style.scss';
+import {Model} from '../model/model';
 
 
 export function FilteringView(container_, state_) {
   let container = container_;
   let root = null;
+  let listeners = new Map();
   let msc = null;
   let chart = Chart().width(250).height(100);
   let prevent = false;
@@ -19,32 +21,50 @@ export function FilteringView(container_, state_) {
   let sy = d3.scaleLinear();
   let width = 290, height = 450;
 
-  container.on('open', () => setup());
-  container.on('resize', () => resize());
-  container.on('destroy', () => console.log('FilteringView::destroy'));
+  let model = Model();
 
-  function setup() {
-    root = d3.select(container.getElement()[0]);
-    root.html(template);
+  let {publish, subscribe, unsubscribe} = pubsub();
 
-    chart.on('range', range => {
-      if (!prevent) {
-        prevent = true;
-        saved = range;
-        publish('persistence.range', range);
-        prevent = false;
-      }
-      // else console.log('ctrl move prevent');
-    });
+  root = d3.select(container.getElement()[0]);
+  root.html(template);
 
+  chart.on('range', range => {
+    if (!prevent) {
+      prevent = true;
+      saved = range;
+      publish('persistence.range', range);
+      prevent = false;
+    }
+    // else console.log('ctrl move prevent');
+  });
 
-    subscribe('persistence.range', (topic, range) => move_range(range));
-    subscribe('data.new', (topic, data) => reset(data));
+  register();
+
+  function register() {
+    container.on('resize', () => resize());
+    container.on('destroy', () => on_close());
+    container.on('open', () => on_open);
+
+    monitor('persistence.range', (topic, range) => move_range(range));
+    monitor('data.msc', (topic, data) => reset(data));
   }
 
+  function monitor(topic, cb) {
+    listeners.set(topic, subscribe(topic, cb));
+  }
+
+  function on_close() {
+    for (let [topic, listener] of listeners) {
+      unsubscribe(topic, listener);
+    }
+    listeners = new Map();
+  }
+
+  function on_open() {
+    // reset(shared_msc);
+  }
 
   function resize() {
-    if (!root) setup();
     root.select('.filtering_view')
       .style('max-width', `${container.width - 5}px`)
       .style('max-height', `${container.height}px`);
@@ -53,7 +73,6 @@ export function FilteringView(container_, state_) {
     if (!features.empty()) {
       let w = root.select('.features').attr('width');
       let h = root.select('.features').attr('height');
-      console.log('resize', w, h);
     }
   }
 

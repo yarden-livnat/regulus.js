@@ -64,7 +64,7 @@ export function ResampleView(contianer_, state_) {
       .on('click', d => submit_params(root.select('.parameters').property('value')));
 
 
-    subscribe('data.new', (topic, data) => reset(data));
+    subscribe('data.msc', (topic, data) => reset(data));
     subscribe('partition.selected', (topic, partition, on) => select(partition, on));
     subscribe('range.selected', (topic, range) => set_resample_range(range));
   }

@@ -32,8 +32,8 @@
 .filter {
   border: 0.5px gray solid;
   border-radius: 5px;
-  background-color: #fafafa;
-  padding: 5px;
+  //background-color: #fafafa;
+  padding: 5px 5px 0 5px;
   margin-bottom: 5px;
 }
 
@@ -45,6 +45,7 @@
 
 .filter-opt {
   width: 60px;
+  font-size: 0.75rem;
 }
 
 .filter-show {
@@ -57,4 +58,10 @@
 
 .feature-color {
   text-transform: uppercase;
+  height: 1.4rem;
+  font-size: 0.675rem;
+
+  option {
+    font-size: 0.75rem;
+  }
 }

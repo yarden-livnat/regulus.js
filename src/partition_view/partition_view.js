@@ -31,9 +31,6 @@ export function PartitionView(container_, state_) {
   let model = Model();
   shared_msc = model.shared_msc;
 
-  console.log("PV created", model);
-
-
   root = d3.select(container.getElement()[0]);
   root.html(template);
 
@@ -60,8 +57,8 @@ export function PartitionView(container_, state_) {
     container.on('hide', () => console.log(name, ': hide'));
     container.on('show', () => console.log(name, ': show'));
 
-    monitor('data.pts', (topic, data) => reset(data));
-    monitor('data.loaded', (topic, data) => reset(data));
+    // monitor('data.pts', (topic, data) => reset(data));
+    monitor('data.shared_msc', (topic, data) => reset(data));
     monitor('partition.highlight', (topic, partition, show) => highlight_partition(partition, show));
     monitor('partition.selected', (topic, partition, show) => select_partition(partition, show));
   }
@@ -230,7 +227,7 @@ export function PartitionView(container_, state_) {
     selected = highlight = null;
 
     localStorage.setItem(`partition_view.${shared_msc.name}.measure`, d.name);
-    publish('data.new', shared_msc.msc(d.name));
+    publish('data.msc', shared_msc.msc(d.name));
   }
 
 }
