@@ -1,3 +1,4 @@
+const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
@@ -13,7 +14,7 @@ module.exports = {
     }
   },
   plugins: [
-    new CleanWebpackPlugin(['dist'], {watch: true}),
+    new CleanWebpackPlugin(['dist'], /*{watch: true}*/),
     new HtmlWebpackPlugin({
       template: './src/app/index.html'
     }),
@@ -36,6 +37,7 @@ module.exports = {
               },
               { loader: 'sass-loader' }]
       },
+      { test: /\.less$/, use: [{loader: "style-loader"}, {loader: "css-loader"}, {loader: "less-loader"}] },
       { test: /\.css$/,  use: [ 'style-loader', 'css-loader' ] },
       { test: /\.(png|svg|jpg|gif)$/, use: [ 'file-loader' ] },
       { test: /\.html$/, use: {loader: 'html-loader', options: {} }

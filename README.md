@@ -1,36 +1,53 @@
 # Regulus
-Topology based visual analytics of high-dimensional data using Morse-Smale complexes
+Visual analytics of high-dimensional data using a topology based approach.
+Regulus support both Morse and Morse-Smale complexes.
 
 
 ## Installation
-### server 
-Regulus uses [Bottle](http://bottlepy.org) python server. It can installed using 
+### Server
+Regulus uses [Bottle](http://bottlepy.org) python server, which can installed via
 `pip install bottle` or `conda install bottle -c conda-forge`.
 
-### client
-Regulus uses the [yarn](https://yarnpkg.com) package manager. e.g. `conda install yarn -c conda-forge`.
+### Client
+Install the [yarn](https://yarnpkg.com) package manager. e.g. `conda install yarn -c conda-forge`.
  
-- run `yarn install` in the regulus root directory, which will locally install all the required Javascript packages.  
-- run `yarn build` to build the Javascript code. 
-- Use `yarn watch` during development which will run the build process 
-whenever any file in the src directory is saved.
+- Run `yarn install` in the regulus root directory. It will locally install all the required Javascript packages.
+- Run `yarn build` to build the Javascript code.
+- During development, use `yarn watch` to continuously rebuild Regulus you save files.
 
-<!---
-## Post processing data
-The data (.csv) file is a collection of n-d points.
 
-Use scripts/post.py to parse data file.
-`python scripts/post.py -d dims --all --name <name your data> <path-to-data file`
-- '-d dims': indicates the first <dims> columns are dimensions (input variables) and the rest of
-the columns are measures (output variables). The default is all but the last one.
-- '--all': process all measures
-- '-c col': process only the measure on column <col>
-- '-m name': process only the measure named <name>
-Use `python post.py --help` to see all options
--->
+## Data
+
+Regulus works with high-dimensional data where the first d-dimensions are independent variables
+(dimensions) and the rest of dependent variables (measures).
+
+- **todo: \[expand]**: convert csv file to a regulus json file
+- **todo: \[expand]**: compute Morse- or Morse-Smale complexes
+- **todo: \[expand]**: compute various statistic such as linear regression and inverser regression
+
+### Data sampling
+
+Regulus can sample the domain to create additional data points during the analysis process. There are
+two main approaches,
+
+#### 1. Interpolation of existing data points
+TBD
+
+#### 2. Running a user simulation program
+Currently, Regulus only support running a local [cyclus](http://fuelcycle.org) for a specific scenario.
 
 ## Running
-- Run the server in the `server/` directory `python server.py -d <path-to-data-directory>`. 
+#### Server:
+
+`cd server; python server.py -d <path-to-data-directory>`
+
 You can also set an environment variable `REGULUS_DATA_DIR` to point at the data directory.
-- Point your browser to localhost:8081
+
+#### Client
+Point your browser to `localhost:8081`
+
+Regulus automatically save and reload the layout configuration.
+- `localhost:8081/?noload` prevents loading of previous layout
+- `localhost:8081/?nosave` prevents saving the layout during this run
+- `localhost:8081/?noload&nosave` prevents both
 

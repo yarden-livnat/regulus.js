@@ -6,7 +6,7 @@
 
   .ev_header_label {
     display: inline-block;
-    padding: 10px;
+    padding: 5px;
     font-size: 0.875rem;
   }
 
@@ -48,6 +48,10 @@
       grid-column: 2;
       text-align: right;
       margin: 0 2px;
+
+      &:hover {
+        background-color: lightgray;
+      }
     }
 
     .ev_value {

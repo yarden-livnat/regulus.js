@@ -24,6 +24,8 @@
     "jquery": "^3.3.1",
     "js-priority-queue": "^0.1.5",
     "kernel-smooth": "^0.2.3",
+    "less": "^3.0.1",
+    "less-loader": "^4.1.0",
     "popper.js": "^1.14.1",
     "validate.io-array": "^1.0.6",
     "validate.io-function": "^1.0.2"

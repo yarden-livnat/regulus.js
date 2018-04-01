@@ -8,6 +8,7 @@ import 'bootstrap';
 import {layout} from './layout';
 import {pubsub} from "../utils/pubsub";
 
+import {ChartsView} from '../charts_view';
 import {DetailsView} from '../details_view';
 import {ExtremaView} from '../extrema_view';
 import {FilteringView} from '../filtering_view';
@@ -23,21 +24,22 @@ let {publish, subscribe} = pubsub();
 subscribe('status', report_status);
 
 let views = [
-  {label:'Details',   componentName: 'details',   componentState: {}, type: 'component', factory: DetailsView},
-  {label:'Extrema',   componentName: 'extrema',   componentState: {}, type: 'component', factory: ExtremaView},
-  {label:'Filtering', componentName: 'filtering', componentState: {}, type: 'component', factory: FilteringView},
-  {label:'Lifeline',  componentName: 'lifeline',  componentState: {}, type: 'component', factory: LifelineView},
-  {label:'Partition', componentName: 'partition', componentState: {}, type: 'component', factory: PartitionView},
-  {label:'Resample',  componentName: 'resample',  componentState: {}, type: 'component', factory: ResampleView},
+  {componentName: 'Details',   componentState: {}, type: 'component', factory: DetailsView},
+  {componentName: 'Extrema',   componentState: {}, type: 'component', factory: ExtremaView},
+  {componentName: 'Filtering', componentState: {}, type: 'component', factory: FilteringView},
+  {componentName: 'Lifeline',  componentState: {}, type: 'component', factory: LifelineView},
+  {componentName: 'Partition', componentState: {}, type: 'component', factory: PartitionView},
+  {componentName: 'Resample',  componentState: {}, type: 'component', factory: ResampleView},
+  {componentName: 'Charts',    componentState: {}, type: 'component', factory: ChartsView},
 ];
 
 d3.select('#views .dropdown-menu').selectAll('a')
-  .data(views)
+  .data(views.sort( (a,b) => a.componentName < b.componentName ? -1 : 1))
   .enter()
   .append('a')
   .attr('class', 'dropdown-item')
   .on('click', add_item)
-  .text(d => d.label);
+  .text(d => d.componentName);
 
 views.forEach(view => layout.registerComponent(view.componentName, view.factory));
 layout.on('initialised', init);
