@@ -1,4 +1,7 @@
 .tree_view {
+  //display: flex;
+  //flex-direction: column;
+
   .config {
     padding: 5px;
     display: flex;
@@ -6,6 +9,7 @@
   }
 
   .tree {
+    //flex: 1 1 auto;
     padding: 10px;
   }
 

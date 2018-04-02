@@ -1,62 +1,62 @@
 @import "../app/variables";
 
-.lifeline .node {
-  fill: white;
-  stroke: gray;
-  stroke-width: 0.5px;
-}
-
-.lifeline .node:hover {
-  /*fill: lightgray;*/
-  stroke-width: 2px;
-  z-index: 10;
-  /*fill: lightblue;*/
-}
-
-.lifeline .node.selected {
-  /*fill: lightblue;*/
-}
-
-.lifeline .highlight {
-  /*stroke-width: 2px;*/
-  /*stroke: gray;*/
-  fill: lightyellow;
-  /*filter: url('#drop-shadow');*/
-}
-
-.lifeline .highlight_max {
-  fill: $max_color;
-}
-
-.lifeline .highlight_min {
-  fill: $min_color;
-}
-
-.lifeline .node.details {
-  stroke-width: 4px;
-  stroke: lightgreen;
-  /*fill: lightgreen;*/
-  /*filter: url('#drop-shadow');*/
-}
-
-.lifeline .node.filtered {
-  color: white;
-  stroke: none;
-}
-
 .lifeline {
   user-select: none;
-}
 
-.lifeline .name {
-  /*color: red;*/
-  text-anchor: middle;
-  alignment-baseline: middle;
-  pointer-events: none;
-}
+  .node {
+    fill: white;
+    stroke: gray;
+    stroke-width: 0.5px;
 
-.lifeline .axis .axis-label {
-  fill: black;
-  font-size: 10pt;
+    &:hover {
+      /*fill: lightgray;*/
+      stroke-width: 2px;
+      z-index: 10;
+      /*fill: lightblue;*/
+    }
+
+    &.selected {
+      /*fill: lightblue;*/
+    }
+
+    &.highlight {
+      /*stroke-width: 2px;*/
+      /*stroke: gray;*/
+      fill: lightyellow;
+      /*filter: url('#drop-shadow');*/
+    }
+
+    &.highlight_max {
+      fill: $max_color;
+    }
+
+    &.highlight_min {
+      fill: $min_color;
+    }
+
+    &.details {
+      stroke-width: 4px;
+      stroke: lightgreen;
+      /*fill: lightgreen;*/
+      /*filter: url('#drop-shadow');*/
+    }
+
+    &.filtered {
+      color: white;
+      stroke: none;
+    }
+  }
+
+  .name {
+    /*color: red;*/
+    text-anchor: middle;
+    alignment-baseline: middle;
+    pointer-events: none;
+  }
+
+  .axis .axis-label {
+    fill: black;
+    font-size: 10pt;
+  }
 }
 

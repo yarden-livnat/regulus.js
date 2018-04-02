@@ -4,7 +4,7 @@ import './lifeline.scss';
 import {noop} from "../model/filter";
 
 export default function Lifeline() {
-  let margin = {top: 10, right: 10, bottom: 50, left:60},
+  let margin = {top: 10, right: 30, bottom: 50, left:60},
     width = 800 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
@@ -195,69 +195,82 @@ export default function Lifeline() {
   }
 
   function lifeline(selection) {
-    width = parseInt(selection.style('width'));
-    height = parseInt(selection.style('height'));
+    width = parseInt(selection.style('width'))-margin.left - margin.right;
+    height = parseInt(selection.style('height')) - margin.top - margin.bottom;
 
-    svg = selection
-      // .append('svg')
-      .classed('lifeline', true)
-        // .dattr('width', width + margin.left + margin.right)
-        // .attr('height', height + margin.top + margin.bottom)
-      .append('g')
+    console.log('lifeline', width, height);
+    if (isNaN(width) || isNaN(height)) return;
+
+    let g = selection.selectAll('g')
+      .data([1])
+      .enter()
+        .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
-    svg.append('g')
+
+    g.append('g')
       .attr('class', 'nodes');
 
-
-
-    svg.append('g')
+    g.append('g')
       .attr('class', 'names');
 
-    svg.append('g')
+    g.append('g')
       .attr('class', 'x axis')
-      .attr('transform', `translate(0,${height})`)
       .append('text')
         .attr('class', 'axis-label')
-        .attr('transform', `translate(${width/2},${margin.top + 20})`)
         .style('text-anchor', 'middle')
         .text('Points');
 
-    svg.append('g')
+    g.append('g')
       .attr('class', 'y axis')
       .append('text')
         .attr('class', 'axis-label')
         .attr('transform', 'rotate(-90)')
-        .attr('y', 0 - margin.left)
-        .attr('x',0 - (height / 2))
+
         .attr('dy', '1em')
         .style('text-anchor', 'middle')
         .text('Persistence');
 
-    let defs = svg.append('defs');
+    svg = selection.merge(g);
 
-    let filter = defs.append('filter')
-      .attr('id', 'drop-shadow')
-      .attr('height', '130%')
-      .attr('width', '130%');
+    svg.select('.x')
+      .attr('transform', `translate(0,${height})`)
+      .select('text')
+      .attr('transform', `translate(${width/2},${margin.top + 20})`);
 
-    filter.append("feGaussianBlur")
-      .attr("in", "SourceAlpha")
-      .attr("stdDeviation", 5)
-      .attr("result", "blur");
+    svg.select('.y text')
+      .attr('y', 0 - margin.left)
+      .attr('x',0 - (height / 2));
 
-    filter.append("feOffset")
-      .attr("in", "blur")
-      .attr("dx", 5)
-      .attr("dy", 5)
-      .attr("result", "shadow");
+    pt_scale.range([0, width]);
+    sx.range([0, width]);
+    sy.range([height, 0]);
 
-    let feMerge = filter.append("feMerge");
+    // let defs = svg.append('defs');
+    //
+    // let filter = defs.append('filter')
+    //   .attr('id', 'drop-shadow')
+    //   .attr('height', '130%')
+    //   .attr('width', '130%');
+    //
+    // filter.append("feGaussianBlur")
+    //   .attr("in", "SourceAlpha")
+    //   .attr("stdDeviation", 5)
+    //   .attr("result", "blur");
+    //
+    // filter.append("feOffset")
+    //   .attr("in", "blur")
+    //   .attr("dx", 5)
+    //   .attr("dy", 5)
+    //   .attr("result", "shadow");
+    //
+    // let feMerge = filter.append("feMerge");
+    //
+    // feMerge.append("feMergeNode")
+    //   .attr("in", "shadow");
+    // feMerge.append("feMergeNode")
+    //   .attr("in", "SourceGraphic");
 
-    feMerge.append("feMergeNode")
-      .attr("in", "shadow");
-    feMerge.append("feMergeNode")
-      .attr("in", "SourceGraphic");
-
+    render();
 
     return lifeline;
   }

@@ -4,27 +4,36 @@
   padding: 5px;
 
   .pv_info {
-    //border: 0.5px gray solid;
-    //border-radius: 5px;
-    //background-color: @bg-color;
     padding: 5px;
     border-bottom: 1px solid gray;
+    margin-bottom: 10px;
 
     .grid {
       display: grid;
-      grid-template-columns: 15px 25px 0fr 0fr 0fr 0fr;
+      grid-template-columns: 15px 30px 0fr 0fr 0fr 0fr;
       grid-gap: 5px;
       grid-auto-rows: auto;
     }
 
+    .pv_dataset_label {
+      grid-column: 1 / span 2;
+      grid-row: 1;
+    }
+
+    .pv_dataset {
+      grid-column: 3 / span 3;
+      grid-row: 1;
+      text-transform: uppercase;
+    }
+
     .pv_id_label {
       grid-column: 1;
-      grid-row: 1;
+      grid-row: 2;
     }
 
     .pv_id {
       grid-column: 2;
-      grid-row: 1;
+      grid-row: 2;
 
       &.highlight {
          background-color: lightgray;
@@ -37,72 +46,71 @@
 
     .pv_name_label {
       grid-column: 3;
-      grid-row: 1;
+      grid-row: 2;
     }
 
     .pv_name {
       grid-column: 4 / span3;
-      grid-row: 1;
+      grid-row: 2;
 
       border: none;
-      border-bottom: 1px solid #999;
+      border-bottom: 0.5px solid #ccc;
       text-align: left;
     }
 
     input.pv_name {
-      //font-size: 8pt;
       font-weight: bold;
     }
 
 
     .pv_size_label {
       grid-column-start: 1 / span 2;
-      grid-row: 2;
+      grid-row: 3;
     }
 
     .pv_size {
       grid-column: 3;
-      grid-row: 2;
+      grid-row: 3;
     }
 
     .pv_minmax_label {
       grid-column: 4;
-      grid-row: 2;
+      grid-row: 3;
     }
 
     .pv_min {
       grid-column: 5;
-      grid-row: 2;
+      grid-row: 3;
     }
 
     .pv_max {
       grid-column: 6;
-      grid-row: 2;
+      grid-row: 3;
     }
 
     .pv_fitness_label {
       grid-column: 1 / span 2;
-      grid-row: 3;
+      grid-row: 4;
     }
 
     .pv_fitness {
       grid-column: 3;
-      grid-row: 3;
+      grid-row: 4;
     }
 
     .pv_similarity_label {
       grid-column: 1 / span 2;
-      grid-row: 4;
+      grid-row: 5;
     }
 
     .pv_parent_similarity {
       grid-column: 3;
-      grid-row: 4;
+      grid-row: 5;
     }
 
     .pv_sibling_similarity {
       grid-column: 4;
-      grid-row: 4;
+      grid-row: 5;
     }
   }
 

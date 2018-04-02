@@ -2,9 +2,9 @@
   padding: 5px;
 
   .config {
-    //border-bottom: 1px solid gray;
-    //padding: 2px 0 5px 0;
-    //margin-bottom: 10px;
+    border-bottom: 1px solid gray;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
     //display: flex;
     //flex-direction: row;
     .first {
@@ -14,6 +14,18 @@
       justify-content: flex-start;
       align-items: center;
       align-content: space-between;
+    }
+
+    .opt {
+      margin: 0 5px 0 5px;
+    }
+
+    input[type=select] {
+      margin-right: 10px;
+    }
+
+    input[type=checkbox] {
+      margin-left: 10px;
     }
   }
 

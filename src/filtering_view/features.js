@@ -226,6 +226,11 @@ export default function Features() {
       .call(slider);
   };
 
+  api.redraw = function() {
+    d3.selectAll('.feature-slider')
+      .call(slider)
+  };
+
   api.filter = function() {
     return filter;
   };

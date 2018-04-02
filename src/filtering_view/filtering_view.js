@@ -33,10 +33,8 @@ export function FilteringView(container_, state_) {
   }
 
   features
-    .on('show', value =>
-      publish('filters.show', value))
-    .on('update', () =>
-      publish('filters.update'))
+    .on('show', value => publish('filters.show', value))
+    .on('update', () => publish('filters.update'))
     .on('color_by', feature => publish('show.color_by', feature));
 
   root.select('.filtering_view').call(features);
@@ -75,11 +73,13 @@ export function FilteringView(container_, state_) {
       .style('max-width', `${container.width - 5}px`)
       .style('max-height', `${container.height}px`);
 
-    let features = root.select('.features');
-    if (!features.empty()) {
-      let w = root.select('.features').attr('width');
-      let h = root.select('.features').attr('height');
-    }
+    features.redraw();
+
+    // let features = root.select('.features');
+    // if (!features.empty()) {
+    //   let w = root.select('.features').attr('width');
+    //   let h = root.select('.features').attr('height');
+    // }
   }
 
   function reset(data) {

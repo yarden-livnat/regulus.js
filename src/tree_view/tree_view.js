@@ -64,7 +64,7 @@ export function LifelineView(container_, state_) {
       .color_by(model.color_by);
   }
 
-  root.select('.tree').call(tree);
+  root.select('.lifeline').call(tree);
 
   slider.on('change', on_slider_change);
 
@@ -88,7 +88,6 @@ export function LifelineView(container_, state_) {
 
     monitor('partition.details', (topic, partition, on) => tree.details(partition, on));
     monitor('partition.selected', (topic, partition, on) => tree.selected(partition, on));
-     // subscribe('persistence.range', (topic, range) => set_persistence_range(range) );
 
     monitor('filters.new', (topic, filter) => tree.filter(filter));
     monitor('filters.show', (topic, value) => tree.show(value));
@@ -113,7 +112,12 @@ export function LifelineView(container_, state_) {
     let rh = container.height; // parseInt(root.style('height'));
     let ch = parseInt(root.select('.config').style('height'));
 
-    tree.set_size(rw-20, rh - ch);
+    root.select('.tree')
+      .style('width', rw)
+      .style('height', rh - ch);
+
+    root.select('.lifeline').call(tree);
+    // tree.set_size(rw-20, rh - ch);
   }
 
   function on_open() {

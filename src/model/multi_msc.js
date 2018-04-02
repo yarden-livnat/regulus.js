@@ -1,5 +1,5 @@
 import * as d3 from 'd3-array';
-// import Partition from "./partition";
+
 import {MSC} from './msc';
 import Partition from "./partition";
 

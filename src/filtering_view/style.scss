@@ -1,67 +1,44 @@
+
 .filtering_view {
+
   padding: 5px;
   overflow: auto;
-}
-
-.chart {
-  /*background-color: lightcyan;*/
-}
-
-.chart path {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.chart .axis path,
-.chart .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-.chart .axis  {
-  fill: black;
-}
-
-.brush .selection {
-  fill: lightgray;
-}
-
-.filter {
-  border: 0.5px gray solid;
-  border-radius: 5px;
-  //background-color: #fafafa;
-  padding: 5px 5px 0 5px;
-  margin-bottom: 5px;
-}
 
 
-.color-by {
-  display: flex;
-  margin-bottom: 5px;
-}
+  .filter {
+    border: 0.5px gray solid;
+    border-radius: 5px;
+    //background-color: #fafafa;
+    padding: 5px 5px 0 5px;
+    margin-bottom: 5px;
+  }
 
-.filter-opt {
-  width: 60px;
-  font-size: 0.75rem;
-}
+  .color-by {
+    display: flex;
+    margin-bottom: 5px;
+  }
 
-.filter-show {
-  display: flex;
-}
-
-.filter-show input[type=radio] {
-  margin: 0 5px 0 15px;
-}
-
-.feature-color {
-  text-transform: uppercase;
-  height: 1.4rem;
-  font-size: 0.675rem;
-
-  option {
+  .filter-opt {
+    width: 60px;
     font-size: 0.75rem;
+  }
+
+  .filter-show {
+    display: flex;
+    overflow: auto;
+  }
+
+  .filter-show input[type=radio] {
+    margin: 0 5px 0 15px;
+  }
+
+  .feature-color {
+    text-transform: uppercase;
+    height: 1.4rem;
+    font-size: 0.675rem;
+
+    option {
+      font-size: 0.75rem;
+    }
   }
 }

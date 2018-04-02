@@ -2,11 +2,11 @@ import * as d3 from 'd3';
 import PriorityQueue from 'js-priority-queue';
 
 import {pubsub} from '../utils/pubsub';
+import {Model} from '../model/model';
 import Chart from './chart';
 
 import template from './charts_view.html';
 import './style.scss';
-import {Model} from '../model/model';
 
 
 export function ChartsView(container_, state_) {

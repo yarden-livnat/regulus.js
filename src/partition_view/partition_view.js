@@ -94,6 +94,7 @@ export function PartitionView(container_, state_) {
     highlight = null;
     measure = null;
 
+    root.select('.pv_dataset').text(shared_msc && shared_msc.name || '');
     show_partition(true);
   }
 
