@@ -6,7 +6,6 @@ import csv
 from datetime import date
 from getpass import getuser
 
-
 ### Takes in json or csv, returns a regulusfile
 
 def create_from_csv(filename, name, ndims, sim_method):
