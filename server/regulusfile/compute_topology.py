@@ -405,6 +405,7 @@ def compute_topology(regulus, k = None, b = None, n = None, g = None, G = None, 
                     .data(y) \
                     .msc(msc.descending_partitions, msc.max_hierarchy)
             elif type == 'ascending':
+
                 tmp = Post(debug) \
                     .data(y) \
                     .msc(msc.ascending_partitions, msc.min_hierarchy)
@@ -413,7 +414,9 @@ def compute_topology(regulus, k = None, b = None, n = None, g = None, G = None, 
                     .data(y) \
                     .msc(msc.base_partitions, msc.hierarchy)
 
+
             params = set_param(k,b,n,g,G,topo,type)
+
 
             mscs[measure] = tmp \
                 .build() \
