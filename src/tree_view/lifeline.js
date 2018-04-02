@@ -146,7 +146,7 @@ export default function Lifeline() {
     let d3nodes = svg.select('.nodes').selectAll('.node')
       .data(items, d => d.id);
 
-    let enter = d3nodes.enter()
+    d3nodes.enter()
       .append('rect')
         .attr('class', 'node')
         .on('mouseenter', d => hover(d, true))

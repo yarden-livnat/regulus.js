@@ -106,12 +106,10 @@ export function DetailsView(container_, state_) {
   }
 
   function on_open() {
-    console.log(' DV open');
     // reset(shared_msc);
   }
 
   function on_close() {
-    console.log('DV closed');
     for (let [topic, listener] of listeners) {
       unsubscribe(topic, listener);
     }

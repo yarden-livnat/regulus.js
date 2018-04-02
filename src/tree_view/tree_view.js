@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-import Features from './features';
+import {Model} from '../model';
 import {pubsub} from "../utils/pubsub";
 
 
@@ -8,14 +8,13 @@ import Tree from './lifeline';
 import Slider from '../components/slider'
 
 import template from './tree_view.html';
-import './style.css';
+import './style.scss';
 
 
 export function LifelineView(container_, state_) {
   let container = container_;
 
   let root = null;
-  let msc = null;
   let tree = Tree();
   let listeners = new Map();
 
@@ -24,7 +23,9 @@ export function LifelineView(container_, state_) {
   let prevent = false;
   let saved = [0, 0];
 
-  let features = Features();
+  let model = Model();
+  let msc = model.msc;
+
 
   let sliders = [
     { id: 'x', type: 'linear', domain: [Number.EPSILON, 1], ticks: {n: 5, format: 'd'}, selection: [0, 1]},
@@ -55,16 +56,18 @@ export function LifelineView(container_, state_) {
     .on('select', (node, on) => publish('partition.selected', node, on))
     .on('details', (node, on) => publish('partition.details', node, on))
     .x_type(sliders[0].type)
-    .y_type(sliders[1].type)
-    .filter(features.filter());
+    .y_type(sliders[1].type);
+
+  if (model.features) {
+    tree
+      .filter(model.features.filter())
+      .color_by(model.color_by);
+  }
 
   root.select('.tree').call(tree);
 
-  features.on('show', value => tree.show(value));
-  features.on('update', () => tree.update());
-  features.on('color_by', feature => tree.color_by(feature));
 
-  // resize();
+
 
   slider.on('change', on_slider_change);
 
@@ -79,7 +82,6 @@ export function LifelineView(container_, state_) {
     container.on('destroy', () => on_close());
     container.on('open', () => on_open);
 
-    monitor('init', init);
     monitor('data.msc', (topic, data) => reset(data));
     monitor('data.shared_msc', (topic, data) => reset(null));
     monitor('filters.updated', () => tree.update());
@@ -90,6 +92,11 @@ export function LifelineView(container_, state_) {
     monitor('partition.details', (topic, partition, on) => tree.details(partition, on));
     monitor('partition.selected', (topic, partition, on) => tree.selected(partition, on));
      // subscribe('persistence.range', (topic, range) => set_persistence_range(range) );
+
+    monitor('filters.new', (topic, filter) => tree.filter(filter));
+    monitor('filters.show', (topic, value) => tree.show(value));
+    monitor('filters.update', (topic) => tree.update());
+    monitor('show.color_by', (topic, feature) => tree.color_by(feature));
   }
 
   function monitor(topic, cb) {
@@ -97,15 +104,10 @@ export function LifelineView(container_, state_) {
   }
 
   function on_close() {
-    console.log('PV closed');
     for (let [topic, listener] of listeners) {
       unsubscribe(topic, listener);
     }
     listeners = new Map();
-  }
-
-  function init() {
-    d3.select('.filtering_view').call(features);
   }
 
 
@@ -118,8 +120,7 @@ export function LifelineView(container_, state_) {
   }
 
   function on_open() {
-    console.log(' TV open');
-    // reset(shared_msc);
+    reset(msc);
   }
 
   function reset(data) {
@@ -134,8 +135,7 @@ export function LifelineView(container_, state_) {
       sliders[0].domain = [Number.EPSILON, msc.pts.length];
       root.selectAll('.slider').call(slider);
 
-      features.update(msc.minmax);
-
+      publish('data.updated', msc);
       tree.data(msc.partitions, msc.tree);
     }
   }

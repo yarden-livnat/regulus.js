@@ -26,6 +26,34 @@ export default function Slider() {
   function brush_started() {
   }
 
+  function linear_gradient(svg) {
+    let defs = svg.select('defs');
+
+    let g = defs
+      .each(d => console.log(d))
+      .append('linearGradient')
+      .attr('id', d => `slider-gradient-${d.id}`)
+      .attr('x1', '0%')
+      .attr('y1', '0%')
+      .attr('x2', '100%')
+      .attr('y2', '0%');
+
+    g.append('stop')
+      .attr('offset', '0%')
+      .attr('stop-color', d => d.colorScale(d.domain[0]))
+      .attr('opacity', 1);
+
+    g.append('stop')
+      .attr('offset', '50%')
+      .attr('stop-color', d => d.colorScale((d.domain[0]+d.domain[1])/2))
+      .attr('opacity', 1);
+
+    g.append('stop')
+      .attr('offset', '100%')
+      .attr('stop-color', d => d.colorScale(d.domain[1]))
+      .attr('opacity', 1);
+  }
+
   function slider(selection) {
     selection.each( function(d, i) {
       let svg = d3.select(this);
@@ -33,6 +61,10 @@ export default function Slider() {
       width = parseInt(svg.style('width')) - margin.left - margin.right;
       height = parseInt(svg.style('height')) - margin.top - margin.bottom;
 
+      if (isNaN(width) || isNaN(height))
+        return;
+
+      console.log('slider2: ', d.id, width, height);
       let g = svg.selectAll('g')
         .data([1]).enter()
         .append('g')
@@ -58,11 +90,13 @@ export default function Slider() {
       svg.select('.axis')
         .call(d3.axisBottom(scale).ticks(d.ticks.n, d.ticks.format));
 
+      linear_gradient(svg);
+
       svg.select('rect')
         .attr('y', -10)
         .attr('width', width)
         .attr('height', 10)
-        .attr('fill', 'url(#fs-gradient');
+        .attr('fill', `url(#slider-gradient-${d.id})`);
 
       brush.extent([[0, -10], [width, 1]]);
       svg.select('.brush')
