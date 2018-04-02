@@ -359,25 +359,10 @@ def save_param(regulus, measures, k, b, n, g, G, type):
             msc['params'] = '-k '+str(k)+' -b '+str(b)+' -n '+n+' -g '+g+' -G '+G
             msc['topo'] = type
 
+def set_param(k, b, n, g, G):
+    return '-k '+str(k)+' -b '+str(b)+' -n '+n+' -g '+g+' -G '+G
 
-def set_param(k, b, n, g, G, topo, type):
-    if type =='':
-        return '-k '+str(k)+' -b '+str(b)+' -n '+n+' -g '+g+' -G '+G + ' -t '+topo
-    else:
-        return '-k '+str(k)+' -b '+str(b)+' -n '+n+' -g '+g+' -G '+G + ' -t '+topo + ' '+type
-
-
-def compute_topology(regulus, k = None, b = None, n = None, g = None, G = None, topo = None,  debug=None):#k = None, b = None, n = None, g = None, G = None):
-
-    type = ''
-
-    if topo != 'morse-smale':
-        if 'ascend' in topo:
-            type = 'ascending'
-            topo = 'morse'
-        else:
-            type = 'descending'
-            topo = 'morse'
+def compute_topology(regulus, k, b, n, g, G, type, debug=None):#k = None, b = None, n = None, g = None, G = None):
 
     mscs = dict()
     for msc in regulus['mscs']:
@@ -400,11 +385,12 @@ def compute_topology(regulus, k = None, b = None, n = None, g = None, G = None, 
             x = msc.X
             y = msc.Y
 
-            if type == 'descending':
+
+            if type == 'descend':
                 tmp = Post(debug) \
                     .data(y) \
                     .msc(msc.descending_partitions, msc.max_hierarchy)
-            elif type == 'ascending':
+            elif type == 'ascend':
                 tmp = Post(debug) \
                     .data(y) \
                     .msc(msc.ascending_partitions, msc.min_hierarchy)
@@ -413,15 +399,12 @@ def compute_topology(regulus, k = None, b = None, n = None, g = None, G = None, 
                     .data(y) \
                     .msc(msc.base_partitions, msc.hierarchy)
 
-            params = set_param(k,b,n,g,G,topo,type)
+            params = set_param(k,b,n,g,G)
 
             mscs[measure] = tmp \
                 .build() \
                 .verify() \
-                .get_tree(measure, params, topo, type)
+                .get_tree(measure, params)
 
         except RuntimeError as error:
             print(error)
-
-    regulus['mscs'] = list(mscs.values())
-    return regulus
