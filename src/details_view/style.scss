@@ -1,0 +1,220 @@
+.details_view {
+  padding: 5px;
+
+  .config {
+    //border-bottom: 1px solid gray;
+    //padding: 2px 0 5px 0;
+    //margin-bottom: 10px;
+    //display: flex;
+    //flex-direction: row;
+    .first {
+      display: flex;
+      flex-direction: row;
+      padding: 2px 0 5px 0;
+      justify-content: flex-start;
+      align-items: center;
+      align-content: space-between;
+    }
+  }
+
+  .brush {
+    .overlay {
+      fill: aliceblue;
+    }
+
+    .selection {
+      fill: limegreen;
+      fill-opacity: 1;
+    }
+  }
+
+  .dims {
+    margin-left: 110px;
+    display: flex;
+    flex-direction: row;
+    /*width: 100%;*/
+    box-sizing: border-box;
+
+    .dim {
+      padding: 0;
+      text-align: center;
+
+      label {
+        /*background-color: beige;*/
+        display: block;
+      }
+    }
+  }
+
+  .details {
+    overflow: auto;
+  }
+
+  .groups {
+    position: relative;
+  }
+
+  .group {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    /*overflow: auto;*/
+
+    &.highlight {
+      /*background-color: #f0f0f0;*/
+    }
+
+    &.selected .plots {
+      background-color: lightblue;
+    }
+
+    .group-header {
+      display: flex;
+      flex-direction: column;
+      width: 3em;
+      height: 100px;
+      padding: 0 5px 0 5px;
+      margin-top: 10px;
+      font-size: 10pt;
+
+      background-color: lightgreen;
+    }
+
+    &.highlight .group-header {
+      background-color: lightgray;
+    }
+
+    &.selected .group-header {
+      stroke-width: 3px;
+      stroke: lightgreen;
+    }
+
+    &.edit .group-header {
+      background-color: lightsalmon;
+    }
+
+    .header .size {
+      font-size: 8pt;
+      font-style: italic;
+    }
+
+    .plots {
+      display: flex;
+      flex-direction: row;
+    }
+  }
+
+  .measure {
+    .name {
+      transform: rotate(-90deg);
+      transform-origin: 45px 45px;
+      position: absolute;
+      /*background-color: beige;*/
+    }
+
+    .y_axis label {
+      fill: black;
+      font-size: 10pt;
+    }
+  }
+
+  .plot {
+    position: relative;
+    margin: 10px 8px 0 10px;
+    /*background-color: #fdfdfd;*/
+
+    .canvas-bg {
+      position: relative;
+      top: -2px;
+      left: -2px;
+      stroke: black;
+      stroke-width: 2px;
+    }
+
+    .canvas-fg {
+      position: absolute;
+      top: -2px;
+      left: -2px;
+    }
+
+    svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .frame {
+      fill: none;
+      stroke: black;
+      stroke-width: 0.5px;
+    }
+
+    .line {
+      fill: none;
+      stroke: #666;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      stroke-opacity: 0.7;
+      stroke-width: 1px;
+    }
+
+    .area {
+      fill: #f0f0f0;
+      fill-opacity: 0.4;
+      stroke: gray;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      stroke-opacity: 0.3;
+      stroke-width: 1px;
+      z-index: 0;
+    }
+
+    circle {
+      /*fill: steelblue;*/
+    }
+
+    .brush {
+      .overlay {
+        fill: none;
+      }
+
+      .selection {
+        fill: lightgray;
+        fill-opacity: 0;
+        stroke: black;
+        stroke-width: 1px;
+      }
+    }
+  }
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+  .dim-list {
+    display: flex;
+    flex-direction: row;
+    vertical-align: top;
+    margin-left: 20px;
+  }
+
+  .dim-ctrl {
+    margin: 5px;
+    background: lightblue;
+    border: 0.5px solid lightgray;
+    border-radius: 3px;
+    font-size: 9pt;
+    padding: 1px 5px;
+    display: inline-block;
+
+    &:hover {
+      /*border: 1.5px solid lightgray;*/
+    }
+
+    &.non-active {
+      background: #fafafa;
+    }
+  }
+}

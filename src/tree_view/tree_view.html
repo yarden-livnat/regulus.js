@@ -1,23 +1,25 @@
-<div class="tree_view config">
+<div class="tree_view">
+  <div class="config">
 
-  <div class="y-axis">
-    <label>Y axis</label>
-    <div id="y-slider" class="slider"></div>
-    <select id="tree-y-type">
-      <option value="log">log</option>
-      <option value="linear">linear</option>
-    </select>
+    <div class="y-axis">
+      <label>Y axis</label>
+      <div id="y-slider" class="slider"></div>
+      <select id="tree-y-type">
+        <option value="log">log</option>
+        <option value="linear">linear</option>
+      </select>
+    </div>
+
+    <div class="x-axis">
+      <label>X axis</label>
+      <div id="x-slider" class="slider"></div>
+      <select id="tree-x-type">
+        <option value="log">log</option>
+        <option value="linear">linear</option>
+      </select>
+    </div>
+
   </div>
 
-  <div class="x-axis">
-    <label>X axis</label>
-    <div id="x-slider" class="slider"></div>
-    <select id="tree-x-type">
-      <option value="log">log</option>
-      <option value="linear">linear</option>
-    </select>
-  </div>
-
+  <svg class="tree"></svg>
 </div>
-
-<div class="tree"></div>

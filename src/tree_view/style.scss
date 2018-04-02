@@ -1,20 +1,22 @@
-.tree_view.config {
-  padding: 5px;
-  display: flex;
-  flex-direction: row;
-}
+.tree_view {
+  .config {
+    padding: 5px;
+    display: flex;
+    flex-direction: row;
+  }
 
-.tree {
-  padding: 10px;
-}
+  .tree {
+    padding: 10px;
+  }
 
-.y-axis, .x-axis {
-  display: flex;
-  align-items: center;
-  margin-right: 30px;
-}
+  .y-axis, .x-axis {
+    display: flex;
+    align-items: center;
+    margin-right: 30px;
+  }
 
-.y-axis select, .x-axis select {
-  margin-left: 10px;
+  .y-axis select, .x-axis select {
+    margin-left: 10px;
+  }
 }
 

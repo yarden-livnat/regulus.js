@@ -66,9 +66,6 @@ export function LifelineView(container_, state_) {
 
   root.select('.tree').call(tree);
 
-
-
-
   slider.on('change', on_slider_change);
 
   root.selectAll('.slider')
@@ -112,11 +109,11 @@ export function LifelineView(container_, state_) {
 
 
   function resize() {
-    let rw = parseInt(root.style('width'));
-    let rh = parseInt(root.style('height'));
+    let rw = container.width; // parseInt(root.style('width'));
+    let rh = container.height; // parseInt(root.style('height'));
     let ch = parseInt(root.select('.config').style('height'));
 
-    tree.set_size(rw, rh - ch);
+    tree.set_size(rw-20, rh - ch);
   }
 
   function on_open() {

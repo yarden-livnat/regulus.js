@@ -10,7 +10,7 @@ import config from './config';
 import Group from './group';
 import XAxis from './x_axis';
 import template from './details_view.html';
-import './style.css';
+import './style.scss';
 
 
 // TODO: simplify or break up code
@@ -58,12 +58,12 @@ export function DetailsView(container_, state_) {
   root = d3.select(container.getElement()[0]);
   root.html(template);
 
-  root.select('.config').select('#color-by')
+  root.select('.config').select('.color-by')
     .on('change', function (d) {
       select_color(this.value);
     });
 
-  root.select('.config').select('#cmap')
+  root.select('.config').select('.cmap')
     .on('change', function (d) {
       select_cmap(chromatic['interpolate' + this.value])
     })
@@ -189,17 +189,17 @@ export function DetailsView(container_, state_) {
   }
 
   function show_dims() {
-    let list = root.select('.config .dims-list')
-      .selectAll('div')
-      .data(dims, d => d.name);
-
-    list.enter()
-      .append('div')
-      .attr('class', 'dim-ctrl')
-      .on('click', dim_clicked)
-      .merge(list)
-      .text(d => d.name);
-    list.exit().remove();
+    // let list = root.select('.config .dims-list')
+    //   .selectAll('div')
+    //   .data(dims, d => d.name);
+    //
+    // list.enter()
+    //   .append('div')
+    //   .attr('class', 'dim-ctrl')
+    //   .on('click', dim_clicked)
+    //   .merge(list)
+    //   .text(d => d.name);
+    // list.exit().remove();
 
     let axis = root.select('.dims').selectAll('.dim')
       .data(dims.filter(d => !d.disabled));

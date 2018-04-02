@@ -1,21 +1,25 @@
 <div class="details_view">
+
   <div class="config">
-    <div>
-      <div>
-        <label>Color by: <select id="color-by"></select></label>
-        <label>Color map: <select id="cmap"></select></label>
-      </div>
-      <label>Show filtered <input type="checkbox" id="details_show_filtered"></label>
-      <label>Show regression <input type="checkbox" id="details_show_regression"></label>
-      <!--<label>Use canvas <input type="checkbox" id="details_use_canvas"></label>-->
+    <div class="d-flex flex-row justify-content-start align-items-center">
+
+      <div class="p-2">Color by</div>
+      <select class="custom-select-sm color-by"></select>
+
+      <div class="m-6">Colormap</div>
+      <select class="custom-select-sm cmap"></select>
+
+      <input type="checkbox" id="details_show_filtered" >
+      <div class="p-2">Filtered</div>
+      <input type="checkbox" id="details_show_regression" >
+      <div class="p-2">Regression</div>
     </div>
-    <div class='dims-list'>
-    </div>
+
+    <div class='dims-list'></div>
   </div>
 
   <div class="details">
     <div class="dims"></div>
     <div class="groups"></div>
   </div>
-
-  </div>
+</div>

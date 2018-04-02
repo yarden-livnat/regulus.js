@@ -30,7 +30,6 @@ export default function Slider() {
     let defs = svg.select('defs');
 
     let g = defs
-      .each(d => console.log(d))
       .append('linearGradient')
       .attr('id', d => `slider-gradient-${d.id}`)
       .attr('x1', '0%')
@@ -64,7 +63,6 @@ export default function Slider() {
       if (isNaN(width) || isNaN(height))
         return;
 
-      console.log('slider2: ', d.id, width, height);
       let g = svg.selectAll('g')
         .data([1]).enter()
         .append('g')

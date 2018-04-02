@@ -95,52 +95,6 @@ body text {
 }
 
 
-.drop-btn {
-  //font: $font;
-  font-size: 12pt;
-  border: none;
-}
-
-.dropdown {
-  position: relative;
-  display: inline-block;
-
-  &:hover .dropdown-content {
-    display:block;
-  }
-
-  &:hover .drop-btn {
-    background-color: #ccc;
-  }
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f0f0f0;
-  min-width: 40px;
-  box-shadow: 5px 6px 6px 0 rgba(0, 0, 0, 0.6);
-  z-index: 10;
-
-  .dropdown-item {
-    padding: 5px;
-  }
-
-  .dropdown-item:hover {
-    background-color: #ddd;
-  }
-}
-
-
-.sync {
-  display: inline-block;
-
-  &:hover {
-    //border: 1px solid gray;
-    background-color: #ccc;
-  }
-}
-
 .cogs {
   color: gray;
   display: inline;

@@ -195,15 +195,20 @@ export default function Lifeline() {
   }
 
   function lifeline(selection) {
+    width = parseInt(selection.style('width'));
+    height = parseInt(selection.style('height'));
+
     svg = selection
-      .append('svg')
-        .attr('class', 'lifeline')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
+      // .append('svg')
+      .classed('lifeline', true)
+        // .dattr('width', width + margin.left + margin.right)
+        // .attr('height', height + margin.top + margin.bottom)
       .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
     svg.append('g')
       .attr('class', 'nodes');
+
+
 
     svg.append('g')
       .attr('class', 'names');
