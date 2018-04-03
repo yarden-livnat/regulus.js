@@ -359,17 +359,11 @@ def save_param(regulus, measures, k, b, n, g, G, type):
             msc['params'] = '-k '+str(k)+' -b '+str(b)+' -n '+n+' -g '+g+' -G '+G
             msc['topo'] = type
 
-<<<<<<< HEAD
-
-def set_param(k, b, n, g, G):
-    return '-k '+str(k)+' -b '+str(b)+' -n '+n+' -g '+g+' -G '+G
-=======
 def set_param(k, b, n, g, G, topo, type):
     if type =='':
         return '-k '+str(k)+' -b '+str(b)+' -n '+n+' -g '+g+' -G '+G + ' -t '+topo
     else:
         return '-k '+str(k)+' -b '+str(b)+' -n '+n+' -g '+g+' -G '+G + ' -t '+topo + ' '+type
->>>>>>> add regulusfile and pca
 
 
 def compute_topology(regulus, k = None, b = None, n = None, g = None, G = None, topo = None,  debug=None):#k = None, b = None, n = None, g = None, G = None):
