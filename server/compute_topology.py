@@ -399,7 +399,6 @@ def compute_topology(regulus, k = None, b = None, n = None, g = None, G = None, 
             x = msc.X
             y = msc.Y
 
-
             if type == 'descending':
                 tmp = Post(debug) \
                     .data(y) \
