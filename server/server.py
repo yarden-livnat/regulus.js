@@ -4,7 +4,7 @@ from bottle import Bottle, run, static_file, post, request
 from pathlib import Path
 import json
 import argparse
-from sample import create_reg, compute_msc, pts2json
+from sample import resample2, get_sample#, pts2json#create_reg, compute_msc, pts2json, resample2
 from compute import compute
 
 p = argparse.ArgumentParser(description='Regulus server')
@@ -68,15 +68,19 @@ def recompute():
     return json.dumps(job['id'])
 
 @app.post('/request_samples')
-def validate():
-    spec = request.json
-    print('validate request received', spec)
-    reg_file = create_reg(spec, data_dir)
-    if reg_file == 0:
-        return json.dumps("Can't resample provided data")
-    else:
-        return json.dumps(pts2json(reg_file))
+def get_samples():
+    try:
+        spec = request.json
+        print('sample request received', spec)
+        #reg_file = create_reg(spec, data_dir)
+        new_samples = get_sample(spec, data_dir)
+        #if reg_file == 0:
+        #else:
+        return json.dumps(new_samples) #json.dumps(pts2json(reg_file))
 
+    except Exception as e:
+        print(e)
+        return json.dumps("Can't resample provided data")
 
 @app.route('/status/<job_id>')
 def status(job_id):
@@ -104,9 +108,10 @@ def new_job():
 def resample_job(job, spec):
     job['status'] = 'running'
     try:
-        reg_file = create_reg(spec, data_dir)
-        code = compute_msc(reg_file)
-        print("code",code)
+        #reg_file = create_reg(spec, data_dir)
+        #code = compute_msc(reg_file)
+        #print("code",code)
+        code = resample2(spec, data_dir)
         with jobs_lock:
             job['status'] = 'done' if code == 0 else 'error'
             job['code'] = code

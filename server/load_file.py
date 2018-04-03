@@ -14,8 +14,6 @@ def create_from_csv(filename, name, ndims, sim_method):
         reader = csv.reader(f)
         header = next(reader)
         data = [[float(x) for x in row] for row in reader]
-        # data = [p for p in data if p[-1] > 700]
-        # print('new len', len(data))
 
         if ndims is None:
             ndims = len(header) - 1
@@ -79,4 +77,33 @@ def load_file(filename, dim = None, measure = None, col = None, name = None, sim
     data = np_data.tolist()
     regulus['pts'] = data
 
+    return regulus
+
+
+def get_file(spec = None, version = None, name = None, dir = None):
+    if dir is not None:
+        cur_dir = dir
+    else:
+        cur_dir = Path('.')
+
+    if spec is not None:
+        # spec is the file from
+        name = spec['name']
+        version = spec['version']
+        get_file(name = name, version = version, dir = cur_dir)
+
+    else:
+
+        if (cur_dir / (name +'.'+ version + '.json')).exists():
+            regulus = load_file(cur_dir/(name + '.'+ version + '.json'))
+
+        elif (cur_dir/(name +'.json')).exists():
+            regulus = load_file(cur_dir/(name + '.json'))
+
+        else:
+            print("Can not find old regulus file")
+        #elif (cur_dir/(name +'_mc'+'.json')).exists():
+        #    load_file(filename = name + '_mc'+'.json', dir= cur_dir)
+        #elif (cur_dir/(name +'_mc'+version +'.json')).exists():
+        #    self.load_reg_json(filename = name + '_mc'+version +'.json', dir= cur_dir)
     return regulus
