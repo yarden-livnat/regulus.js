@@ -30,13 +30,20 @@ def update_partition(partition, idx, pts, ndims, measure, n_com):
     #reg = linear_model.LinearRegression()
     #reg.fit(x, y)
 
-    partition['model'] = {
-        "pca": {
-            "components": X.tolist(),
-            "y": y.tolist()
+    if 'model' not in partition:
+        partition['model'] = {
+            "pca": {
+                "components": X.tolist(),
+                "y": y.tolist()
+                }
+        #    'fitness': reg.score(x,y)
             }
-    #    'fitness': reg.score(x,y)
-        }
+    else:
+        partition['model']['pca'] = \
+            {
+                "components": X.tolist(),
+                "y": y.tolist()
+            }
 
 
 def update_msc(msc, pts, ndims, measure, n_com):
