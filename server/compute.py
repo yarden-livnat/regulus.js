@@ -23,17 +23,17 @@ def decode(param_received):
     return newparams
 def update_params(reg, spec):
 
-    newparams = decode(spec["params"])
+    #newparams = decode(spec["params"])
 
+    #newparams = spec["params"]
 
-    for key, value in newparams.items():
-        if value!= '':
-            for msc in reg.mscs:
-                msc["params"][key] = value
+    #for key, value in newparams.items():
+    #    if value!= '':
+    #        for msc in reg.mscs:
+    #            msc["params"][key] = value
 
     reg.name = spec["name"]
     reg.version = spec["new_version"]
-
 
 
 def compute(spec, data_dir):
@@ -43,22 +43,13 @@ def compute(spec, data_dir):
     reg_file.load_reg_json(spec=spec, dir=data_dir)
 
     update_params(reg_file, spec)
+
     dims = len(reg_file.dims)
     name = reg_file.name
     updated_json = reg_file.save_json(dir=data_dir)
 
     status = {}
-    status = subprocess.run(['python', 'post.py', '-d', str(dims), '--p', '--morse', updated_json])
-
-    #status = subprocess.run(['python', 'post.py', '-d', str(dims), '--name', name, '--p', updated_json])
-
-    #if reg_file.name == 'test':
-    #    status = subprocess.run(['python', 'post.py', '-d', dims, '--name', name, '-p', 1, updated_json])
-    #elif reg_file.name == 'deployment':
-    #    status = subprocess.run(['python', 'post.py', '-d', dims, '--name', name, '-p', 1, updated_json])
-    #else:
-    #    print("Can't resample for selected data")
-    #    exit(255)
+    status = subprocess.run(['python', 'create_reg.py', '-d', str(dims), spec['params'],updated_json])
 
     linear_fit(updated_json)
 

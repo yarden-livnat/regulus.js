@@ -1,13 +1,8 @@
+from topopy.MorseSmaleComplex import MorseSmaleComplex as MSC
 import numpy as np
+from collections import defaultdict
 import json
 import csv
-import argparse
-from pathlib import Path
-from collections import defaultdict
-from datetime import date
-from getpass import getuser
-
-from topopy.MorseSmaleComplex import MorseSmaleComplex as MSC, TopologicalObject
 
 
 class Merge(object):
@@ -289,14 +284,16 @@ class Post(object):
     # save
     #
 
-    def get_tree(self, name, params=''):
+    def get_tree(self, name, params='', topo = '', type = ''):
         partitions = []
         self.collect(self.root, partitions)
         tree = {
             'name': name,
             'params': params,
             'partitions': partitions,
-            'pts_idx': self.pts
+            'pts_idx': self.pts,
+            'topo': topo,
+            'type': type
         }
         return tree
 
@@ -355,172 +352,75 @@ class Post(object):
                 self.stat(child, levels)
 
 
-def create_from_csv(filename, name, ndims):
-    with open(filename) as f:
-        reader = csv.reader(f)
-        header = next(reader)
-        data = [[float(x) for x in row] for row in reader]
-        # data = [p for p in data if p[-1] > 700]
-        # print('new len', len(data))
+def save_param(regulus, measures, k, b, n, g, G, type):
+    for msc in regulus['mscs']:
+        measure = msc['name']
+        if measure in measures:
+            msc['params'] = '-k '+str(k)+' -b '+str(b)+' -n '+n+' -g '+g+' -G '+G
+            msc['topo'] = type
 
-        if ndims is None:
-            ndims = len(header) - 1
-
-        regulus = {
-            'name': name,
-            'version': '1',
-            'dims': header[0:ndims],
-            'measures': header[ndims:],
-            'notes': [{"date": str(date.today()), "author": getuser()}],
-            'pts': data,
-            'mscs': []
-        }
-        return regulus
-
-
-def load_regulus(filename):
-    with open(filename) as f:
-        regulus = json.load(f)
-        return regulus
-
-
-def save_regulus(filename, regulus):
-    #print("Post_filename", filename)
-    with open(filename, 'w') as f:
-        json.dump(regulus, f, indent=2)
-
-
-def post(args=None):
-    p = argparse.ArgumentParser(prog='analyze', description='Extract input dimension and a single measure')
-    p.add_argument('filename', help='input file [.csv data file or a regulus .json file]')
-    p.add_argument('-k', '--knn', type=int, default=100, help='knn')
-    p.add_argument('-b', '--beta', type=float, default=1.0, help='beta')
-    p.add_argument('-n', '--norm', default='feature', help='norm')
-    p.add_argument('-g', '--gradient', default='steepest', help='gradient')
-    p.add_argument('-G', '--graph', default='relaxed beta skeleton', help='graph')
-
-    p.add_argument('--p', action='store_true', help='use parameters in json')
-    p.add_argument('-o', '--out', help='use parameters in json')
-
-    p.add_argument('-d', '--dims', type=int, default=None, help='number of input dimensions')
-    p.add_argument('-m', '--measure', default=None, help='measure name')
-    p.add_argument('-c', '--col', type=int, default=None, help='measure column index starting at 0')
-
-    p.add_argument('--name', default=None, help='dataset name')
-    p.add_argument('--morse', default='smale', choices=['smale', 'ascend', 'descend'], help='type of complex to compute')
-
-    p.add_argument('--debug', action='store_true', help='process all measures')
-
-    ns = p.parse_args(args)
-
-    filename = Path(ns.filename)
-    path = filename.parent
-
-    catalog = {}
-    regulus = None
-    measures = []
-
-    if filename.suffix == '.csv':
-        print(filename.stem)
-        regulus = create_from_csv(filename, ns.name or filename.stem or path.name, ns.dims)
-    elif filename.suffix == '.json':
-        regulus = load_regulus(filename)
+def set_param(k, b, n, g, G, topo, type):
+    if type =='':
+        return '-k '+str(k)+' -b '+str(b)+' -n '+n+' -g '+g+' -G '+G + ' -t '+topo
     else:
-        print('Unknown input file type')
-        exit(255)
+        return '-k '+str(k)+' -b '+str(b)+' -n '+n+' -g '+g+' -G '+G + ' -t '+topo + ' '+type
 
-    ndims = len(regulus['dims'])
 
-    if ns.col is not None:
-        measures = regulus['measures'][ns.col:ns.col]
-    elif ns.measure is not None:
-        measures = [regulus['measures'].index(ns.measure)]
-    else:
-        measures = regulus['measures']
+def compute_topology(regulus, k = None, b = None, n = None, g = None, G = None, topo = None,  debug=None):#k = None, b = None, n = None, g = None, G = None):
 
-    data = regulus['pts']
+    type = ''
 
-    np_data = np.array(data)
-    x = np_data[:, 0:ndims]
-    y = np_data[:, ndims:]
-
-    x, y = TopologicalObject.aggregate_duplicates(x, y)
-
-    np_data = np.concatenate((x, y), axis=1)
-    data = np_data.tolist()
-    regulus['pts'] = data
-
-    if ns.p:
-        param_in_file = regulus['mscs'][0]["params"]
-        if type(param_in_file) is dict:
-            if "k" in param_in_file:
-                ns.knn = param_in_file["k"]
-            if "b" in param_in_file:
-                ns.beta = param_in_file["b"]
-            if "n" in param_in_file:
-                ns.norm = param_in_file["n"]
-            if "G" in param_in_file:
-                ns.graph = param_in_file["G"]
-            if "g" in param_in_file:
-                ns.gradient = param_in_file["g"]
-
+    if topo != 'morse-smale':
+        if 'ascend' in topo:
+            type = 'ascending'
+            topo = 'morse'
+        else:
+            type = 'descending'
+            topo = 'morse'
 
     mscs = dict()
     for msc in regulus['mscs']:
         mscs[msc['name']] = msc
 
-    #params = '-k {} -b {} -n {} -G "{}" -g {}'.format(ns.knn, ns.beta, ns.norm, ns.graph, ns.gradient)
-    params = {}
-    params['k'] = ns.knn
-    params['b'] = ns.beta
-    params['n'] = ns.norm
-    params['G'] = ns.graph
-    params['g'] = ns.gradient
+    measures = regulus['measures']
+    ndims = len(regulus['dims'])
+
+    data = regulus['pts']
+    np_data = np.array(data)
+    x = np_data[:, 0:ndims]
 
     for i, measure in enumerate(measures):
         try:
             print('\npost ', measure)
             y = np_data[:, ndims+i]
-            msc = MSC(ns.graph, ns.gradient, ns.knn, ns.beta, ns.norm, debug=True, aggregator='mean')  # connect=True
+            msc = MSC(G, g, k, b, n, debug=True, aggregator='mean')  # connect=True
             msc.build(X=x, Y=y, names=regulus['dims']+[measure])
 
             x = msc.X
             y = msc.Y
 
-            if ns.morse == 'descend':
-                tmp = Post(ns.debug) \
+            if type == 'descending':
+                tmp = Post(debug) \
                     .data(y) \
                     .msc(msc.descending_partitions, msc.max_hierarchy)
-            elif ns.morse == 'ascend':
-                tmp = Post(ns.debug) \
+            elif type == 'ascending':
+                tmp = Post(debug) \
                     .data(y) \
                     .msc(msc.ascending_partitions, msc.min_hierarchy)
             else:
-                tmp = Post(ns.debug) \
+                tmp = Post(debug) \
                     .data(y) \
                     .msc(msc.base_partitions, msc.hierarchy)
+
+            params = set_param(k,b,n,g,G,topo,type)
 
             mscs[measure] = tmp \
                 .build() \
                 .verify() \
-                .get_tree(measure, params)
+                .get_tree(measure, params, topo, type)
 
         except RuntimeError as error:
             print(error)
 
     regulus['mscs'] = list(mscs.values())
-    #print("filename",filename)
-    if ns.out:
-        out = ns.out
-    elif ns.morse == 'ascend':
-        out = filename.with_name(filename.stem+'_ascend')
-    elif ns.morse == 'descend':
-        out = filename.with_name(filename.stem + '_descend')
-    else:
-        out = filename
-    #print(out)
-    save_regulus(out.with_suffix('.json'), regulus)
-
-
-if __name__ == '__main__':
-    post()
+    return regulus
