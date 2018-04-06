@@ -1,6 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const DelWebpackPlugin = require('del-webpack-plugin')
 
 module.exports = {
   mode: 'development',
@@ -14,7 +14,10 @@ module.exports = {
     }
   },
   plugins: [
-    new CleanWebpackPlugin(['dist'], /*{watch: true}*/),
+    new DelWebpackPlugin({
+      info: true,
+      exclude: ['vendors*.js']
+    }),
     new HtmlWebpackPlugin({
       template: './src/app/index.html'
     }),

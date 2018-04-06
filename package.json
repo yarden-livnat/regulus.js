@@ -31,8 +31,9 @@
     "validate.io-function": "^1.0.2"
   },
   "devDependencies": {
-    "clean-webpack-plugin": "^0.1.18",
     "css-loader": "^0.28.10",
+    "del-webpack-plugin": "^1.0.4",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^1.1.9",
     "html-loader": "^1.0.0-alpha.0",
     "html-webpack-plugin": "^3.1.0",
