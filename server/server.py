@@ -55,6 +55,7 @@ def resample():
     thread.start()
     return json.dumps(job['id'])
 
+
 @app.post('/recompute')
 def recompute():
     spec = request.json
@@ -66,6 +67,7 @@ def recompute():
     thread = threading.Thread(target=recompute_job, args=[job, spec])
     thread.start()
     return json.dumps(job['id'])
+
 
 @app.post('/request_samples')
 def validate():
@@ -118,7 +120,6 @@ def resample_job(job, spec):
         #job['status'] = 'done' if code == 0 else 'error'
         job['code'] = code
     print('job {} done with code:{}'.format(job['id'], code))
-
 
 
 def recompute_job(job, spec):
