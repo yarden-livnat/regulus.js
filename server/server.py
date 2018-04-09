@@ -9,6 +9,7 @@ from regulus.update.refine_topo import refine, get_sample
 from regulus.update.recompute_topo import recompute_topo
 
 
+
 p = argparse.ArgumentParser(description='Regulus server')
 p.add_argument('-d', '--data', default=None, help='data directory')
 args = p.parse_args()
@@ -93,6 +94,7 @@ def get_samples():
         print("Error, Could not get new samples")
 
 
+
 @app.route('/status/<job_id>')
 def status(job_id):
     print('status', job_id)
@@ -141,6 +143,7 @@ def recompute_job(job, spec):
         with jobs_lock:
             job['status'] = 'done' if code == 0 else 'error'
             job['code'] = code
+
 
     except Exception as e:
         print(e)
