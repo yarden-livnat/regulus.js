@@ -83,6 +83,9 @@ def get_samples():
         print(e)
         return json.dumps("Can't resample provided data")
 
+    except Exception as e:
+        print(e)
+        print("Error, Could not get new samples")
 
 @app.route('/status/<job_id>')
 def status(job_id):
@@ -115,21 +118,29 @@ def resample_job(job, spec):
         with jobs_lock:
             job['status'] = 'done' if code == 0 else 'error'
             job['code'] = code
+        print('job {} done with code:{}'.format(job['id'], code))
+
     except Exception as e:
         print(e)
         print("Error, Job Not Finished")
         code = 1
         job['code'] = code
-    print('job {} done with code:{}'.format(job['id'], code))
 
 
 def recompute_job(job, spec):
     job['status'] = 'running'
-    code = update_topo(spec, data_dir)
-    print('job {} done with code:{}'.format(job['id'], code))
-    with jobs_lock:
-        job['status'] = 'done' if code == 0 else 'error'
-        job['code'] = code
+    try:
+        code = update_topo(spec, data_dir)
+        print('job {} done with code:{}'.format(job['id'], code))
+        with jobs_lock:
+            job['status'] = 'done' if code == 0 else 'error'
+            job['code'] = code
 
+
+    except Exception as e:
+        print(e)
+        print("Error, Job Not Finished")
+        code = 1
+        job['code'] = code
 
 run(app, host='localhost', port=8081, debug=True, reloader=True)
