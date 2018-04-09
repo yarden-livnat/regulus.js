@@ -8,7 +8,6 @@ import argparse
 from regulus.update.update_reg import get_newreg, get_sample
 from regulus.update.update_topo import update_topo
 
-
 p = argparse.ArgumentParser(description='Regulus server')
 p.add_argument('-d', '--data', default=None, help='data directory')
 args = p.parse_args()
@@ -81,7 +80,8 @@ def get_samples():
 
     except Exception as e:
         print(e)
-        print("Error, Could not get new samples")
+        print("Error, Could not resample provided data")
+
 
 @app.route('/status/<job_id>')
 def status(job_id):
@@ -137,5 +137,6 @@ def recompute_job(job, spec):
         print("Error, Job Not Finished")
         code = 1
         job['code'] = code
+
 
 run(app, host='localhost', port=8081, debug=True, reloader=True)
