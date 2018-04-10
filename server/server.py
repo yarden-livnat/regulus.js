@@ -5,8 +5,8 @@ from pathlib import Path
 import json
 import argparse
 
-from regulus.update.update_reg import get_newreg, get_sample
-from regulus.update.update_topo import update_topo
+from regulus.update.refine_topo import refine, get_sample
+from regulus.update.recompute_topo import recompute_topo
 
 
 p = argparse.ArgumentParser(description='Regulus server')
@@ -120,7 +120,7 @@ def resample_job(job, spec):
     job['status'] = 'running'
     try:
 
-        code = get_newreg(spec, data_dir)
+        code = refine(spec, data_dir)
         with jobs_lock:
             job['status'] = 'done' if code == 0 else 'error'
             job['code'] = code
@@ -136,7 +136,7 @@ def resample_job(job, spec):
 def recompute_job(job, spec):
     job['status'] = 'running'
     try:
-        code = update_topo(spec, data_dir)
+        code = recompute_topo(spec, data_dir)
         print('job {} done with code:{}'.format(job['id'], code))
         with jobs_lock:
             job['status'] = 'done' if code == 0 else 'error'
