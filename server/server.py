@@ -8,7 +8,6 @@ import argparse
 from regulus.update.refine_topo import refine, get_sample
 from regulus.update.recompute_topo import recompute_topo
 
-
 p = argparse.ArgumentParser(description='Regulus server')
 p.add_argument('-d', '--data', default=None, help='data directory')
 args = p.parse_args()
