@@ -133,6 +133,7 @@ export function DetailsView(container_, state_) {
 
 
   function reset(data) {
+    //console.log(data);
     partitions = [];
     msc = data;
     measure = msc.measure;

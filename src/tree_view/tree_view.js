@@ -144,24 +144,29 @@ export function LifelineView(container_, state_) {
   function process_data() {
     if (!msc) return;
     visit(msc.tree, 'parent_similarity', node => node.parent);
-
+    visit(msc.tree, 'fitness');
     visit(msc.tree, 'sibling_similarity', sibling );
     msc.partitions.forEach( p => p.model.minmax = p.minmax);
 
 
     function visit(node, feature, func) {
-      let other = func(node);
-      if (other) {
-        let c = node.model.linear_reg.coeff;
-        let o = other.model.linear_reg.coeff;
+      if (feature != 'fitness'){
+        let other = func(node);
+        if (other) {
+          let c = node.model.linear_reg.linear_reg.coeff;
+          let o = other.model.linear_reg.linear_reg.coeff;
 
-        if (c.norm === undefined) c.norm = norm(c);
-        if (o.norm === undefined) o.norm = norm(o);
 
-        node.model[feature] = dot(c,o)/(c.norm * o.norm);
-      } else {
-        node.model[feature] = 1;
+          if (c.norm === undefined) c.norm = norm(c);
+          if (o.norm === undefined) o.norm = norm(o);
+
+          node.model[feature] = dot(c,o)/(c.norm * o.norm);
+        } else {
+          node.model[feature] = 1;
+        }
       }
+      else
+          node.model[feature] = node.model.linear_reg.fitness;
       for (let child of node.children)
         visit(child, feature, func);
     }

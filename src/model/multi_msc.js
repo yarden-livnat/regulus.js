@@ -32,9 +32,15 @@ export class MultiMSC {
 
     // this.tree = [];
     this.mscs = new Map();
-    for (let d of _.mscs) {
-      this.mscs.set(d.name, new MSC(d, this));
+
+    for (let d in _.morse.complexes) {
+
+      this.mscs.set(d, new MSC(_.morse.complexes[d], this, d));
+
     }
+    //for (let d of _.mscs) {
+    //  this.mscs.set(d.name, new MSC(d, this));
+    //}
 
     this.as_partition = new Partition( {
       id: 'ALL',
