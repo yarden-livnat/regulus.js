@@ -4,8 +4,9 @@
     <!-- 1959 to 2211 -->
     <startyear>1959</startyear>
     <startmonth>1</startmonth>
-    <!--<duration>3024</duration>-->
-    <duration>2400</duration>
+    <duration>3024</duration>
+    <!--<duration>2400</duration>-->
+    <explicit_inventory>true</explicit_inventory>
   </control>
 
   <archetypes>
