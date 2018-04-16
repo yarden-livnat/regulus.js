@@ -18,6 +18,7 @@ export default function BoxPlot() {
 
   // For each small multiple…
   function box(selection) {
+
     selection
         .each(function (d, i) {
           let svg = d3.select(this);
@@ -61,6 +62,7 @@ export default function BoxPlot() {
           // Update center line: the vertical line spanning the whiskers.
           let center = g.selectAll("line.center")
             .data([[min, max]]);
+
 
           center.enter().insert("line", "rect")
             .attr("class", "center")

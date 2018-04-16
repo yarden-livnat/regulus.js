@@ -25,9 +25,10 @@ function build_tree(partitions){
 }
 
 export class MSC {
-  constructor(_, shared) {
-    this.name = _.name;
-    this.version = _.version;
+  constructor(_, shared, name) {
+
+    this.name = name;//shared.name;
+    this.version = shared.version;
     this.shared = shared;
     this.parms = _.params;
     this.pts_idx = _.pts_idx;
@@ -39,7 +40,7 @@ export class MSC {
 
     this.partitions = _.partitions.map(p => new Partition(p, this));
     this.tree = build_tree(this.partitions);
-
+    //Change
     this.measure = shared.measures.find( m => m.name === this.name);
 
     this.minmax = this.partitions[0].minmax;

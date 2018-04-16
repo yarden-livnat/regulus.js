@@ -165,9 +165,10 @@ export function PartitionView(container_, state_) {
       .property('value', current && current.notes || "")
       .attr('disabled', current ? null : true);
 
-    let stat = current && Array.from(current.statistics.values()) || [];
+    let stat = current && current.size!=0 && Array.from(current.statistics.values()) || [];
 
     let all = stat.sort( (a, b) => a.type === b.type ? (a.name < b.name ? -1 : 1) : a.type === 'dim' ? -1 : 1);
+
     show(all);
 
     if (init && shared_msc) {
@@ -200,6 +201,7 @@ export function PartitionView(container_, state_) {
       .on('click', select_measure)
       .text(d => d.name);
     labels.exit().remove();
+
 
     let boxes = root.select('.pv_stat_grid').selectAll('.pv_box')
       .data(data);
