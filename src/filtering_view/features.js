@@ -112,9 +112,11 @@ export default function Features() {
   function add_minmax_feature() {
     let name = 'minmax';
     let domain = [0, 1];
-    let cmap = chromatic['interpolateRdYlBu'];
+    // let cmap = chromatic['interpolateRdYlBu'];
     // let colorScale = d3.scaleSequential(cmap).domain(domain);
-    let colorScale = d3.scaleLinear().domain(domain).range(['#bce2fe', /*'#fffebe',*/ '#fd666e']);
+    // let colorScale = d3.scaleLinear().domain(domain).range(['#bce2fe', '#fffebe', '#fd666e']);
+    let cmap = ['#bce2fe', '#fffebe', '#fd666e'];
+    let colorScale = d3.scaleSequential(d3.interpolateRgbBasis(cmap)).domain([0, 1]);
 
     features.push({
       id: 3, name: name, label: 'min max',

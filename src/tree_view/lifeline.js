@@ -46,7 +46,6 @@ export default function Lifeline() {
 
   function update_front() {
     if (!svg) return;
-    // return;
 
     nodes.forEach(node => node.front = node.on_path = false);
     if (root && root.model)
@@ -114,16 +113,19 @@ export default function Lifeline() {
   }
 
   function render(items = null) {
-    if (!svg) return;
+    if (!svg || !feature) return;
 
     items = items || nodes;
     svg.select('.x').call(x_axis);
     svg.select('.y').call(y_axis);
 
+    let c= feature.colorScale;
+    let [dmin, dmax] = c.domain();
+    let dmid = (dmin+dmax)/2;
 
     let gradients = svg.select('defs').selectAll('linearGradient')
       .data(color_by === 'minmax' ? items : [],
-          d => `g-${d.id}`);
+          d => d.id);
 
     let defs = gradients.enter()
       .append('linearGradient')
@@ -132,14 +134,41 @@ export default function Lifeline() {
       .attr('x2', '0%').attr('y2', '100%');
 
     defs.append('stop')
+
       .attr('offset', '0%')
-      .attr('stop-color', d => color(d.minmax[d.parent && d.parent.merge === 'min' ? 0 : 1]))
+      .attr('stop-color', d => c(d.minmax[d.parent && d.parent.merge === 'min' ? 0 : 1]))
+      .attr('opacity', 1);
+
+    defs.append('stop')
+      .attr('offset', d => `${d.mid_percent}%`)
+      .attr('stop-color', d => c(d.mid_value))
       .attr('opacity', 1);
 
     defs.append('stop')
       .attr('offset', '100%')
-      .attr('stop-color', d => color(d.minmax[d.parent && d.parent.merge === 'min' ? 1 : 0]))
+      .attr('stop-color', d => c(d.minmax[d.parent && d.parent.merge === 'min' ? 1 : 0]))
       .attr('opacity', 1);
+
+    let update = defs.merge(gradients)
+      .each( d => {
+        let [pmin, pmax] = d.minmax;
+        if (pmin <= dmid && dmid <= pmax) {
+          d.mid_percent = Math.round(100 * (dmid - pmin) / (pmax - pmin));
+          d.mid_value = dmid;
+        }
+        else {
+          d.mid_percent = 0;
+          d.mid_value = pmin;
+        }
+      });
+
+    update.select(':first-child')
+      .attr('stop-color', d => c(d.minmax[d.parent && d.parent.merge === 'min' ? 0 : 1]));
+    update.select(":nth-child(2)")
+      .attr('offset', d => `${d.mid_percent}%`)
+      .attr('stop-color', d => c(d.mid_value));
+    update.select(':nth-child(3')
+      .attr('stop-color', d => c(d.minmax[d.parent && d.parent.merge === 'min' ? 1 : 0]));
 
     gradients.exit().remove();
 
@@ -229,6 +258,8 @@ export default function Lifeline() {
         .attr('dy', '1em')
         .style('text-anchor', 'middle')
         .text('Persistence');
+
+    g.append('defs');
 
     svg = selection.merge(g);
 
@@ -399,7 +430,8 @@ export default function Lifeline() {
     return this;
   };
 
-  lifeline.color_by = function(feature) {
+  lifeline.color_by = function(_) {
+    feature = _;
     color_by = feature.name;
     color = feature.color;
     render();
