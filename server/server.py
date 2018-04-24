@@ -82,9 +82,6 @@ def get_samples():
         print(e)
         return json.dumps("Can't resample provided data")
 
-    except Exception as e:
-        print(e)
-        print("Error, Could not get new samples")
 
 @app.route('/status/<job_id>')
 def status(job_id):
@@ -135,11 +132,11 @@ def recompute_job(job, spec):
             job['status'] = 'done' if code == 0 else 'error'
             job['code'] = code
 
-
     except Exception as e:
         print(e)
         print("Error, Job Not Finished")
         code = 1
         job['code'] = code
+
 
 run(app, host='localhost', port=8081, debug=True, reloader=True)
