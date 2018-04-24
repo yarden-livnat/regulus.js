@@ -48,7 +48,7 @@ export default function Features() {
 
   function add_fitness_feature() {
     let name = 'fitness';
-    let domain = [0.8, 1];
+    let domain = [-1, 1];
     //let cmap = ["#3e926e", "#f2f2f2", "#9271e2"];
     // let cmap = ['thistle', 'lightyellow', 'lightgreen'];
     // let colorScale = d3.scaleSequential(d3.interpolateRgbBasis(cmap)).domain(domain);
