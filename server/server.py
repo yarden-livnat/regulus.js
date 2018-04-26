@@ -72,13 +72,6 @@ def recompute():
 
 
 
-@app.post('/request_samples')
-def get_samples():
-    try:
-        spec = request.json
-        print('sample request received', spec)
-        new_samples = get_sample(spec, data_dir)
-        return json.dumps(new_samples)  # json.dumps(pts2json(reg_file))
 
 @app.post('/request_samples')
 def get_samples():
@@ -150,10 +143,5 @@ def recompute_job(job, spec):
         code = 1
         job['code'] = code
 
-    except Exception as e:
-        print(e)
-        print("Error, Job Not Finished")
-        code = 1
-        job['code'] = code
 
 run(app, host='localhost', port=8081, debug=True, reloader=True)
