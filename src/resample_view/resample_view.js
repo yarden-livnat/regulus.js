@@ -228,6 +228,8 @@ export function ResampleView(contianer_, state_) {
                 parsed_params[cur_arg] = cur_val;
 
             }
+            else
+                return {};
         }
         return parsed_params;
 

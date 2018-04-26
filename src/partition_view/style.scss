@@ -112,6 +112,22 @@
       grid-column: 4;
       grid-row: 5;
     }
+
+    .pv_correlation_label {
+      grid-column: 1 / span 2;
+      grid-row: 6;
+    }
+
+    .pv_parent_correlation {
+      grid-column: 3;
+      grid-row: 6;
+    }
+
+    .pv_sibling_correlation {
+      grid-column: 4;
+      grid-row: 6;
+    }
+
   }
 
 

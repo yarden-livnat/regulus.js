@@ -25,9 +25,11 @@ export default function Features() {
 
   add_fitness_feature();
   add_parent_feature();
-  add_sibling_feature();
+  add_sibling_feature()
   add_minmax_feature();
   add_no_cmap();
+  add_parent_correlation_feature();
+  add_sibling_correlation_feature();
 
   let idx = +localStorage.getItem('feature.color_by') || 0;
   model.color_by= features[idx];
@@ -109,6 +111,8 @@ export default function Features() {
     });
   }
 
+
+
   function add_minmax_feature() {
     let name = 'minmax';
     let domain = [0, 1];
@@ -140,6 +144,48 @@ export default function Features() {
       color: p => 'white',
       interface: false
     });
+  }
+
+  function add_parent_correlation_feature() {
+      let name = 'parent_correlation';
+      let domain = [-1, 1];
+      // let cmap = ["#4472a5", "#f2f2f2", "#d73c4a"];
+      // let cmap = ['thistle', 'lightyellow', 'lightgreen'];
+      // let colorScale = d3.scaleSequential(d3.interpolateRgbBasis(cmap)).domain(domain);
+
+      features.push({
+          id: 5, name: name, label: 'parent correlation',
+          domain: domain,
+          cmp: (a, b) => a < b,
+          filter: AttrRangeFilter(name, domain),
+          active: false,
+          cmap: cmap,
+          colorScale: colorScale,
+          color: p => colorScale(p.model[name]),
+          ticks:{n: 4, format:'.2f'},
+          interface: true
+      });
+  }
+
+  function add_sibling_correlation_feature() {
+      let name = 'sibling_correlation';
+      let domain = [-1, 1];
+      // let cmap = ["#4472a5", "#f2f2f2", "#d73c4a"];
+      // let cmap = ['thistle', 'lightyellow', 'lightgreen'];
+      // let colorScale = d3.scaleSequential(d3.interpolateRgbBasis(cmap)).domain(domain);
+
+      features.push({
+          id: 6, name: name, label: 'sibling correlation',
+          domain: domain,
+          cmp: (a, b) => a < b,
+          filter: AttrRangeFilter(name, domain),
+          active: false,
+          cmap: cmap,
+          colorScale: colorScale,
+          color: p => colorScale(p.model[name]),
+          ticks:{n: 4, format:'.2f'},
+          interface: true
+      });
   }
 
 
