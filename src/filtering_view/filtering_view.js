@@ -19,7 +19,6 @@ export function FilteringView(container_, state_) {
   let model = Model();
   let msc = model.msc;
   let features = model.features;
-
   let {publish, subscribe, unsubscribe} = pubsub();
 
   root = d3.select(container.getElement()[0]);
@@ -35,7 +34,7 @@ export function FilteringView(container_, state_) {
   features
     .on('show', value => publish('filters.show', value))
     .on('update', () => publish('filters.update'))
-    .on('color_by', feature => publish('show.color_by', feature));
+    .on('color_by', feature => {console.log(feature);publish('show.color_by', feature)});
 
   root.select('.filtering_view').call(features);
 
@@ -83,6 +82,7 @@ export function FilteringView(container_, state_) {
   }
 
   function reset(data) {
+    //console.log("Reset: ", data);
     msc = data;
   }
 

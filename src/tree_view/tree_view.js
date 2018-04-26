@@ -92,7 +92,7 @@ export function LifelineView(container_, state_) {
     monitor('filters.new', (topic, filter) => tree.filter(filter));
     monitor('filters.show', (topic, value) => tree.show(value));
     monitor('filters.update', (topic) => tree.update());
-    monitor('show.color_by', (topic, feature) => tree.color_by(feature));
+    monitor('show.color_by', (topic, feature) => { tree.color_by(feature)});
   }
 
   function monitor(topic, cb) {
@@ -146,6 +146,7 @@ export function LifelineView(container_, state_) {
     visit(msc.tree, 'parent_similarity', node => node.parent);
     visit(msc.tree, 'fitness');
     visit(msc.tree, 'sibling_similarity', sibling );
+
     msc.partitions.forEach( p => p.model.minmax = p.minmax);
 
 
