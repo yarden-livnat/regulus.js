@@ -80,7 +80,7 @@ def get_samples():
 
     except Exception as e:
         print(e)
-        return json.dumps("Can't resample provided data")
+        print("Error, Could not get new samples")
 
 
 @app.route('/status/<job_id>')

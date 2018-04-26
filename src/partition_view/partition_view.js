@@ -161,6 +161,12 @@ export function PartitionView(container_, state_) {
     root.select('.pv_sibling_similarity')
       .text(current && current.model && format_f(current.model.sibling_similarity));
 
+    root.select('.pv_parent_correlation')
+        .text(current && current.model && format_f(current.model.parent_correlation));
+
+    root.select('.pv_sibling_correlation')
+        .text(current && current.model && format_f(current.model.sibling_correlation));
+
     root.select('.pv_notes')
       .property('value', current && current.notes || "")
       .attr('disabled', current ? null : true);
