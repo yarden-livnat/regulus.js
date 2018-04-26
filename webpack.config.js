@@ -1,9 +1,11 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const DelWebpackPlugin = require('del-webpack-plugin')
+const DelWebpackPlugin = require('del-webpack-plugin');
+const WebpackMd5Hash = require('webpack-md5-hash');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-  mode: 'development',
+  // mode: 'development',
   entry: {
     app: './src/app/app.js',
 
@@ -21,6 +23,10 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/app/index.html'
     }),
+    new WebpackMd5Hash(),
+    new MiniCssExtractPlugin({
+      filename: 'style.[contenthash].css',
+    }),
   ],
   output: {
     filename: '[name].[chunkhash].js',
@@ -28,9 +34,20 @@ module.exports = {
   },
   module: {
     rules: [
+      // { test: /\.(scss)$/,
+      //   use: [{ loader: 'style-loader', },
+      //         { loader: 'css-loader',  },
+      //         { loader: 'postcss-loader',
+      //           options: {
+      //             plugins: function () { // post css plugins, can be exported to postcss.config.js
+      //               return [require('precss'), require('autoprefixer') ];
+      //             }
+      //           }
+      //         },
+      //         { loader: 'sass-loader' }]
+      // },
       { test: /\.(scss)$/,
-        use: [{ loader: 'style-loader', },
-              { loader: 'css-loader',  },
+        use: ['style-loader', MiniCssExtractPlugin.loader,'css-loader',
               { loader: 'postcss-loader',
                 options: {
                   plugins: function () { // post css plugins, can be exported to postcss.config.js
@@ -38,7 +55,8 @@ module.exports = {
                   }
                 }
               },
-              { loader: 'sass-loader' }]
+              'sass-loader'
+            ]
       },
       { test: /\.less$/, use: [{loader: "style-loader"}, {loader: "css-loader"}, {loader: "less-loader"}] },
       { test: /\.css$/,  use: [ 'style-loader', 'css-loader' ] },
