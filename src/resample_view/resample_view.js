@@ -245,8 +245,8 @@ export function ResampleView(contianer_, state_) {
                 .text('  ' + pts);
         }
         else {
-            let coeff = current.partition.model.linear_reg.coeff;
-            let intercept = current.partition.model.linear_reg.intercept;
+            let coeff = current.partition.model.linear_reg.linear_reg.coeff;
+            let intercept = current.partition.model.linear_reg.linear_reg.intercept;
             let measure = current.spec.name;
             let dim_num = coeff.length;
             let y_avg = pts.map(x => x[measure]).reduce((p, c) => p + c, 0) / pts.length;
