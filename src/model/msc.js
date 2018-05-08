@@ -30,8 +30,9 @@ export class MSC {
     this.name = name;//shared.name;
     this.version = shared.version;
     this.shared = shared;
-    this.parms = _.params;
+    this.params = _.params;
     this.pts_idx = _.pts_idx;
+    this.type = _.type;
     this.pts = shared.pts;
 
     this.attrs = shared.attrs;

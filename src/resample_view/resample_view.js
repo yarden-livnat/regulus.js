@@ -79,7 +79,7 @@ export function ResampleView(contianer_, state_) {
         current = null;
         queue = [];
         root.select('#msc-parameters')
-            .text(Object.entries(msc.parms));//Object.entries(msc.parms));
+            .text(Object.entries(msc.params));//Object.entries(msc.parms));
         // root.select('.submit').attr('disabled', true);
     }
 

@@ -152,6 +152,12 @@ export function PartitionView(container_, state_) {
     root.select('.pv_max')
       .text(current && current.minmax && !isNaN(current.minmax[1]) ? d3.format('.2s')(current.minmax[1]) : '');
 
+    root.select('.pv_type1')
+      .text(model && model.msc && "Morse");
+
+    root.select('.pv_type2')
+      .text(model && model.msc && model.msc.type);
+
     root.select('.pv_fitness')
       .text(current && current.model && format_f(current.model.fitness));
 
