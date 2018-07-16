@@ -157,7 +157,6 @@ export function LifelineView(container_, state_) {
           let c = node.model.linear_reg.linear_reg.coeff;
           let o = other.model.linear_reg.linear_reg.coeff;
 
-
           if (c.norm === undefined) c.norm = norm(c);
           if (o.norm === undefined) o.norm = norm(o);
 
@@ -170,6 +169,10 @@ export function LifelineView(container_, state_) {
           node.model[feature] = node.model.linear_reg.fitness;
       for (let child of node.children)
         visit(child, feature, func);
+    }
+
+    function score(model, pts) {
+    
     }
 
     function norm(vec) {

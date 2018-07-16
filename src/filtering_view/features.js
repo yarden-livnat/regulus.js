@@ -17,6 +17,7 @@ export default function Features() {
   let slider = Slider();
   let features = [];
   let model = Model();
+  let _during_redraw = false;
 
   let dispatch = d3.dispatch('show', 'update', 'color_by');
 
@@ -28,8 +29,9 @@ export default function Features() {
   add_sibling_feature()
   add_minmax_feature();
   add_no_cmap();
-  add_parent_correlation_feature();
-  add_sibling_correlation_feature();
+  // correlation is not implemented yet
+  // add_parent_correlation_feature();
+  // add_sibling_correlation_feature();
 
   let idx = +localStorage.getItem('feature.color_by') || 0;
   model.color_by= features[idx];
@@ -72,9 +74,6 @@ export default function Features() {
   function add_parent_feature() {
     let name = 'parent_similarity';
     let domain = [-1, 1];
-    // let cmap = ["#4472a5", "#f2f2f2", "#d73c4a"];
-    // let cmap = ['thistle', 'lightyellow', 'lightgreen'];
-    // let colorScale = d3.scaleSequential(d3.interpolateRgbBasis(cmap)).domain(domain);
 
     features.push({
       id: 1, name: name, label: 'parent similarity',
@@ -93,9 +92,6 @@ export default function Features() {
   function add_sibling_feature() {
     let name = 'sibling_similarity';
     let domain = [-1, 1];
-    // let cmap = ["#4472a5", "#f2f2f2", "#d73c4a"];
-    // let cmap = ['thistle', 'lightyellow', 'lightgreen'];
-    // let colorScale = d3.scaleSequential(d3.interpolateRgbBasis(cmap)).domain(domain);
 
     features.push({
       id: 2, name: name, label: 'sibling similarity',
@@ -116,9 +112,6 @@ export default function Features() {
   function add_minmax_feature() {
     let name = 'minmax';
     let domain = [0, 1];
-    // let cmap = chromatic['interpolateRdYlBu'];
-    // let colorScale = d3.scaleSequential(cmap).domain(domain);
-    // let colorScale = d3.scaleLinear().domain(domain).range(['#bce2fe', '#fffebe', '#fd666e']);
     let cmap = ['#bce2fe', '#fffebe', '#fd666e'];
     let colorScale = d3.scaleSequential(d3.interpolateRgbBasis(cmap)).domain([0, 1]);
 
@@ -149,9 +142,6 @@ export default function Features() {
   function add_parent_correlation_feature() {
       let name = 'parent_correlation';
       let domain = [-1, 1];
-      // let cmap = ["#4472a5", "#f2f2f2", "#d73c4a"];
-      // let cmap = ['thistle', 'lightyellow', 'lightgreen'];
-      // let colorScale = d3.scaleSequential(d3.interpolateRgbBasis(cmap)).domain(domain);
 
       features.push({
           id: 5, name: name, label: 'parent correlation',
@@ -170,9 +160,6 @@ export default function Features() {
   function add_sibling_correlation_feature() {
       let name = 'sibling_correlation';
       let domain = [-1, 1];
-      // let cmap = ["#4472a5", "#f2f2f2", "#d73c4a"];
-      // let cmap = ['thistle', 'lightyellow', 'lightgreen'];
-      // let colorScale = d3.scaleSequential(d3.interpolateRgbBasis(cmap)).domain(domain);
 
       features.push({
           id: 6, name: name, label: 'sibling correlation',
@@ -231,6 +218,7 @@ export default function Features() {
   }
 
   function update_feature(feature, range) {
+    if (_during_redraw) return;
     let section = d3.select(this.parentNode.parentNode.parentNode.parentNode);
     feature.filter.range(range);
     section.select('.feature-value').text(`[${format(range[0])}, ${format(range[1])}]`);
@@ -275,8 +263,10 @@ export default function Features() {
   };
 
   api.redraw = function() {
+    _during_redraw = true;
     d3.selectAll('.feature-slider')
       .call(slider)
+    _during_redraw = false;
   };
 
   api.filter = function() {

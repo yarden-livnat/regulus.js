@@ -107,6 +107,7 @@ export default function Slider() {
           ;
         }
       } catch(e) {
+        // ignore
         // console.log(e);
       }
     });

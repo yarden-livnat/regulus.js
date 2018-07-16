@@ -140,12 +140,12 @@ export default function Lifeline() {
       .attr('opacity', 1);
 
     defs.append('stop')
-      .attr('offset', d => `${d.mid_percent}%`)
+      .attr('offset', d => `${d.mid_percent || 0}%`)
       .attr('stop-color', d => c(d.mid_value))
       .attr('opacity', 1);
 
     defs.append('stop')
-      .attr('offset', '100%')
+      .attr('offset', '100%') 
       .attr('stop-color', d => c(d.minmax[d.parent && d.parent.merge === 'min' ? 1 : 0]))
       .attr('opacity', 1);
 
